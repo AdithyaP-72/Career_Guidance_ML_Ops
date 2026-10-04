@@ -1,0 +1,105 @@
+# Every raw dataset, where it comes from, and which files we keep.
+# `uv run python -m src.data.download` fetches these into data/raw/<dest>/.
+# After downloading, each data/raw/<dest>/ folder is tracked with `dvc add`.
+#
+# `files` maps the name we save → the file's path inside the downloaded zip.
+# Kaggle's public download API currently needs no login. If that changes, use the
+# `kaggle` CLI with an API token instead.
+
+sources:
+  # ── core: training data and the drift reference ──────────────────────────────
+  naukri_2025:
+    url: https://www.kaggle.com/api/v1/datasets/download/shivamshrivastava21/indian-job-market-dataset-2025-2026
+    page: https://www.kaggle.com/datasets/shivamshrivastava21/indian-job-market-dataset-2025-2026
+    licence: CC BY-NC-SA 4.0
+    group: core
+    dest: naukri_2025
+    files:
+      naukri_2025.xlsx: indian-job-market-dataset-2025.xlsx
+
+  naukri_2019:
+    url: https://www.kaggle.com/api/v1/datasets/download/promptcloud/jobs-on-naukricom
+    page: https://www.kaggle.com/datasets/promptcloud/jobs-on-naukricom
+    licence: CC0
+    group: core
+    dest: naukri_2019
+    files:
+      naukri_2019.csv: home/sdf/marketing_sample_for_naukri_com-jobs__20190701_20190830__30k_data.csv
+
+  # ── comparison snapshots: role taxonomy + drift timeline ─────────────────────
+  naukri_2017:
+    url: https://www.kaggle.com/api/v1/datasets/download/PromptCloudHQ/jobs-on-naukricom
+    page: https://www.kaggle.com/datasets/PromptCloudHQ/jobs-on-naukricom
+    licence: CC BY-NC-SA 4.0
+    group: comparison
+    dest: naukri_2017
+    files:
+      naukri_2017.csv: naukri_com-job_sample.csv
+
+  naukri_2022:
+    url: https://www.kaggle.com/api/v1/datasets/download/kuchhbhi/latest-30k-jobs-data
+    page: https://www.kaggle.com/datasets/kuchhbhi/latest-30k-jobs-data
+    licence: CC0
+    group: comparison
+    dest: naukri_2022
+    files:
+      naukri_2022.csv: Naukri Jobs Data.csv
+
+  # ── supporting: education prior, occupations, courses (used after Step 4) ────
+  plfs:
+    url: https://www.kaggle.com/api/v1/datasets/download/pradnyakalvikatte/plfs-india-2017-18-to-2023-24
+    page: https://microdata.gov.in/NADA/index.php/catalog   # official MoSPI source
+    licence: Govt. of India (MoSPI); Kaggle mirror says CC0
+    group: supporting
+    dest: plfs
+    files:
+      plfs_perv1_2023_24.csv: perv1_2023_24.csv     # only the latest year; ~120 MB
+
+  nco_2015:
+    url: https://www.kaggle.com/api/v1/datasets/download/nemaleshwarh/national-classification-of-organisationnco-2015
+    page: https://www.kaggle.com/datasets/nemaleshwarh/national-classification-of-organisationnco-2015
+    licence: MIT (Govt. of India data)
+    group: supporting
+    dest: nco_2015
+    files:
+      nco2015_full.csv: nco2015_full.csv
+      nco2015_family.csv: family.csv
+      nco2015_group.csv: group.csv
+
+  nco_2015_descriptions:
+    url: https://www.kaggle.com/api/v1/datasets/download/shriabhinandansharma/nco-occupation-descriptions-dataset
+    page: https://www.kaggle.com/datasets/shriabhinandansharma/nco-occupation-descriptions-dataset
+    licence: MIT (Govt. of India data)
+    group: supporting
+    dest: nco_2015
+    files:
+      nco2015_descriptions.csv: EmbeddingsV-0.2.csv
+
+  nptel_swayam:
+    url: https://www.kaggle.com/api/v1/datasets/download/lakshyyaaaa/nptel-swayam-course-catalog
+    page: https://www.kaggle.com/datasets/lakshyyaaaa/nptel-swayam-course-catalog
+    licence: MIT
+    group: supporting
+    dest: courses
+    files:
+      nptel_swayam_courses.csv: merged_courses.csv
+
+  coursera_2025:
+    url: https://www.kaggle.com/api/v1/datasets/download/longnguyen3774/coursera-courses-metadata-for-analytics-2025
+    page: https://www.kaggle.com/datasets/longnguyen3774/coursera-courses-metadata-for-analytics-2025
+    licence: CC BY-NC-SA 4.0
+    group: supporting
+    dest: courses
+    files:
+      coursera_courses_2025.csv: courses_en.csv
+
+  onet_31_0:
+    url: https://www.onetcenter.org/dl_files/database/db_31_0_csv.zip
+    page: https://www.onetcenter.org/database.html
+    licence: CC BY 4.0
+    group: supporting
+    dest: onet_31_0
+    files:
+      software_skills.csv: db_31_0_csv/software_skills.csv
+      occupation_data.csv: db_31_0_csv/occupation_data.csv
+      job_zones.csv: db_31_0_csv/job_zones.csv

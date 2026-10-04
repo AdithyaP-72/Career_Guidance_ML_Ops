@@ -1,0 +1,11 @@
+{
+  "train": 54752,
+  "test": 13688,
+  "reference_2019": 20186,
+  "classes": 103,
+  "stable_classes_in_reference": 100,
+  "smallest_class_train": 84,
+  "largest_class_train": 4669,
+  "largest_class_share": 0.0853,
+  "largest_class": "Software Engineer (general)"
+}

@@ -1,0 +1,75 @@
+# canonical skill: [variants that mean the same thing]
+#
+# Before this map is applied, every tag is lower-cased, whitespace is collapsed and
+# spaces around / + - # . are removed ("c + +" → "c++", "ci / cd" → "ci/cd",
+# "pl / sql" → "pl/sql"), so those spellings don't need entries here.
+# Variants were found by grouping the 4,000 most common tags across the 2019, 2022
+# and 2025 Naukri snapshots (see notebooks/01_eda.ipynb, section 2).
+#
+# Judgement calls, open to change:
+#   - angularjs (1.x) is merged into angular: job postings use them interchangeably.
+#   - advanced excel / ms excel are merged into excel: the search box should offer one "excel".
+#   - tally erp / tally prime are merged into tally.
+
+# ── programming & web ──────────────────────────────────────────────────────────
+javascript: [java script, js]
+react.js: [react, react js, reactjs]
+node.js: [node, node js, nodejs]
+angular: [angularjs, angular js, angular.js]
+html: [html5, html 5]
+css: [css3, css 3]
+c#: [c sharp, c#.net, c# net]
+.net: [dot net, dotnet, .net framework]
+asp.net: [asp net, asp.net mvc]
+vb.net: [vb net]
+spring boot: [springboot]
+microservices: [micro services, microservice]
+web services: [webservices]
+web api: [webapi]
+multithreading: [multi-threading]
+object oriented programming: [object-oriented programming, oops, oop]
+object oriented design: [object-oriented design, ood]
+software development life cycle: [software development lifecycle, sdlc]
+e-commerce: [ecommerce]
+
+# ── data & cloud ───────────────────────────────────────────────────────────────
+power bi: [powerbi]
+pl/sql: [plsql]
+t-sql: [tsql]
+sql server: [ms sql, mssql, ms sql server, microsoft sql server]
+postgresql: [postgres]
+mongodb: [mongo db]
+dynamodb: [dynamo db]
+elasticsearch: [elastic search]
+databricks: [data bricks]
+machine learning: [ml]
+artificial intelligence: [ai]
+generative ai: [gen ai, genai]
+aws: [amazon web services]
+gcp: [google cloud, google cloud platform]
+kubernetes: [k8s]
+ci/cd: [cicd]
+
+# ── enterprise apps ────────────────────────────────────────────────────────────
+sap s/4hana: [s/4 hana, s4 hana, s4hana, s/4hana, sap s/4 hana, sap s4 hana, sap s4hana]
+smartforms: [smart forms]
+
+# ── office, accounting, support ────────────────────────────────────────────────
+excel: [ms excel, microsoft excel, advanced excel, ms-excel]
+ms office: [microsoft office, ms-office, ms office suite]
+tally: [tally erp, tally erp 9, tally erp9, tally prime, tallyprime]
+gst: [goods and services tax]
+help desk: [helpdesk]
+troubleshooting: [trouble shooting]
+telecaller: [tele caller, telecalling, tele calling]
+proofreading: [proof reading]
+sales & marketing: [sales marketing]
+
+# ── communication ──────────────────────────────────────────────────────────────
+communication skills: [communication, good communication skills, excellent communication skills, effective communication]
+english: [spoken english, fluent english, english proficiency]
+
+# ── degrees that appear as skill tags ──────────────────────────────────────────
+b.ed: [bed]
+b.com: [bcom]
+b.tech: [btech]

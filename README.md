@@ -140,16 +140,18 @@ The 2025 data has 55k unique free-text titles and no role column. Labels come fr
 
 Why not just use the most common raw titles? We tried. Automatic matching produces useless generic labels: the top "roles" come out as *manager*, *engineer*, *developer*, *executive*. The role list has to be hand-curated.
 
-First attempt at roles (~113 rules, ~2 hours):
-- 80% of 2025 postings get a specific role;
-- **102 roles have ≥ 100 postings** (70 have ≥ 300). Those 102 are the classes.
+The rules define **113 candidate roles**. They are *not* automatically the classes. Which roles the model learns is decided by **comparing every snapshot** (2017, 2019, 2022, 2025) in the `taxonomy` pipeline stage, using thresholds in `params.yaml` (results in 2.5):
+- **stable**: enough postings in 2025 (to learn) *and* in 2019 (so we can measure drift for that role);
+- **emerging**: enough in 2025 only (new or fast-growing roles; the product recommends them, but a 2019-trained model can't know them);
+- **excluded**: too rare in 2025 to learn.
 
-Checking the resulting skill lists catches rule bugs. Three we found and fixed:
+Checking each role's skill list catches rule bugs, and the tests in `tests/test_labels.py` keep fixed bugs fixed. Four found so far:
 - `unity` matched "Opport**unity**", so generic ads became *Game Developer*;
 - `hiring` put BPO ads under *Recruiter*;
-- `secretary` caught *Company Secretary* titles and filed them under *Executive Assistant*.
+- `secretary` caught *Company Secretary* titles and filed them under *Executive Assistant*;
+- the building-*Architect* rule caught "Solution Architect" (found by a unit test).
 
-Expect more bugs like these. Reviewing each role's top skills is part of the labelling work.
+Expect more. Reviewing each role's top skills (notebook section 9) is part of the labelling work.
 
 The 22 families come from grouping 2019's 72 Naukri `Functional Area` values:
 
@@ -157,7 +159,16 @@ The 22 families come from grouping 2019's 72 Naukri `Functional Area` values:
 
 **Why this is checkable:** 2019 has *both* titles and Naukri's own labels (`Functional Area`, plus a 649-value `Role` column). So we run our rules on the 2019 titles and measure how often the **family** they assign agrees with Naukri's. That agreement rate is a tracked pipeline metric (`reports/label_quality.json`), alongside coverage and postings per role. Improving the rules is a normal commit: `dvc repro` reruns only the labelling stage and everything after it.
 
-First attempt at family-level agreement (22 rules): 78% coverage on 2019 titles, **68% agreement** with Naukri's labels. Phase 1 goal: ≥ 80%. Some disagreement is Naukri's own noise, since recruiters pick the functional area themselves.
+Current rules, as measured by the pipeline:
+
+| Snapshot | Titles given a role | Family agreement with Naukri |
+|---|---|---|
+| 2017 | 78.9% | 67.3% (16,491 postings compared) |
+| 2019 | 79.9% | 67.2% (22,684 postings compared) |
+| 2022 | 87.0% | n/a |
+| 2025 | 78.5% | n/a |
+
+**Read the agreement number with care.** `reports/labels/disagreements.csv` shows that the biggest "disagreements" are Naukri's taxonomy being coarser than ours. Naukri files DevOps engineers, project managers, business analysts, SAP consultants and testers all under *IT Software – Application Programming*. So the Phase 1 goal is not a fixed percentage. It's to fix the *real* rule errors in that file, and the most common uncaught titles in `reports/labels/unlabelled_titles.csv`.
 
 ### 2.4 Feasibility check (done before committing)
 | Test | Result |
@@ -173,6 +184,30 @@ First attempt at family-level agreement (22 rules): 78% coverage on 2019 titles,
 | Education → family (Naukri 2015–17, share of postings asking for the degree) | B.Com → Accounts 56% · B.Tech → Software 49% · B.A → Sales 22% / Journalism 15% · MBBS → Medical 93% · LLB → Legal 63% · B.Ed → Teaching 75% |
 | Skill → course coverage (top‑200 Naukri skills) | NPTEL/SWAYAM title match: 93 · Coursera skill-tag exact match: 95 |
 
+(These were quick experiments before the pipeline existed. The numbers below come from the pipeline itself.)
+
+### 2.5 Which roles become classes: the cross-snapshot comparison
+Produced by `uv run dvc repro` → `reports/taxonomy/role_support.csv` (every role's usable postings per snapshot, its share change 2019 → 2025, and what Naukri's own 2019 `Role` label calls those postings). Explore it in notebook section 7.
+
+With the current thresholds (≥ 100 postings in 2025, ≥ 20 in 2019): **113 candidates → 103 classes (100 stable + 3 emerging), 10 excluded.** The classes cover all 22 families and 77.8% of usable 2025 postings. The 100 stable classes cover 78.9% of usable 2019 postings, giving a **20,186-posting 2019 reference set** for the drift experiment.
+
+| Finding | Detail |
+|---|---|
+| Emerging (enough in 2025, too rare in 2019) | ServiceNow Developer (14 → 303 postings), Trust & Safety / Content Moderator (1 → 251), MEP / HVAC Engineer (18 → 127) |
+| Excluded (< 100 in 2025) | Quantity Surveyor (99), Node.js Developer (97), **iOS Developer (95, steadily falling: 165 → 143 → 117 → 95 from 2017 to 2025)**, Data Entry Operator, Medical Representative, Instrumentation Engineer, Lab Technician, Pharmacist, Physiotherapist, Game Developer |
+| Role-level drift 2019 → 2025 (change in share of postings) | ML / AI Engineer **×6.0** (59 → 1,186 postings), Data Engineer ×2.5, Accounts Payable/Receivable ×2.3, SAP Consultant ×2.2 · .NET Developer **×0.32**, Java Developer ×0.52, Content Writer ×0.52, Graphic Designer ×0.54 |
+| 2022 snapshot is IT-only in practice | e.g. Content Writer 15, Graphic Designer 7, Site Engineer 3 postings (vs. 365 / 423 / 469 in 2025). Use 2022 for tech roles only |
+| 2017 behaves like 2019 | Similar counts per role, so it's a second "past" point and a check that 2019 isn't a fluke |
+| Weakest roles by Naukri-label agreement (review these rules first) | R&D / Process Engineer (Naukri's top label is "Other", 7%), Video Editor / Animator (10%), Data Analyst (12%; the catch-all `analyst` rule is too broad) |
+| Thin 2019 baseline (< 60 postings) | ML / AI Engineer, Staff Nurse, Chef / Cook, Interior Designer, Payroll Executive and 10 more. Their drift numbers will be noisy |
+| Class balance (train split) | Largest: Software Engineer (general), 4,669 postings (8.5%). Smallest: 84 |
+
+**Decision so far:** keep these thresholds for the first baselines (103 classes). The team reviews notebook sections 6–9 and records any change in its "Decisions" cell. Changing a threshold is one line in `params.yaml` plus `uv run dvc repro`. Or try one without editing anything: `uv run dvc exp run -S taxonomy.min_reference_postings=50`.
+
+**Starter rule work found by the reports:**
+- *application lead* is the most common uncaught 2025 title (1,145 postings, an Accenture template), followed by *application support engineer*, *technical lead – l1*, *application designer*, *security architect* and *solution architect*. Decide which roles these belong to;
+- `net` (108 tags) is probably `.net` and should go in `skill_aliases.yaml`.
+
 ---
 
 ## 3. Phase 1: Development & Reproducibility
@@ -187,103 +222,173 @@ git clone <repo> && uv sync && dvc pull && dvc repro
 
 and get the **same metrics**, with every run visible in MLflow. Every step below works toward that.
 
-### Step 0: Decisions to lock in on day 1 (seniors' "versions!!!" advice)
-- **One package manager: `uv`.** It's fast, it writes a lockfile (`uv.lock`) and it pins the Python version. Never mix in `pip install` or conda. Install: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
-- **Python 3.12.**
-- **No neural model in Phase 1.** On sparse skill features, scikit-learn and LightGBM are the right tools. If a Keras MLP is added later (for the TF Serving / TFLite quantization path the seniors used), read TensorFlow's NumPy compatibility notes before adding it.
+### Status
+| Steps | State |
+|---|---|
+| 0–4 (setup, repo, data + DVC, EDA, features) | ✅ **Code written and tested end-to-end** (28 unit tests; full `dvc repro` in ~2 min). **Your setup still to do**, see the checklist below |
+| 5–8 (baselines, `dvc.yaml` train/evaluate stages, MLflow, evaluation) | ⏳ Next |
+
+### Your setup checklist (do this yourselves, per the seniors)
+Every command below was run on a clean machine with the versions uv resolves today. Run them from the repo root.
+
+**A. Install the tools (each teammate, once)**
+1. **uv**:
+   - Linux/macOS: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+   - Windows PowerShell: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+
+   Check with `uv --version`. uv downloads Python 3.12 by itself; you don't install Python separately.
+2. **Git**, plus a **GitHub** account.
+3. A **DagsHub** account (sign up with GitHub). It gives us free DVC storage now and a hosted MLflow server in Step 7.
+
+**B. Create the Python environment (one person, once; others just run `uv sync`)**
+```bash
+uv init --bare --python 3.12 --name career-guidance --pin-python   # only writes pyproject.toml + .python-version
+uv add pandas pyarrow openpyxl scikit-learn pyyaml matplotlib fg-data-profiling "dvc[s3]"
+uv add --dev pytest ruff jupyter
+uv run pytest -q                                                    # expect: 28 passed
+git add pyproject.toml uv.lock .python-version && git commit -m "uv project + lockfile"
+```
+- Plain `uv init` (without `--bare`) would create a `src/career_guidance/` package layout that clashes with our `src/`.
+- `lightgbm` and `mlflow` get added in Step 5. I've checked that they resolve together with everything above.
+
+**C. Download the raw data (one person, once)**
+```bash
+uv run python -m src.data.download --list   # what will be fetched, with licences
+uv run python -m src.data.download          # ~260 MB, ~1–2 min, into data/raw/<name>/
+```
+
+**D. Version the data with DVC**
+```bash
+uv run dvc init
+uv run dvc add data/raw/naukri_2025 data/raw/naukri_2019 data/raw/naukri_2017 data/raw/naukri_2022 data/raw/nco_2015 data/raw/courses data/raw/onet_31_0
+git add .dvc .dvcignore data/raw/*.dvc data/raw/.gitignore
+git commit -m "Track raw datasets with DVC"
+```
+**PLFS is deliberately left out.** It's MoSPI survey microdata, and our DagsHub repo is public. Pushing it there would mean redistributing it, and MoSPI's data-use terms may not allow that. It stays on your machine only (`data/raw/plfs/` is in `.gitignore`), and nothing before the education-prior stage uses it. Once the terms are checked, track it with `dvc add data/raw/plfs` after removing that `.gitignore` line. Publishing aggregated tables derived from it is the safer route either way.
+
+**E. Connect DagsHub as the storage remote**
+1. On DagsHub, create a **public** repository **connected to the GitHub repo**. Code stays on GitHub; DagsHub adds storage and MLflow. Add the three teammates as collaborators with **write** access.
+   - Why public: the free plan allows only 2 collaborators and 100 tracked experiments on *private* repos. Public repos have no limit on either.
+   - What that means: anyone can see what you push (data, metrics, models), and a leaked token gives write access. So never commit a token, and revoke one immediately if it slips.
+2. Get a token: DagsHub → your avatar → **User Settings → Tokens**.
+3. In the DagsHub repo, click **Remote → Data → DVC**. It shows the exact commands. They look like this:
+   ```bash
+   uv run dvc remote add -d origin s3://dvc
+   uv run dvc remote modify origin endpointurl https://dagshub.com/<user>/<repo>.s3
+   uv run dvc remote modify origin --local access_key_id <your-token>
+   uv run dvc remote modify origin --local secret_access_key <your-token>
+   ```
+   **`--local` matters:** it puts the token in `.dvc/config.local`, which DVC keeps out of Git. The first two lines go into `.dvc/config`, which *is* committed.
+4. Commit and push:
+   ```bash
+   git add .dvc/config && git commit -m "DagsHub DVC remote"
+   uv run dvc push
+   ```
+
+**F. Run the pipeline**
+```bash
+uv run dvc repro          # ingest → profiling → label → taxonomy → split → profiles (~2 min)
+uv run dvc metrics show   # the numbers in sections 2.3 and 2.5
+git status                # dvc.lock, reports/*.json, reports/labels, reports/taxonomy, new .gitignore files
+git add -A && git commit -m "Run Phase 1 data pipeline"
+uv run dvc push && git push
+```
+
+**G. Explore**
+- Open `notebooks/01_eda.ipynb` in VS Code (kernel: `.venv`) or with `uv run jupyter lab`.
+- The profiling reports are in `reports/profiling/naukri_<year>.html`. Open them in a browser.
+
+**H. Every other teammate**
+```bash
+git clone <github-url> && cd <repo>
+uv sync
+uv run dvc remote modify origin --local access_key_id <their-token>
+uv run dvc remote modify origin --local secret_access_key <their-token>
+uv run dvc pull
+uv run dvc repro          # should print "Data and pipelines are up to date."
+```
+That last line is the Phase 1 reproducibility check.
+
+### Step 0: Decisions locked in (seniors' "versions!!!" advice)
+- **One package manager: `uv`.** It writes `uv.lock`, which pins every package including sub-dependencies. Never `pip install` into this project.
+- **Python 3.12**, pinned in `.python-version`.
+- **pandas 2.3, not 3.x.** The profiling library requires `pandas<3` and `numpy<2.4`, and uv picks the newest versions that fit. All our code is tested on these versions.
+- **`fg-data-profiling`, not `ydata-profiling`.** We read the docs before installing and hit two problems:
+  - ydata-profiling 4.18 is deprecated (its own import warning says to switch to `fg-data-profiling`, from the same team);
+  - it crashes on import with current setuptools, because it uses `pkg_resources`, which setuptools 81+ removed.
+
+  `fg-data-profiling` (imported as `data_profiling`) is its maintained continuation and has neither problem. This is exactly the kind of version error the seniors warned about.
+- **No neural model in Phase 1.** scikit-learn + LightGBM on sparse skill features. A Keras MLP may come later as a challenger (see section 1).
 - **Dataset approval:** get the core and supporting datasets in 2.1 (#1–8) approved by faculty. Mention the CC BY‑NC‑SA licences (Naukri 2025, Naukri 2015–17, Coursera) and that PLFS comes from MoSPI.
 
-### Step 1: Repository structure (cookiecutter-data-science style)
+### Step 1: Repository structure
 ```
-career-guidance/
 ├── configs/
-│   ├── role_rules.yaml      # title regex → specific role + family (versioned, reviewed like code)
-│   ├── skill_aliases.yaml   # "reactjs" / "react js" / "react.js" → "react"
-│   └── family_nco.yaml      # role family ↔ NCO-2015 codes ↔ Naukri functional areas
-├── data/
-│   ├── raw/                 # DVC-tracked, never edited by hand
-│   ├── interim/             # tidy parquet, skills as normalised lists
-│   └── processed/           # labelled + train/test splits
-├── notebooks/               # 01_eda.ipynb, 02_baselines.ipynb
-├── scripts/download.sh      # fetches raw data (Kaggle public API + O*NET)
+│   ├── sources.yaml             # every raw dataset: URL, licence, which files to keep
+│   ├── skill_aliases.yaml       # "reactjs" / "react js" / "react" → "react.js"
+│   ├── role_rules.yaml          # title regex → candidate role + family (first match wins)
+│   └── functional_area_map.yaml # Naukri's 2017/2019 labels → our families (to score the rules)
+├── data/                        # all DVC-managed, never in Git
+│   ├── raw/<source>/            # as downloaded; one .dvc file per folder
+│   ├── interim/                 # postings.parquet (all snapshots, tidy), labelled.parquet
+│   └── processed/               # classes.json, train / test / reference_2019 .parquet
+├── models/                      # skill_profiles.json, skill_cooccurrence.npz, skill_vocab.json (+ model in Step 5)
+├── notebooks/01_eda.ipynb
+├── reports/                     # metrics JSON, labels/ and taxonomy/ CSVs, profiling/ HTML
 ├── src/
-│   ├── data/{ingest.py, label.py, split.py}
-│   ├── features/build.py    # sklearn ColumnTransformer
-│   └── models/{train.py, evaluate.py, profiles.py}
-├── models/                  # DVC outputs: model.pkl, skill_profiles.json
-├── reports/                 # metrics.json, label_quality.json, plots, profiling HTML
-├── params.yaml              # every tunable value lives here
-├── dvc.yaml                 # the pipeline
-├── pyproject.toml + uv.lock
-├── .gitignore  .dvcignore
-└── README.md / journey.md
+│   ├── utils.py                 # paths, config loading, skill + experience parsing
+│   ├── data/                    # download, ingest, profile, label, taxonomy, split
+│   ├── features/build.py        # the sklearn feature pipeline + skill dropout
+│   └── models/profiles.py       # per-role skill profiles (train/evaluate come in Step 5)
+├── tests/                       # pytest: skills, labelling rules, features
+├── dvc.yaml  params.yaml        # the pipeline and every tunable value
+├── pyproject.toml  uv.lock  .python-version   # created by you in step B
+├── ruff.toml  conftest.py  .gitignore
+└── README.md
 ```
+Every pipeline script runs as `uv run python -m src.<module>` from the repo root.
 
-```bash
-uv init --python 3.12
-uv add pandas pyarrow openpyxl scikit-learn lightgbm mlflow dvc ydata-profiling pyyaml
-uv add --dev ruff jupyter pytest
-```
-`openpyxl` is needed because the 2025 data comes as `.xlsx`. "Pandas Profiler" is now called **`ydata-profiling`**. It has lagged behind new NumPy releases before, so check its supported versions before adding it.
+### Step 2: Data, Git and DVC (remember: versioning ≠ storage)
+- **Getting the data:** `src/data/download.py` reads `configs/sources.yaml` and keeps only the files we need from each zip. For example, it keeps 3 of O\*NET's ~40 files and only the 2023‑24 PLFS year, so storage stays at ~260 MB. Kaggle's public API needs no login today; if that changes, use the `kaggle` CLI with a token.
+- **Versioning** = the small `data/raw/*.dvc` files and `dvc.lock`, which hold content hashes. These go in **Git**.
+- **Storage** = the DagsHub **DVC remote**, which holds the actual bytes (`dvc push` / `dvc pull`).
+- **Pipeline outputs** (`data/interim`, `data/processed`, `models/`, `reports/profiling`) are DVC-tracked too, so `dvc pull` gives teammates the outputs without re-running anything. Small review files (`reports/*.json`, `reports/labels/`, `reports/taxonomy/`) are committed to Git so they show up in diffs and on GitHub.
+- **Adding a new snapshot later** (e.g. a 2026 scrape) = add it to `sources.yaml` and a loader in `ingest.py`, then `dvc add`, `dvc repro`, commit. That's our data-versioning story, and the new snapshot becomes "live traffic" for monitoring.
 
-### Step 2: Getting the data, Git and DVC (remember: versioning ≠ storage)
-These Kaggle downloads currently work **without a Kaggle login** through the public API. If that ever changes, use the `kaggle` CLI with an API token.
-```bash
-# scripts/download.sh
-K=https://www.kaggle.com/api/v1/datasets/download
-curl -L -o /tmp/n2025.zip   $K/shivamshrivastava21/indian-job-market-dataset-2025-2026   # core
-curl -L -o /tmp/n2019.zip   $K/promptcloud/jobs-on-naukricom                             # core
-curl -L -o /tmp/n2017.zip   $K/PromptCloudHQ/jobs-on-naukricom                           # education prior
-curl -L -o /tmp/plfs.zip    $K/pradnyakalvikatte/plfs-india-2017-18-to-2023-24           # education prior (~800 MB unzipped; or official MoSPI download)
-curl -L -o /tmp/nco.zip     $K/nemaleshwarh/national-classification-of-organisationnco-2015
-curl -L -o /tmp/ncod.zip    $K/shriabhinandansharma/nco-occupation-descriptions-dataset
-curl -L -o /tmp/nptel.zip   $K/lakshyyaaaa/nptel-swayam-course-catalog
-curl -L -o /tmp/cour.zip    $K/longnguyen3774/coursera-courses-metadata-for-analytics-2025
-curl -L -o /tmp/onet.zip    https://www.onetcenter.org/dl_files/database/db_31_0_csv.zip
-# unzip each into data/raw/<name>/
-```
-```bash
-dvc init
-dvc add data/raw/naukri_2025 data/raw/naukri_2019 data/raw/naukri_2017 data/raw/plfs \
-        data/raw/nco_2015 data/raw/courses data/raw/onet_31_0      # → commit the .dvc files
-dvc remote add -d storage <remote>
-dvc push
-```
-PLFS is the big one (~120 MB per year). Start with just the 2023‑24 file, and only keep the columns we use (education, technical education, occupation, weight) in `data/interim`.
-- **Versioning** means small `.dvc` and `dvc.lock` files that hold content hashes. These go in Git.
-- **Storage** is the DVC *remote* that holds the actual bytes.
-- **Remote choice:** the Google Drive remote now needs your own Google Cloud OAuth client or service account, because the default DVC app is blocked. Read DVC's gdrive docs first. **DagsHub** is a simpler option for a team: it gives a free DVC remote *and* a hosted MLflow server.
-- Raw data never goes into Git. Add `.gitignore` before the first commit (100 MB push limit).
-- Each new snapshot (e.g. a 2026 scrape) is just another `dvc add` and commit. That's our data-versioning demonstration, and it becomes "live traffic" for monitoring.
+### Step 3: Data exploration
+Two layers:
+- **Automated profiling** (`profiling` stage): one `fg-data-profiling` report per snapshot in `reports/profiling/`.
+- **Project-specific EDA** (`notebooks/01_eda.ipynb`): it reads pipeline outputs, so it runs in seconds. It covers snapshot summary, skills per posting and vocabulary size, unmerged synonyms, skill drift, experience, rule quality, the role comparison (2.5), class balance, and a skill-profile sanity check.
 
-### Step 3: Data exploration (`notebooks/01_eda.ipynb`)
-- Run a `ydata-profiling` report per year and save it to `reports/`.
-- **Skills:**
-  - check the separators (`,` in 2025, `|` in 2019) and the leading/trailing spaces;
-  - look at casing and synonyms (`react` / `react.js` / `reactjs`), which go into `skill_aliases.yaml`;
-  - count tags per posting and plot vocabulary coverage against vocabulary size;
-  - treat postings with no skills (0.6% in 2025, 4% in 2019) as unusable.
-- **Titles → families:**
-  - look at the top 200 titles and at what the rules miss (~24%);
-  - find where rules and Naukri's labels disagree on 2019, and why.
-- **Class balance:** Software Development is ~25–33% of postings, while Legal and Hospitality are under 1%. Use macro‑F1 and `class_weight="balanced"`, and set a minimum family size (e.g. 100) in `params.yaml`.
-- **Experience:** 2025 has `minimumExperience`/`maximumExperience`; 2019 has strings like `"5 - 10 yrs"`. Parse both to a number. Use the posting's **minimum** experience as the feature, since the user enters a single number.
-- **Duplicates:** the same job is often reposted. Deduplicate on (title, company, skills).
-- **Train/serve consistency:** only use features the form collects, i.e. skills and experience. Company, location and salary may predict the family, but the app doesn't ask for them, so they stay out of the model.
+What cleaning does (`ingest` stage), and what we found:
+
+| | 2017 | 2019 | 2022 | 2025 |
+|---|---|---|---|---|
+| Postings after removing exact duplicates | 21,321 | 29,249 | 26,252 | 89,052 |
+| Duplicates removed | 679 | 176 | **6,486 (20%)** | **8,877 (9%)** |
+| Median skills per posting | n/a (no tags) | 8 | 8 | 8 |
+| Postings with no skills | 100% | 3.6% | 0.02% | 0.6% |
+| Distinct skills (after aliases) | n/a | 14,462 | 14,982 | 43,833 |
+
+- **Separators differ per snapshot:** `,` in 2025, `|` in 2019, newlines in 2022. Normalisation also removes the spaces Naukri puts around punctuation ("c + +" → "c++", "ci / cd" → "ci/cd") and maps ~50 synonym groups (`configs/skill_aliases.yaml`, mined from the 4,000 most common tags).
+- **Vocabulary size:** with the top 1,500 skills, **87%** of 2025 postings keep ≥ 3 known skills (top 500: 69%, top 1,000: 82%). That's why `top_k_skills = 1500`.
+- **Skill drift 2019 → 2025** (% of postings): javascript 8.0 → 3.2, html 6.4 → 1.7, jquery 3.8 → 0.6, mysql 3.3 → 0.7 · sap 1.1 → 5.1, software testing 0.3 → 2.1, continuous integration 0.3 → 1.8, kubernetes 0.01 → 1.6.
+- **Experience:** median minimum experience is 2–3 years in every snapshot. The model uses the posting's **minimum** (`exp_min`), since a user enters one number.
+- **Train/serve consistency:** only features the form collects (skills, experience). Company, location and salary stay out of the model.
 
 ### Step 4: Features (`src/features/build.py`)
-- **Skills → multi-hot vector over the top‑K vocabulary.** `CountVectorizer(analyzer=identity, binary=True, max_features=K)` works directly on a column of skill lists. `identity` must be a top-level function so the pipeline can be pickled. K (start at 1,500) lives in `params.yaml`.
-- **Experience:** clip to 0–20 and scale.
-- **Skill dropout (training only):** add copies of each training posting reduced to 2–6 random skills. Users enter ~5 skills while postings have ~8, so this makes training look like real use. Never apply it to the test set. The test set gets its own fixed 5-skill version for the headline metric.
-- Put everything in an **sklearn `Pipeline` + `ColumnTransformer`**. The vocabulary is then learned from the training split only (no leakage), and the whole thing is one artifact to serve. The serving vocabulary *is* the search box's list.
-- **Skill profiles (for O2/O3, pandas, not a model):** for each role, compute:
-  - the share of postings asking for each skill, giving the core skills (≥ 8%) and the readiness weights;
-  - skill co-occurrence counts, which order the learning path;
-  - growth 2019 → 2025;
-  - the 5 most common raw titles;
-  - the typical experience range.
+- `make_preprocessor(top_k, exp_clip)` is an sklearn `ColumnTransformer` with two parts:
+  - **skills:** `CountVectorizer(analyzer=identity, binary=True, max_features=1500)` straight on the skill lists, giving a sparse 0/1 vector;
+  - **experience:** median-impute → clip to 0–20 → scale to 0–1.
 
-  This is written to `models/skill_profiles.json` and versioned by DVC like the model.
+  It's fit on the train split only, so there's no leakage. The fitted vocabulary *is* the search box's list. Skills outside it are ignored at serving time (tested). `identity` and `clip_experience` are top-level functions so the fitted pipeline can be pickled (tested).
+- `skill_dropout(df, copies, min_k, max_k, seed)`: training-time augmentation that adds copies of each posting cut to 2–6 random skills. It's applied in Step 5 to the training split only.
+- `sample_skills(...)`: gives each test posting (and each 2019 reference posting) a fixed 5-skill `skills_eval` column in the `split` stage. **The headline metric uses `skills_eval`**, because users type ~5 skills while postings list ~8.
+- **Skill profiles** (`profiles` stage, from the *train* split only, since the profile-matching baseline predicts from them):
+  - per role, the core skills (≥ 8% of the role's postings, max 12), the top 30 skills with shares, common titles, and experience quartiles (`models/skill_profiles.json`);
+  - skill growth 2019 → 2025;
+  - a 1,500×1,500 skill co-occurrence matrix that orders the learning path (`models/skill_cooccurrence.npz` + `skill_vocab.json`).
+- **Splits** (`split` stage): 2025 class postings with ≥ 3 skills → **54,752 train / 13,688 test** (stratified by role, seed 42). Plus **20,186** 2019 postings in the 100 stable classes as the drift reference.
 
 ### Step 5: Baseline models
 | Model | Why |
@@ -301,64 +406,39 @@ Use a stratified split with a fixed seed, both set in `params.yaml`.
 - top‑3 accuracy of the family implied by the predicted role;
 - macro‑F1;
 - a per-role report;
-- a confusion matrix at family level (102×102 is unreadable).
+- a confusion matrix at family level (103×103 is unreadable).
 
 Expect confusion between neighbouring roles: Java vs. Full Stack, Data Analyst vs. BI Developer, Sales Executive vs. BDE.
 
 ### Step 6: The DVC pipeline (`dvc.yaml`)
-```yaml
-stages:
-  ingest:      # raw → tidy parquet; skills split, normalised, aliased
-    cmd: uv run python -m src.data.ingest
-    deps: [src/data/ingest.py, configs/skill_aliases.yaml, data/raw/naukri_2019.csv, data/raw/naukri_2025.xlsx]
-    outs: [data/interim/postings_2019.parquet, data/interim/postings_2025.parquet]
-  label:       # title → role family; scores the rules against Naukri's 2019 labels
-    cmd: uv run python -m src.data.label
-    deps: [src/data/label.py, configs/role_rules.yaml, data/interim/postings_2019.parquet, data/interim/postings_2025.parquet]
-    params: [label]
-    outs: [data/processed/labelled_2019.parquet, data/processed/labelled_2025.parquet]
-    metrics: [reports/label_quality.json: {cache: false}]
-  split:
-    cmd: uv run python -m src.data.split
-    deps: [src/data/split.py, data/processed/labelled_2025.parquet]
-    params: [split]
-    outs: [data/processed/train.parquet, data/processed/test.parquet]
-  train:
-    cmd: uv run python -m src.models.train
-    deps: [src/models/train.py, src/features/build.py, data/processed/train.parquet]
-    params: [features, train]
-    outs: [models/model.pkl]
-  evaluate:
-    cmd: uv run python -m src.models.evaluate
-    deps: [src/models/evaluate.py, models/model.pkl, data/processed/test.parquet]
-    metrics: [reports/metrics.json: {cache: false}]
-    plots: [reports/confusion_matrix.png]
-  profiles:    # skill shares, 2019→2025 growth, typical titles per family
-    cmd: uv run python -m src.models.profiles
-    deps: [src/models/profiles.py, data/processed/labelled_2019.parquet, data/processed/labelled_2025.parquet]
-    params: [profiles]
-    outs: [models/skill_profiles.json]
-  lookups:     # education prior (Naukri 2017 + PLFS via NCO), skill → course links (NPTEL/SWAYAM, Coursera)
-    cmd: uv run python -m src.models.lookups
-    deps: [src/models/lookups.py, configs/family_nco.yaml, data/raw/naukri_2017, data/raw/plfs, data/raw/nco_2015, data/raw/courses, models/skill_profiles.json]
-    outs: [models/education_prior.json, models/course_links.json]
-```
-```yaml
-# params.yaml
-label:    {min_role_size: 100}
-split:    {test_size: 0.2, seed: 42}
-features: {top_k_skills: 1500, exp_clip: 20, dropout_copies: 2, dropout_min: 2, dropout_max: 6, eval_n_skills: 5}
-train:    {model: logreg, C: 1.0, class_weight: balanced}
-profiles: {top_n_skills: 15, top_n_titles: 5}
-```
-`dvc repro` reruns only the stages whose inputs changed. Editing `role_rules.yaml` reruns label → split → train → evaluate → profiles but not ingest. `dvc exp run -S features.top_k_skills=1000` plus `dvc exp show` gives the same experiment table the seniors showed on slide 14.
+Built so far (Steps 2–4). `train` and `evaluate` get added in Step 5.
+
+| Stage | Command | Reads | Writes |
+|---|---|---|---|
+| `ingest` | `src.data.ingest` | `data/raw/naukri_*`, `skill_aliases.yaml` | `data/interim/postings.parquet`, metric `reports/ingest_summary.json` |
+| `profiling` | `src.data.profile` | postings | `reports/profiling/*.html` |
+| `label` | `src.data.label` | postings, `role_rules.yaml`, `functional_area_map.yaml` | `data/interim/labelled.parquet`, `reports/labels/*.csv`, metric `reports/label_quality.json` |
+| `taxonomy` | `src.data.taxonomy` | labelled; params `taxonomy`, `data.min_skills` | `data/processed/classes.json`, `reports/taxonomy/role_support.csv`, metric `reports/taxonomy_summary.json` |
+| `split` | `src.data.split` | labelled, classes; params `split`, `features.eval_n_skills` | `train` / `test` / `reference_2019.parquet`, metric `reports/split_summary.json` |
+| `profiles` | `src.models.profiles` | train, labelled, classes; params `profiles`, `features.top_k_skills` | `models/skill_profiles.json`, `skill_cooccurrence.npz`, `skill_vocab.json` |
+| *(Step 5)* `train`, `evaluate` | `src.models.train` / `.evaluate` | train, test, reference; params `features`, `train` | model, `reports/metrics.json`, plots |
+| *(later)* `lookups` | `src.models.lookups` | Naukri 2017, PLFS, NCO, courses | education prior, skill → course links |
+
+`dvc repro` reruns only stages whose inputs changed:
+- editing `role_rules.yaml` reruns label → taxonomy → split → profiles, but not ingest or profiling;
+- changing `taxonomy.min_train_postings` reruns taxonomy onward.
+
+Useful commands:
+- `uv run dvc dag` draws the graph;
+- `uv run dvc params diff` shows what changed;
+- `uv run dvc exp run -S taxonomy.min_reference_postings=50` followed by `uv run dvc exp show` gives the experiment table the seniors showed on slide 14.
 
 ### Step 7: MLflow experiment tracking
-```bash
-uv run mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
-```
+Two options; the code is the same, only the tracking URI changes:
+- **Team server on DagsHub (recommended):** every DagsHub repo has an MLflow server at `https://dagshub.com/<user>/<repo>.mlflow`. Authenticate with `MLFLOW_TRACKING_USERNAME=<user>` and `MLFLOW_TRACKING_PASSWORD=<token>` in a `.env` file (already gitignored). All four of you then see the same runs.
+- **Local, for offline work:** `uv run mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000`.
 ```python
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000"))
 mlflow.set_experiment("career-baselines")
 with mlflow.start_run(run_name="logreg"):
     mlflow.set_tags({"git_commit": commit, "data_md5": raw_dvc_md5})  # ← links MLflow to DVC
@@ -380,10 +460,10 @@ Compare runs in the MLflow UI and pick the best baseline. Write the following up
 Also run the 2019-trained model on 2025 once and record the drop. It's the first evidence for the monitoring phase.
 
 ### Suggested team split
-1. **Data:** `download.sh`, ingest, `skill_aliases.yaml`, EDA
-2. **Labels:** the role + family taxonomy, `role_rules.yaml` (~100 roles), reviewing each role's top skills for rule bugs, label-quality metric (target ≥ 80% family agreement on 2019)
-3. **Models:** features, baselines (including profile matching), evaluation, MLflow logging
-4. **Infra + lookups:** repo, uv, DVC remote, MLflow server, `dvc.yaml`, the skill-profiles and lookups stages (education prior from Naukri 2017 + PLFS, course links)
+1. **Data:** `sources.yaml` / download, `ingest.py`, `skill_aliases.yaml` (start with notebook section 3), EDA notebook
+2. **Labels:** `role_rules.yaml`, starting from the starter list in 2.5 and the two `reports/labels/*.csv` files; review notebook sections 6, 7 and 9; propose the taxonomy thresholds
+3. **Models (Step 5):** baselines including profile matching, the `train` / `evaluate` stages, MLflow logging
+4. **Infra + lookups:** uv / DVC / DagsHub setup (each person still does their own), the DagsHub MLflow server, keeping `dvc.yaml` tidy, and later the `lookups` stage (education prior, course links)
 
 The infrastructure person shouldn't do everyone's setup. The seniors said to set up the tools yourselves, so each person should do their own `uv sync` and `dvc pull` at least once.
 
@@ -391,17 +471,17 @@ The infrastructure person shouldn't do everyone's setup. The seniors said to set
 
 ## 4. Roadmap summary
 
-| # | MLOps stage | Tools for this project | Phase 1? |
+| # | MLOps stage | Tools for this project | Status |
 |---|---|---|---|
-| 1 | Problem definition & data collection | Naukri 2025 + 2019 (core); Naukri 2015–17, PLFS, NCO‑2015, NPTEL/SWAYAM, Coursera, O\*NET (supporting) | ✅ Done |
-| 2 | Data cleaning & preprocessing | pandas, ydata-profiling, rule-based labelling, scikit-learn encoders | ✅ Done |
-| 3 | Data versioning & storage | Git, DVC with a GDrive or DagsHub remote | ✅ Done (dataset versioning plus the pipeline) |
-| 4a | Model development: baselines & tracking | scikit-learn, LightGBM, MLflow | ✅ Done |
+| 1 | Problem definition & data collection | Naukri 2025 + 2019 (core), 2017 + 2022 (comparison); PLFS, NCO‑2015, NPTEL/SWAYAM, Coursera, O\*NET (supporting) | ✅ Built: `download.py` + `sources.yaml` |
+| 2 | Data cleaning & preprocessing | pandas, fg-data-profiling, rule-based labelling, cross-snapshot taxonomy, scikit-learn feature pipeline | ✅ Built: `ingest` / `profiling` / `label` / `taxonomy` / `split` / `profiles` stages |
+| 3 | Data versioning & storage | Git, DVC with DagsHub remote | 🟡 Code ready; your setup (checklist E) |
+| 4a | Model development: baselines & tracking | scikit-learn, LightGBM, MLflow (DagsHub) | ⏳ Next (Steps 5–8) |
 | 4b | Model development: tuning (and optional neural model) | Optuna, optional Keras MLP | ⏳ Later |
-| 5 | Validation & testing | MLflow registry (champion/challenger), pytest (rule and schema tests), SHAP (which skills drove a recommendation), CodeCarbon | 🟡 Partly (initial evaluation only) |
+| 5 | Validation & testing | pytest (28 tests: skills, rules, features), MLflow registry (champion/challenger), SHAP, CodeCarbon | 🟡 Tests built; rest later |
 | 6 | Packaging & CI/CD | Docker or Podman, TF Serving (if neural), **quantization** (ONNX for sklearn/LightGBM, TFLite if neural), GitHub Actions | ⏳ Later |
 | 7 | Deployment | FastAPI with Render or Hugging Face Spaces (or SageMaker) | ⏳ Later |
-| 8 | Monitoring | Prometheus + Grafana **run as Docker images**. For drift, **not Evidently** (per seniors): use NannyML, Alibi Detect or custom chi-square/JS-distance tests on skill frequencies. 2019 = reference, 2025 = live; later a fresh scrape | ⏳ Later |
+| 8 | Monitoring | Prometheus + Grafana **run as Docker images**. For drift, **not Evidently** (per seniors): use NannyML, Alibi Detect or custom chi-square/JS-distance tests on skill frequencies. 2019 = reference (`reference_2019.parquet` is already built), 2025 = live; later a fresh scrape | ⏳ Later |
 | 9 | Continuous training & feedback | GitHub Actions → `dvc repro` on a new snapshot → challenger vs. champion, plus user feedback ("was this helpful?") | ⏳ Later |
 
 **What Phase 1 covers:** stages 1–4a and the start of 5. That means approved and explored data, versioned with DVC, run through a reproducible pipeline, with tracked baseline experiments in MLflow and an initial evaluation. Everything after that (tuning, packaging, serving, monitoring, retraining) builds on this foundation.

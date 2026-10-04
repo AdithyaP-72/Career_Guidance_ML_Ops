@@ -1,0 +1,226 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: uv run python -m src.data.ingest
+    deps:
+    - path: configs/skill_aliases.yaml
+      hash: md5
+      md5: 9b6375b90636222b2a410fd6fa336808
+      size: 3744
+    - path: data/raw/naukri_2017
+      hash: md5
+      md5: 486d46efcbf4c7e8ca6b9d8650d82977.dir
+      size: 52262246
+      nfiles: 1
+    - path: data/raw/naukri_2019
+      hash: md5
+      md5: 820fb03b201bff6a0e0a4fa17c0ab951.dir
+      size: 11258599
+      nfiles: 1
+    - path: data/raw/naukri_2022
+      hash: md5
+      md5: 6dd971bbfe19a1119afb207607d2f58f.dir
+      size: 9855664
+      nfiles: 1
+    - path: data/raw/naukri_2025
+      hash: md5
+      md5: eee95efc046d24e12fe616376b8547eb.dir
+      size: 31709363
+      nfiles: 1
+    - path: src/data/ingest.py
+      hash: md5
+      md5: 4f370488bd91a44e8996245677fc98a1
+      size: 5696
+    - path: src/utils.py
+      hash: md5
+      md5: caf7cd050a365bf58b36ed79836b5319
+      size: 3648
+    outs:
+    - path: data/interim/postings.parquet
+      hash: md5
+      md5: 4210b74bc81e1c8b0c891a0fdca13c6c
+      size: 10184097
+    - path: reports/ingest_summary.json
+      hash: md5
+      md5: cf54f872e63bcc85d30b15813fe679c7
+      size: 823
+  profiling:
+    cmd: uv run python -m src.data.profile
+    deps:
+    - path: data/interim/postings.parquet
+      hash: md5
+      md5: 4210b74bc81e1c8b0c891a0fdca13c6c
+      size: 10184097
+    - path: src/data/profile.py
+      hash: md5
+      md5: 8cb082a4dd8a1b3ab7134a43a5a422be
+      size: 1426
+    params:
+      params.yaml:
+        profiling:
+          minimal: true
+          snapshots:
+          - 2017
+          - 2019
+          - 2022
+          - 2025
+    outs:
+    - path: reports/profiling
+      hash: md5
+      md5: 932568132f4f14b9dc7e3412b636bb93.dir
+      size: 10554744
+      nfiles: 4
+  label:
+    cmd: uv run python -m src.data.label
+    deps:
+    - path: configs/functional_area_map.yaml
+      hash: md5
+      md5: 95a091f3844ed849f36e57e232d48c06
+      size: 2382
+    - path: configs/role_rules.yaml
+      hash: md5
+      md5: a87c9a33ddcc70e217f0bf3526fade23
+      size: 18235
+    - path: data/interim/postings.parquet
+      hash: md5
+      md5: 4210b74bc81e1c8b0c891a0fdca13c6c
+      size: 10184097
+    - path: src/data/label.py
+      hash: md5
+      md5: 8d9a9e5acbb3d780f5f90282ab5cc667
+      size: 3996
+    outs:
+    - path: data/interim/labelled.parquet
+      hash: md5
+      md5: da7fb225330dca577d29eb748283e784
+      size: 10466142
+    - path: reports/label_quality.json
+      hash: md5
+      md5: 7ac8829e80c96fd07b9af89398706875
+      size: 352
+    - path: reports/labels
+      hash: md5
+      md5: 2142edd75d8b39d5a4291a2d9c13cd1b.dir
+      size: 18488
+      nfiles: 2
+  taxonomy:
+    cmd: uv run python -m src.data.taxonomy
+    deps:
+    - path: data/interim/labelled.parquet
+      hash: md5
+      md5: da7fb225330dca577d29eb748283e784
+      size: 10466142
+    - path: src/data/taxonomy.py
+      hash: md5
+      md5: 57adf968bfa379299313bd2a582334ec
+      size: 4818
+    params:
+      params.yaml:
+        data.min_skills: 3
+        taxonomy:
+          train_snapshot: 2025
+          reference_snapshot: 2019
+          min_train_postings: 100
+          min_reference_postings: 20
+    outs:
+    - path: data/processed/classes.json
+      hash: md5
+      md5: 6721bafbb67cfd0e9bd03a31bf50ee75
+      size: 11911
+    - path: reports/taxonomy
+      hash: md5
+      md5: 7dbb4967e8d5be8458c1c3dc9b896f9c.dir
+      size: 14461
+      nfiles: 1
+    - path: reports/taxonomy_summary.json
+      hash: md5
+      md5: 617298470dcf0b94b4f4a6064f856598
+      size: 234
+  split:
+    cmd: uv run python -m src.data.split
+    deps:
+    - path: data/interim/labelled.parquet
+      hash: md5
+      md5: da7fb225330dca577d29eb748283e784
+      size: 10466142
+    - path: data/processed/classes.json
+      hash: md5
+      md5: 6721bafbb67cfd0e9bd03a31bf50ee75
+      size: 11911
+    - path: src/data/split.py
+      hash: md5
+      md5: 370f018c4f9c3f568e52b0d2c7be80fb
+      size: 2874
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    params:
+      params.yaml:
+        data.min_skills: 3
+        features.eval_n_skills: 5
+        split:
+          test_size: 0.2
+          seed: 42
+    outs:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: ce6e1b560f8017bee3ae53daea056823
+      size: 1884625
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: 135e6bb77c2be0b2f2864a3d3c38771c
+      size: 3095884
+    - path: reports/split_summary.json
+      hash: md5
+      md5: efd53fdb57dffc1a665827344b51fa03
+      size: 265
+  profiles:
+    cmd: uv run python -m src.models.profiles
+    deps:
+    - path: data/interim/labelled.parquet
+      hash: md5
+      md5: da7fb225330dca577d29eb748283e784
+      size: 10466142
+    - path: data/processed/classes.json
+      hash: md5
+      md5: 6721bafbb67cfd0e9bd03a31bf50ee75
+      size: 11911
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: 135e6bb77c2be0b2f2864a3d3c38771c
+      size: 3095884
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/profiles.py
+      hash: md5
+      md5: c88051f194b6d8672fa7ab9515114dab
+      size: 3706
+    params:
+      params.yaml:
+        data.min_skills: 3
+        features.top_k_skills: 1500
+        profiles:
+          core_min_share: 0.08
+          max_core_skills: 12
+          top_n_skills: 30
+          top_n_titles: 5
+    outs:
+    - path: models/skill_cooccurrence.npz
+      hash: md5
+      md5: 16540a7dd98944617e81e670be7651ab
+      size: 521484
+    - path: models/skill_profiles.json
+      hash: md5
+      md5: d4aa5dbc3390e3ce28c4b8d3aaf34e53
+      size: 328312
+    - path: models/skill_vocab.json
+      hash: md5
+      md5: 9e7338175a727d10c88357c6d98e9f63
+      size: 27631

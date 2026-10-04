@@ -1,0 +1,102 @@
+# The Phase 1 data pipeline (Steps 3–4). Run everything with:  uv run dvc repro
+# Steps 5–8 (train, evaluate, MLflow) get added here next.
+#
+#   data/raw/* ──ingest──▶ postings ──label──▶ labelled ──taxonomy──▶ classes
+#                             │                    │                     │
+#                         profiling                └─────────split◀──────┘
+#                       (ydata reports)                      │
+#                                                        profiles
+
+stages:
+  ingest:
+    cmd: uv run python -m src.data.ingest
+    deps:
+      - src/data/ingest.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - data/raw/naukri_2017
+      - data/raw/naukri_2019
+      - data/raw/naukri_2022
+      - data/raw/naukri_2025
+    outs:
+      - data/interim/postings.parquet
+    metrics:
+      - reports/ingest_summary.json:
+          cache: false
+
+  profiling:
+    cmd: uv run python -m src.data.profile
+    deps:
+      - src/data/profile.py
+      - data/interim/postings.parquet
+    params:
+      - profiling
+    outs:
+      - reports/profiling
+
+  label:
+    cmd: uv run python -m src.data.label
+    deps:
+      - src/data/label.py
+      - configs/role_rules.yaml
+      - configs/functional_area_map.yaml
+      - data/interim/postings.parquet
+    outs:
+      - data/interim/labelled.parquet
+      - reports/labels:
+          cache: false
+    metrics:
+      - reports/label_quality.json:
+          cache: false
+
+  taxonomy:
+    cmd: uv run python -m src.data.taxonomy
+    deps:
+      - src/data/taxonomy.py
+      - data/interim/labelled.parquet
+    params:
+      - data.min_skills
+      - taxonomy
+    outs:
+      - data/processed/classes.json
+      - reports/taxonomy:
+          cache: false
+    metrics:
+      - reports/taxonomy_summary.json:
+          cache: false
+
+  split:
+    cmd: uv run python -m src.data.split
+    deps:
+      - src/data/split.py
+      - src/features/build.py
+      - data/interim/labelled.parquet
+      - data/processed/classes.json
+    params:
+      - data.min_skills
+      - split
+      - features.eval_n_skills
+    outs:
+      - data/processed/train.parquet
+      - data/processed/test.parquet
+      - data/processed/reference_2019.parquet
+    metrics:
+      - reports/split_summary.json:
+          cache: false
+
+  profiles:
+    cmd: uv run python -m src.models.profiles
+    deps:
+      - src/models/profiles.py
+      - src/features/build.py
+      - data/processed/train.parquet
+      - data/processed/classes.json
+      - data/interim/labelled.parquet
+    params:
+      - data.min_skills
+      - features.top_k_skills
+      - profiles
+    outs:
+      - models/skill_profiles.json
+      - models/skill_cooccurrence.npz
+      - models/skill_vocab.json

@@ -1,0 +1,36 @@
+# Every tunable value in the pipeline. DVC tracks these: change one, and `dvc repro`
+# reruns only the stages that use it. Try variants without editing this file:
+#   uv run dvc exp run -S taxonomy.min_train_postings=200
+
+data:
+  min_skills: 3            # postings listing fewer skills are not used for training or profiles
+
+taxonomy:                  # which candidate roles become classes (src/data/taxonomy.py)
+  train_snapshot: 2025
+  reference_snapshot: 2019
+  min_train_postings: 100  # role needs at least this many usable 2025 postings to be a class
+  min_reference_postings: 20  # below this in 2019 → "emerging" (no 2019 baseline for drift)
+
+split:
+  test_size: 0.2
+  seed: 42
+
+features:
+  top_k_skills: 1500       # vocabulary size = the skills the search box offers
+  exp_clip: 20             # years of experience above this are treated as 20
+  eval_n_skills: 5         # test inputs are cut to this many skills (what users really enter)
+  dropout:                 # training-time augmentation, used from Step 5
+    copies: 2
+    min_k: 2
+    max_k: 6
+    seed: 42
+
+profiles:
+  core_min_share: 0.08     # a skill is "core" for a role if ≥ 8% of its postings ask for it
+  max_core_skills: 12
+  top_n_skills: 30
+  top_n_titles: 5
+
+profiling:
+  minimal: true            # ydata-profiling minimal mode: fast, skips correlations
+  snapshots: [2017, 2019, 2022, 2025]

@@ -1,0 +1,114 @@
+role,family,n_2017,n_2019,n_2022,n_2025,share_2017,share_2019,share_2022,share_2025,naukri_2019_top_role,naukri_2019_top_role_share,status,share_change_ref_to_train
+Software Engineer (general),Software Development,1580,1697,6565,5836,0.09395,0.08255,0.29111,0.08439,Software Developer,0.845,stable,1.02
+Sales Executive,Sales & BD,1086,1489,126,5098,0.06458,0.07243,0.00559,0.07371,Sales Executive/Officer,0.323,stable,1.02
+SAP Consultant,ERP / Enterprise Apps,361,357,383,2606,0.02147,0.01737,0.01698,0.03768,Software Developer,0.356,stable,2.17
+Data Analyst,Data & Analytics,456,501,1895,2106,0.02712,0.02437,0.08403,0.03045,Software Developer,0.122,stable,1.25
+Customer Service Executive,Customer Service / BPO,345,519,121,1945,0.02051,0.02525,0.00537,0.02812,Associate/Senior Associate -(NonTechnical),0.565,stable,1.11
+Business Development Executive,Sales & BD,559,709,174,1674,0.03324,0.03449,0.00772,0.02421,Sales/Business Development Manager,0.563,stable,0.7
+Customer Support (Voice),Customer Service / BPO,260,481,8,1607,0.01546,0.0234,0.00035,0.02324,Associate/Senior Associate -(NonTechnical),0.626,stable,0.99
+Manual Test Engineer,QA & Testing,470,431,1001,1586,0.02795,0.02097,0.04439,0.02293,Testing Engineer,0.457,stable,1.09
+Accountant,Accounting & Finance,278,505,49,1529,0.01653,0.02457,0.00217,0.02211,Accounts Executive/Accountant,0.58,stable,0.9
+Java Developer,Software Development,665,743,888,1312,0.03954,0.03614,0.03938,0.01897,Software Developer,0.77,stable,0.52
+Admin Executive,Office Admin & Data Entry,345,348,85,1307,0.02051,0.01693,0.00377,0.0189,System Administrator,0.195,stable,1.12
+Management Consultant,Strategy & Consulting,259,304,191,1232,0.0154,0.01479,0.00847,0.01781,Software Developer,0.25,stable,1.2
+Full Stack Developer,Software Development,46,243,413,1197,0.00274,0.01182,0.01831,0.01731,Software Developer,0.802,stable,1.46
+ML / AI Engineer,Data & Analytics,31,59,418,1186,0.00184,0.00287,0.01853,0.01715,Software Developer,0.458,stable,5.98
+Recruiter / Talent Acquisition,HR & Recruitment,378,522,108,1186,0.02248,0.02539,0.00479,0.01715,Recruitment Executive,0.621,stable,0.68
+HR Executive / Generalist,HR & Recruitment,268,434,45,1129,0.01594,0.02111,0.002,0.01632,HR Executive,0.399,stable,0.77
+Data Engineer,Data & Analytics,91,130,1263,1102,0.00541,0.00632,0.056,0.01593,Software Developer,0.508,stable,2.52
+Marketing Executive,Marketing,506,597,87,1073,0.03009,0.02904,0.00386,0.01551,Marketing Manager,0.154,stable,0.53
+Frontend Developer,Software Development,244,429,591,1046,0.01451,0.02087,0.02621,0.01512,Software Developer,0.895,stable,0.72
+Production Engineer,Manufacturing & Core Engg,136,166,36,994,0.00809,0.00808,0.0016,0.01437,Production Manager,0.283,stable,1.78
+Mechanical Design Engineer,Manufacturing & Core Engg,232,183,105,939,0.0138,0.0089,0.00466,0.01358,Design Engineer,0.355,stable,1.53
+Area / Territory Sales Manager,Sales & BD,216,247,13,932,0.01284,0.01202,0.00058,0.01348,Sales/Business Development Manager,0.3,stable,1.12
+Cloud Engineer,IT Infra & Support,69,152,726,880,0.0041,0.00739,0.03219,0.01272,Software Developer,0.336,stable,1.72
+Procurement / Purchase,Supply Chain & Logistics,127,139,62,869,0.00755,0.00676,0.00275,0.01257,Purchase/Vendor Development Manager,0.353,stable,1.86
+Relationship Manager (Banking),Banking & Financial Services,133,199,5,864,0.00791,0.00968,0.00022,0.01249,Sales/Business Development Manager,0.322,stable,1.29
+Inside Sales / Telesales,Sales & BD,103,209,34,836,0.00612,0.01017,0.00151,0.01209,Telecalling/Telemarketing Executive,0.249,stable,1.19
+Project Manager,Strategy & Consulting,215,230,215,822,0.01278,0.01119,0.00953,0.01189,Project Manager-IT/Software,0.387,stable,1.06
+Finance Manager,Accounting & Finance,164,187,132,744,0.00975,0.0091,0.00585,0.01076,Finance/Budgeting Manager,0.155,stable,1.18
+Branch Banking Officer,Banking & Financial Services,154,198,14,743,0.00916,0.00963,0.00062,0.01074,Branch Manager,0.187,stable,1.12
+Accounts Payable / Receivable,Accounting & Finance,79,95,18,737,0.0047,0.00462,0.0008,0.01066,Associate/Senior Associate -(NonTechnical),0.274,stable,2.31
+DevOps Engineer,IT Infra & Support,51,138,578,719,0.00303,0.00671,0.02563,0.0104,Software Developer,0.464,stable,1.55
+.NET Developer,Software Development,484,598,614,652,0.02878,0.02909,0.02723,0.00943,Software Developer,0.839,stable,0.32
+Architect (Building),Construction & Site Engg,104,98,51,571,0.00618,0.00477,0.00226,0.00826,Technical Architect,0.449,stable,1.73
+Digital Marketing Executive,Marketing,114,181,45,568,0.00678,0.0088,0.002,0.00821,Marketing Manager,0.177,stable,0.93
+Python Developer,Software Development,65,127,247,565,0.00387,0.00618,0.01095,0.00817,Software Developer,0.843,stable,1.32
+IT Support / Desktop Engineer,IT Infra & Support,169,281,321,530,0.01005,0.01367,0.01423,0.00766,Associate/Senior Associate -(Technical),0.391,stable,0.56
+Doctor / Medical Officer,Healthcare & Pharma,99,107,7,527,0.00589,0.00521,0.00031,0.00762,Medical Officer,0.299,stable,1.46
+School Teacher,Teaching & Training,73,108,2,501,0.00434,0.00525,9e-05,0.00724,Teacher/ Private Tutor,0.5,stable,1.38
+Oracle Apps Consultant,ERP / Enterprise Apps,143,134,90,495,0.0085,0.00652,0.00399,0.00716,Software Developer,0.5,stable,1.1
+Hotel / Travel Staff,Hospitality,64,93,7,487,0.00381,0.00452,0.00031,0.00704,Restaurant Manager,0.172,stable,1.56
+Business Analyst,Strategy & Consulting,134,160,591,473,0.00797,0.00778,0.02621,0.00684,Business Analyst,0.806,stable,0.88
+Site / Civil Engineer,Construction & Site Engg,84,95,3,469,0.00499,0.00462,0.00013,0.00678,Construction-Construction Management,0.137,stable,1.47
+Credit / Loan Officer,Banking & Financial Services,68,107,35,464,0.00404,0.00521,0.00155,0.00671,Credit Officer,0.168,stable,1.29
+R&D / Process Engineer,Manufacturing & Core Engg,143,151,168,463,0.0085,0.00735,0.00745,0.00669,Other,0.066,stable,0.91
+Logistics / Supply Chain Executive,Supply Chain & Logistics,74,93,46,451,0.0044,0.00452,0.00204,0.00652,Logistics Manager,0.172,stable,1.44
+Retail Sales Associate,Sales & BD,115,133,13,448,0.00684,0.00647,0.00058,0.00648,Retail Store Manager,0.241,stable,1.0
+Data Scientist,Data & Analytics,49,90,910,447,0.00291,0.00438,0.04035,0.00646,Software Developer,0.222,stable,1.47
+Key Account Manager,Sales & BD,137,113,35,432,0.00815,0.0055,0.00155,0.00625,Client Servicing/Key Account Manager,0.354,stable,1.14
+Graphic Designer,Design & Creative,130,233,7,423,0.00773,0.01133,0.00031,0.00612,Graphic Designer,0.635,stable,0.54
+Network Engineer,IT Infra & Support,165,159,450,405,0.00981,0.00773,0.01995,0.00586,Network Administrator,0.428,stable,0.76
+Quality Engineer (Manufacturing),Manufacturing & Core Engg,64,42,60,404,0.00381,0.00204,0.00266,0.00584,Quality Assurance/Quality Control Executive,0.5,stable,2.86
+Service Engineer / Technician,Manufacturing & Core Engg,78,75,33,403,0.00464,0.00365,0.00146,0.00583,Service/Maintenance Engineer,0.413,stable,1.6
+Electrical Engineer,Manufacturing & Core Engg,60,75,12,381,0.00357,0.00365,0.00053,0.00551,Electrical Engineer-Industrial,0.147,stable,1.51
+Automation Test Engineer,QA & Testing,66,98,154,376,0.00392,0.00477,0.00683,0.00544,Testing Engineer,0.694,stable,1.14
+Cyber Security Analyst,IT Infra & Support,59,89,115,376,0.00351,0.00433,0.0051,0.00544,System Security,0.303,stable,1.26
+Auditor,Accounting & Finance,77,67,35,366,0.00458,0.00326,0.00155,0.00529,Audit Manager,0.343,stable,1.62
+Content Writer,Content & Media,182,207,15,365,0.01082,0.01007,0.00067,0.00528,Content Developer,0.546,stable,0.52
+Corporate Trainer,Teaching & Training,99,105,24,365,0.00589,0.00511,0.00106,0.00528,Trainer,0.133,stable,1.03
+Salesforce Developer,Software Development,56,117,137,360,0.00333,0.00569,0.00607,0.00521,Software Developer,0.692,stable,0.92
+Maintenance Engineer,Manufacturing & Core Engg,37,48,9,357,0.0022,0.00233,0.0004,0.00516,Service/Maintenance Engineer,0.438,stable,2.21
+Receptionist / Front Office,Office Admin & Data Entry,72,130,3,357,0.00428,0.00632,0.00013,0.00516,Receptionist,0.646,stable,0.82
+Embedded / Firmware Engineer,Software Development,134,145,251,334,0.00797,0.00705,0.01113,0.00483,Software Developer,0.614,stable,0.69
+Customer Support (Non-voice),Customer Service / BPO,28,101,4,333,0.00166,0.00491,0.00018,0.00481,Associate/Senior Associate -(NonTechnical),0.436,stable,0.98
+Insurance Advisor,Banking & Financial Services,67,103,23,333,0.00398,0.00501,0.00102,0.00481,Sales/Business Development Manager,0.291,stable,0.96
+Real Estate Sales,Sales & BD,54,75,2,333,0.00321,0.00365,9e-05,0.00481,Sales Executive/Officer,0.147,stable,1.32
+Tax / GST Executive,Accounting & Finance,56,76,5,321,0.00333,0.0037,0.00022,0.00464,Taxation(Direct) Manager,0.263,stable,1.25
+Executive Assistant,Office Admin & Data Entry,67,110,9,309,0.00398,0.00535,0.0004,0.00447,Secretary/PA,0.645,stable,0.84
+Financial Analyst,Accounting & Finance,53,83,31,299,0.00315,0.00404,0.00137,0.00432,Financial Analyst,0.229,stable,1.07
+Chef / Cook,Hospitality,34,48,0,293,0.00202,0.00233,0.0,0.00424,Commis,0.25,stable,1.82
+Company Secretary / Compliance,Legal,34,82,54,282,0.00202,0.00399,0.00239,0.00408,Company Secretary,0.451,stable,1.02
+Tutor / Academic Counsellor,Teaching & Training,70,83,1,282,0.00416,0.00404,4e-05,0.00408,Counselor,0.41,stable,1.01
+UI/UX Designer,Design & Creative,120,116,52,279,0.00714,0.00564,0.00231,0.00403,Graphic/Web Designer,0.319,stable,0.71
+Product Manager,Strategy & Consulting,69,91,134,278,0.0041,0.00443,0.00594,0.00402,Product Manager,0.451,stable,0.91
+Chartered Accountant,Accounting & Finance,65,106,0,257,0.00387,0.00516,0.0,0.00372,Chartered Accountant,0.491,stable,0.72
+BI Developer,Data & Analytics,84,74,198,251,0.00499,0.0036,0.00878,0.00363,Software Developer,0.473,stable,1.01
+Video Editor / Animator,Design & Creative,37,61,3,238,0.0022,0.00297,0.00013,0.00344,Graphic Designer,0.098,stable,1.16
+Social Media Executive,Marketing,70,63,18,229,0.00416,0.00306,0.0008,0.00331,Social Media Marketing Manager,0.21,stable,1.08
+Collections Officer,Banking & Financial Services,22,80,10,215,0.00131,0.00389,0.00044,0.00311,Associate/Senior Associate -(NonTechnical),0.338,stable,0.8
+Interior Designer,Design & Creative,34,43,2,207,0.00202,0.00209,9e-05,0.00299,Interior Designer,0.465,stable,1.43
+Clinical Research / Pharmacovigilance,Healthcare & Pharma,40,38,21,202,0.00238,0.00185,0.00093,0.00292,Regulatory Affairs Manager,0.316,stable,1.58
+Professor / Lecturer,Teaching & Training,724,194,10,201,0.04305,0.00944,0.00044,0.00291,Lecturer/Professor,0.531,stable,0.31
+Android Developer,Software Development,234,217,200,192,0.01391,0.01056,0.00887,0.00278,Software Developer,0.908,stable,0.26
+Staff Nurse,Healthcare & Pharma,22,44,4,189,0.00131,0.00214,0.00018,0.00273,Nurse,0.591,stable,1.28
+Warehouse / Inventory,Supply Chain & Logistics,34,46,10,186,0.00202,0.00224,0.00044,0.00269,Store Keeper/Warehouse Assistant,0.348,stable,1.2
+Medical Coder,Healthcare & Pharma,49,74,0,182,0.00291,0.0036,0.0,0.00263,Medical Officer,0.378,stable,0.73
+Lawyer / Legal Associate,Legal,45,71,6,179,0.00268,0.00345,0.00027,0.00259,Legal Manager,0.521,stable,0.75
+Payroll Executive,HR & Recruitment,29,25,11,174,0.00172,0.00122,0.00049,0.00252,Pay Roll/Compensation Manager,0.32,stable,2.07
+Database Administrator,IT Infra & Support,146,66,30,169,0.00868,0.00321,0.00133,0.00244,DBA,0.742,stable,0.76
+SEO Specialist,Marketing,96,141,31,168,0.00571,0.00686,0.00137,0.00243,Webmaster,0.291,stable,0.35
+Brand / Product Marketing Manager,Marketing,67,96,13,167,0.00398,0.00467,0.00058,0.00241,Product/Brand Manager,0.24,stable,0.52
+PHP Developer,Software Development,274,403,246,165,0.01629,0.0196,0.01091,0.00239,Software Developer,0.911,stable,0.12
+Mobile App Developer,Software Development,53,69,111,163,0.00315,0.00336,0.00492,0.00236,Software Developer,0.768,stable,0.7
+System Administrator,IT Infra & Support,142,132,87,152,0.00844,0.00642,0.00386,0.0022,System Administrator,0.515,stable,0.34
+Journalist / Editor,Content & Media,55,54,4,141,0.00327,0.00263,0.00018,0.00204,Content Developer,0.185,stable,0.78
+Pre-Sales Consultant,Sales & BD,48,41,20,136,0.00285,0.00199,0.00089,0.00197,Sales/Business Development Manager,0.244,stable,0.99
+Mainframe Developer,Software Development,36,23,34,134,0.00214,0.00112,0.00151,0.00194,Software Developer,0.696,stable,1.73
+Fashion Designer,Design & Creative,40,60,0,124,0.00238,0.00292,0.0,0.00179,Sales Executive/Officer,0.25,stable,0.61
+Microsoft Dynamics Consultant,ERP / Enterprise Apps,39,28,38,122,0.00232,0.00136,0.00168,0.00176,Software Developer,0.571,stable,1.29
+Technical Writer,Content & Media,33,48,11,118,0.00196,0.00233,0.00049,0.00171,Technical Writer,0.521,stable,0.73
+HR Business Partner,HR & Recruitment,18,21,11,105,0.00107,0.00102,0.00049,0.00152,HR Business Partner,0.571,stable,1.49
+ServiceNow Developer,ERP / Enterprise Apps,8,14,36,303,0.00048,0.00068,0.0016,0.00438,Software Developer,0.786,emerging,6.44
+Trust & Safety / Content Moderator,Customer Service / BPO,2,1,2,251,0.00012,5e-05,9e-05,0.00363,Associate/Senior Associate -(NonTechnical),1.0,emerging,72.6
+MEP / HVAC Engineer,Construction & Site Engg,14,18,2,127,0.00083,0.00088,9e-05,0.00184,Design Engineer,0.167,emerging,2.09
+Quantity Surveyor / Estimator,Construction & Site Engg,10,9,0,99,0.00059,0.00044,0.0,0.00143,Construction-Construction Management,0.444,excluded,3.25
+Node.js Developer,Software Development,15,37,81,97,0.00089,0.0018,0.00359,0.0014,Software Developer,0.838,excluded,0.78
+iOS Developer,Software Development,165,143,117,95,0.00981,0.00696,0.00519,0.00137,Software Developer,0.93,excluded,0.2
+Data Entry Operator,Office Admin & Data Entry,33,56,7,86,0.00196,0.00272,0.00031,0.00124,Stenographer/Data Entry Operator,0.357,excluded,0.46
+Medical Representative,Sales & BD,20,32,0,80,0.00119,0.00156,0.0,0.00116,Medical Representative,0.812,excluded,0.74
+Instrumentation Engineer,Manufacturing & Core Engg,15,15,6,79,0.00089,0.00073,0.00027,0.00114,Design Engineer,0.467,excluded,1.56
+Lab Technician,Healthcare & Pharma,11,13,0,61,0.00065,0.00063,0.0,0.00088,Lab Technician/Medical Technician/Lab Staff,0.385,excluded,1.4
+Pharmacist,Healthcare & Pharma,8,16,1,59,0.00048,0.00078,4e-05,0.00085,Pharmacist/Chemist/Bio Chemist,0.438,excluded,1.09
+Physiotherapist,Healthcare & Pharma,12,5,0,33,0.00071,0.00024,0.0,0.00048,Physiotherapist,0.6,excluded,2.0
+Game Developer,Software Development,11,12,17,30,0.00065,0.00058,0.00075,0.00043,Software Developer,0.833,excluded,0.74

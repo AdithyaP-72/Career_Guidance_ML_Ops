@@ -1,0 +1,22 @@
+{
+  "2017": {
+    "rows": 21321,
+    "coverage": 0.7888,
+    "family_agreement": 0.6725,
+    "n_compared": 16491
+  },
+  "2019": {
+    "rows": 29249,
+    "coverage": 0.799,
+    "family_agreement": 0.6715,
+    "n_compared": 22684
+  },
+  "2022": {
+    "rows": 26252,
+    "coverage": 0.8701
+  },
+  "2025": {
+    "rows": 89052,
+    "coverage": 0.7851
+  }
+}

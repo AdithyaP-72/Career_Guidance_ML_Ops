@@ -1,0 +1,38 @@
+{
+  "2017": {
+    "rows_raw": 22000,
+    "rows": 21321,
+    "duplicates_removed": 679,
+    "share_no_skills": 1.0,
+    "median_skills": 0.0,
+    "unique_skills": 0,
+    "share_exp_missing": 0.0053
+  },
+  "2019": {
+    "rows_raw": 29425,
+    "rows": 29249,
+    "duplicates_removed": 176,
+    "share_no_skills": 0.0357,
+    "median_skills": 8.0,
+    "unique_skills": 14462,
+    "share_exp_missing": 0.006
+  },
+  "2022": {
+    "rows_raw": 32738,
+    "rows": 26252,
+    "duplicates_removed": 6486,
+    "share_no_skills": 0.0002,
+    "median_skills": 8.0,
+    "unique_skills": 14982,
+    "share_exp_missing": 0.0002
+  },
+  "2025": {
+    "rows_raw": 97929,
+    "rows": 89052,
+    "duplicates_removed": 8877,
+    "share_no_skills": 0.006,
+    "median_skills": 8.0,
+    "unique_skills": 43833,
+    "share_exp_missing": 0.006
+  }
+}

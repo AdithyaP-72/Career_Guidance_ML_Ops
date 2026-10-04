@@ -1,0 +1,29 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow (local runs; the team server lives on DagsHub)
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Secrets: DagsHub tokens go in .dvc/config.local (DVC ignores it) or here, never in Git
+.env
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# PLFS (MoSPI survey microdata): kept local only. Not pushed to the public DVC remote
+# until MoSPI's redistribution terms are checked. See README, section 2.1 #4.
+data/raw/plfs/
+
+# Data and model files are tracked by DVC, which writes its own .gitignore entries
+# (e.g. data/raw/.gitignore) when you run `dvc add` or `dvc repro`.

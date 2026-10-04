@@ -1,0 +1,33 @@
+# Naukri's own "Functional Area" labels (2017 and 2019 snapshots) → our role families.
+# Used only to measure how well our title rules agree with Naukri (reports/label_quality.json).
+#
+# Ordered: the first pattern that matches the lower-cased functional area wins.
+# Areas with no family of ours (beauty/fitness, defence, CSR, self-employed, "Other")
+# are left unmapped and skipped in the agreement score.
+
+areas:
+  - {pattern: 'it software - qa',                 family: QA & Testing}
+  - {pattern: 'it software - dba',                family: Data & Analytics}
+  - {pattern: 'analytics & business intelligence', family: Data & Analytics}
+  - {pattern: 'it software - erp',                family: ERP / Enterprise Apps}
+  - {pattern: 'it software - (network|systems)',  family: IT Infra & Support}
+  - {pattern: 'it hardware',                      family: IT Infra & Support}
+  - {pattern: 'it software',                      family: Software Development}
+  - {pattern: '^ites',                            family: Customer Service / BPO}
+  - {pattern: '^accounts',                        family: Accounting & Finance}
+  - {pattern: 'financial services',               family: Banking & Financial Services}
+  - {pattern: '^sales',                           family: Sales & BD}
+  - {pattern: '^hr\b',                            family: HR & Recruitment}
+  - {pattern: '^marketing',                       family: Marketing}
+  - {pattern: '^(journalism|tv\b)',               family: Content & Media}
+  - {pattern: '^teaching',                        family: Teaching & Training}
+  - {pattern: '^medical',                         family: Healthcare & Pharma}
+  - {pattern: '^engineering design',              family: Manufacturing & Core Engg}
+  - {pattern: '^(production|packaging)',          family: Manufacturing & Core Engg}
+  - {pattern: '^(site engineering|architecture)', family: Construction & Site Engg}
+  - {pattern: '^(design|fashion)',                family: Design & Creative}
+  - {pattern: '^(purchase|supply chain|shipping|export)', family: Supply Chain & Logistics}
+  - {pattern: '^executive assistant',             family: Office Admin & Data Entry}
+  - {pattern: '^(hotels|travel)',                 family: Hospitality}
+  - {pattern: '^legal',                           family: Legal}
+  - {pattern: '^(strategy|top management)',       family: Strategy & Consulting}
