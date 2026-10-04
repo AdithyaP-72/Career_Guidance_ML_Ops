@@ -29,8 +29,8 @@ stages:
       nfiles: 1
     - path: src/data/ingest.py
       hash: md5
-      md5: 4f370488bd91a44e8996245677fc98a1
-      size: 5696
+      md5: 3805d11c3c7658a8ef7fb33c521c2055
+      size: 5695
     - path: src/utils.py
       hash: md5
       md5: caf7cd050a365bf58b36ed79836b5319

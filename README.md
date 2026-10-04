@@ -234,7 +234,7 @@ Every command below was run on a clean machine with the versions uv resolves tod
 **A. Install the tools (each teammate, once)**
 1. **uv**:
    - Linux/macOS: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-   - Windows PowerShell: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+   - Windows PowerShell: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`, then reopen PowerShell. Full Windows walkthrough in **H (Windows)** below.
 
    Check with `uv --version`. uv downloads Python 3.12 by itself; you don't install Python separately.
 2. **Git**, plus a **GitHub** account.
@@ -299,14 +299,64 @@ uv run dvc push && git push
 - The profiling reports are in `reports/profiling/naukri_<year>.html`. Open them in a browser.
 
 **H. Every other teammate**
+
+Before you start:
+- Install uv (step A).
+- Make a DagsHub account (signing up with GitHub is easiest) and send your GitHub and DagsHub usernames to the repo owner.
+- The owner invites you **twice**: on GitHub (Settings → Collaborators) so you can push code, and on DagsHub (Settings → Collaborators, **write** access) so you can push data and MLflow runs.
+- Accept both invites, then create your own token: DagsHub → User Settings → Tokens. Never paste it into chat or commit it.
+
 ```bash
-git clone <github-url> && cd <repo>
-uv sync
-uv run dvc remote modify origin --local access_key_id <their-token>
-uv run dvc remote modify origin --local secret_access_key <their-token>
-uv run dvc pull
-uv run dvc repro          # should print "Data and pipelines are up to date."
+git clone https://github.com/AdithyaP-72/Career_Guidance_ML_Ops.git && cd Career_Guidance_ML_Ops
+uv sync                                   # installs the exact versions from uv.lock
+read -rs DAGSHUB_TOKEN                    # type this line, Enter, then paste your token, Enter
+uv run dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
+uv run dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
+unset DAGSHUB_TOKEN
+uv run dvc pull                           # raw data + all pipeline outputs from DagsHub
+uv run pytest -q                          # 28 passed
+uv run dvc repro                          # must print "Data and pipelines are up to date."
 ```
+**H (Windows): the same steps in PowerShell**
+
+1. Install the tools. Open **PowerShell** (Start → "PowerShell"); admin isn't needed:
+   ```powershell
+   winget install --id Git.Git -e --source winget                            # Git (skip if `git --version` works)
+   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"   # uv
+   ```
+   **Close and reopen PowerShell** so `git` and `uv` are on your PATH, then check:
+   ```powershell
+   git --version
+   uv --version
+   ```
+2. Clone and install. Use separate lines: Windows PowerShell 5.1 doesn't understand `&&`.
+   ```powershell
+   cd $HOME\Documents                      # or wherever you keep projects; avoid OneDrive-synced folders
+   git clone https://github.com/AdithyaP-72/Career_Guidance_ML_Ops.git
+   cd Career_Guidance_ML_Ops
+   uv sync                                 # downloads Python 3.12 itself + exact versions from uv.lock
+   ```
+3. Store your DagsHub token without it appearing on screen or in PowerShell's history:
+   ```powershell
+   $sec = Read-Host "Paste your DagsHub token" -AsSecureString
+   $tok = [System.Net.NetworkCredential]::new("", $sec).Password
+   uv run dvc remote modify origin --local access_key_id $tok
+   uv run dvc remote modify origin --local secret_access_key $tok
+   Remove-Variable sec, tok
+   ```
+4. Pull and verify:
+   ```powershell
+   uv run dvc pull                         # raw data + pipeline outputs from DagsHub
+   uv run pytest -q                        # 28 passed
+   uv run dvc repro                        # must print "Data and pipelines are up to date."
+   ```
+5. Notebook: same as step G. In VS Code the kernel is `.venv\Scripts\python.exe` (not `.venv/bin/python`).
+
+Windows notes:
+- **Line endings:** `.gitattributes` forces LF endings on checkout. Without it, Git for Windows would convert files to CRLF, DVC's hashes would no longer match `dvc.lock`, and `dvc repro` would rerun everything. If you cloned *before* `.gitattributes` was added, delete the folder and clone again.
+- **OneDrive:** don't put the repo in a OneDrive-synced folder. Syncing `.venv` and `.dvc/cache` is slow and can lock files mid-run.
+- **Git Bash** (installed with Git) also works. In it, the Linux commands above run as written, including `read -rs`.
+- PLFS isn't on DagsHub (see step D). Nobody needs it until the education-prior stage. If you do: `uv run python -m src.data.download --only plfs`.
 That last line is the Phase 1 reproducibility check.
 
 ### Step 0: Decisions locked in (seniors' "versions!!!" advice)
@@ -343,7 +393,7 @@ That last line is the Phase 1 reproducibility check.
 ├── tests/                       # pytest: skills, labelling rules, features
 ├── dvc.yaml  params.yaml        # the pipeline and every tunable value
 ├── pyproject.toml  uv.lock  .python-version   # created by you in step B
-├── ruff.toml  conftest.py  .gitignore
+├── ruff.toml  conftest.py  .gitignore  .gitattributes
 └── README.md
 ```
 Every pipeline script runs as `uv run python -m src.<module>` from the repo root.

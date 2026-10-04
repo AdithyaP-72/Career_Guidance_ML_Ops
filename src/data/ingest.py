@@ -153,7 +153,7 @@ def main() -> None:
     INTERIM.mkdir(parents=True, exist_ok=True)
     postings.to_parquet(INTERIM / "postings.parquet", index=False)
     write_json(summary, REPORTS / "ingest_summary.json")
-    log.info("wrote %d postings → data/interim/postings.parquet", len(postings))
+    log.info("wrote %d postings -> data/interim/postings.parquet", len(postings))
 
 
 if __name__ == "__main__":

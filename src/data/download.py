@@ -52,7 +52,7 @@ def main() -> None:
 
     if args.list:
         for name, s in sources.items():
-            print(f"{name:24s} {s['group']:11s} → data/raw/{s['dest']}/  [{s['licence']}]  {s['page']}")
+            print(f"{name:24s} {s['group']:11s} -> data/raw/{s['dest']}/  [{s['licence']}]  {s['page']}")
         return
 
     chosen = {

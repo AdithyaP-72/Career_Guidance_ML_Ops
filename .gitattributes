@@ -1,0 +1,9 @@
+# Same line endings (LF) on every OS.
+# Without this, Git on Windows checks text files out with CRLF. That changes their bytes,
+# so DVC's hashes no longer match dvc.lock and `dvc repro` reruns stages for no reason.
+* text=auto eol=lf
+
+*.parquet binary
+*.npz binary
+*.xlsx binary
+*.png binary
