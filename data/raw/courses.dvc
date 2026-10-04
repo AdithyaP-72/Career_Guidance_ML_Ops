@@ -1,0 +1,6 @@
+outs:
+- md5: f674c6bd5d4eb20458cb25011465903f.dir
+  size: 39082990
+  nfiles: 2
+  hash: md5
+  path: courses
