@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Guide</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#12161c;--mute:#667085;--line:#e4e7ec;--accent:#2f5bea;--accent-2:#5b8def;--accent-ink:#fff;--soft:#eef2ff;--good:#12805c;--bad:#c0392b;--warn:#a15c00;--shadow:0 1px 2px rgba(16,24,40,.05),0 4px 16px rgba(16,24,40,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0c0f14;--card:#151a21;--ink:#eaedf2;--mute:#93a0b4;--line:#242b35;--accent:#7a9cff;--accent-2:#9db5ff;--accent-ink:#0a1020;--soft:#1a2236;--good:#4cc79a;--bad:#ff8f84;--warn:#e8b04b;--shadow:none}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .in{max-width:920px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:700;font-size:17px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-size:14px}
+nav{display:flex;gap:2px}
+nav button{border:0;background:none;color:var(--mute);padding:7px 14px;border-radius:8px;font:inherit;font-weight:500;cursor:pointer;transition:.15s}
+nav button:hover{color:var(--ink)}
+nav button.on{background:var(--soft);color:var(--accent)}
+.hero{padding:34px 0 18px}
+.hero h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--mute);max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card h2{font-size:16px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mute);font-size:13px;margin:0 0 14px}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+.hint{color:var(--mute);font-size:13px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.row{grid-template-columns:1fr}.hero h1{font-size:24px}}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:.15s}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.box{position:relative}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:10;background:var(--card);border:1px solid var(--line);border-radius:12px;max-height:250px;overflow:auto;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:4px}
+.sugg div{padding:8px 10px;border-radius:8px;cursor:pointer}
+.sugg div.act,.sugg div:hover{background:var(--soft)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:4px}
+.chip{background:var(--soft);color:var(--accent);border-radius:999px;padding:4px 6px 4px 12px;display:inline-flex;gap:4px;align-items:center;font-size:13.5px;font-weight:500;animation:pop .15s}
+@keyframes pop{from{transform:scale(.9);opacity:0}}
+.chip button{border:0;background:none;color:inherit;opacity:.6;cursor:pointer;font-size:16px;line-height:1;padding:0 4px}
+.chip button:hover{opacity:1}
+.actions{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer;transition:.15s}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line);font-weight:500;padding:9px 16px}
+.btn.ghost:hover{background:var(--soft)}
+.progress{flex:1;min-width:140px;font-size:13px;color:var(--mute)}
+.err{color:var(--bad);margin-top:10px;font-size:14px}
+.hidden{display:none!important}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.matches{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:700px){.matches{grid-template-columns:1fr}}
+.match{border:1.5px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;background:var(--card);text-align:left;font:inherit;color:inherit;transition:.15s}
+.match:hover{border-color:var(--accent-2)}
+.match.on{border-color:var(--accent);background:var(--soft)}
+.match .rk{font-size:12px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.match .nm{font-weight:650;font-size:16px;margin:2px 0 2px;letter-spacing:-.01em}
+.match .pc{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:8px 0 6px;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--accent)}
+.pill.g{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.pill.w{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.pill.b{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.pill.m{background:var(--bg);color:var(--mute);border:1px solid var(--line)}
+.note{background:var(--soft);border-radius:10px;padding:10px 14px;margin:0 0 12px;font-size:14px}
+.sec{margin-top:22px}
+.sec h3{font-size:14px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;flex:none;transition:.5s}
+.ring b{width:72px;height:72px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:20px;letter-spacing:-.02em}
+.head{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.head h2{font-size:21px;letter-spacing:-.02em;margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:13.5px;padding:4px 11px;border-radius:99px;border:1px solid var(--line)}
+.tag.have{background:color-mix(in srgb,var(--good) 12%,transparent);border-color:transparent;color:var(--good);font-weight:500}
+.tag.miss{color:var(--mute)}
+.why{display:grid;gap:8px}
+.why .r{display:grid;grid-template-columns:130px 1fr 40px;gap:10px;align-items:center;font-size:14px}
+.why .r span:last-child{color:var(--mute);text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:500px){.why .r{grid-template-columns:90px 1fr 36px}}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.steps li:first-child{border-top:0}
+.steps li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:13px}
+.steps .t{font-weight:600;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.steps a{color:var(--accent);text-decoration:none;font-weight:500}.steps a:hover{text-decoration:underline}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi>div{border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:24px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--mute);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.filters input{flex:1;min-width:200px}.filters select{width:auto;min-width:200px}
+.rolelist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.rolelist button{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:.15s}
+.rolelist button:hover{border-color:var(--accent-2);transform:translateY(-1px)}
+.rolelist small{display:block;color:var(--mute)}
+.skbar{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center;margin:6px 0;font-size:14px}
+@media(max-width:560px){.skbar{grid-template-columns:100px 1fr 40px}}
+.bi{display:flex;gap:6px;align-items:center}
+.drift2{display:grid;grid-template-columns:1fr 1fr;gap:24px}@media(max-width:640px){.drift2{grid-template-columns:1fr}}
+.up i{background:var(--good)!important}.dn i{background:var(--bad)!important}
+.empty{color:var(--mute);padding:14px 0}
+footer{color:var(--mute);font-size:12.5px;text-align:center;margin-top:30px}
+.skeleton{height:120px;border-radius:14px;background:linear-gradient(90deg,var(--line),var(--soft),var(--line));background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.fade{animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+@media print{.top,.hero,#inputCard,.actions,#fb,nav,.filters,footer{display:none!important}.card{box-shadow:none;break-inside:avoid}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="top"><div class="in">
+  <div class="brand"><span class="logo">↗</span> Career Guide</div>
+  <nav aria-label="Sections">
+    <button id="t-find" class="on">Find my career</button>
+    <button id="t-roles">Explore roles</button>
+    <button id="t-ins">Insights</button>
+  </nav>
+</div></div>
+
+<div class="wrap">
+<!-- ============ FIND ============ -->
+<section id="find">
+  <div class="hero">
+    <h1>Which job fits the skills you already have?</h1>
+    <p>Add 5 to 10 skills. We match you against 70,000+ real Indian job postings across 100+ roles, show your skill gaps and build a learning path.</p>
+  </div>
+
+  <div class="card" id="inputCard">
+    <label for="q">Your skills</label>
+    <div class="box">
+      <input id="q" autocomplete="off" placeholder="Type a skill, e.g. tally, python, sales" role="combobox" aria-expanded="false" aria-controls="sugg">
+      <div id="sugg" class="sugg hidden" role="listbox"></div>
+    </div>
+    <div id="chips" class="chips" aria-live="polite"></div>
+    <div class="row" style="margin-top:16px">
+      <div><label for="exp">Experience (years)</label><input id="exp" type="number" min="0" max="50" step="0.5" value="0"></div>
+      <div><label for="edu">Education <span class="hint">(optional)</span></label><select id="edu"></select></div>
+    </div>
+    <div class="actions">
+      <button id="go" class="btn" disabled>Find my matches</button>
+      <button id="clear" class="btn ghost">Reset</button>
+      <span id="count" class="progress"></span>
+    </div>
+    <div id="err" class="err" role="alert"></div>
+  </div>
+
+  <div id="load" class="skeleton hidden"></div>
+  <div id="out" class="hidden fade">
+    <div class="card">
+      <h2>Your top matches</h2>
+      <p class="sub">Match strength shows how closely your skills resemble postings for each role. It is not a personal probability.</p>
+      <div id="note"></div>
+      <div id="matches" class="matches"></div>
+    </div>
+    <div class="card" id="detail"></div>
+    <div class="card" id="fb" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <span>Was this helpful?</span>
+      <button class="btn ghost" data-v="1">Yes</button><button class="btn ghost" data-v="0">No</button>
+      <span id="fbmsg" class="hint"></span>
+      <span style="flex:1"></span>
+      <button class="btn ghost" id="print">Save as PDF</button>
+      <button class="btn ghost" id="copy">Copy summary</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROLES ============ -->
+<section id="roles" class="hidden">
+  <div class="hero"><h1>Explore roles</h1><p>What each role actually asks for, built from job postings: core skills, how often they appear, whether they are rising or fading, and where to learn them.</p></div>
+  <div class="filters"><input id="rq" placeholder="Search roles…" aria-label="Search roles"><select id="rf" aria-label="Filter by family"></select></div>
+  <div id="rolelist" class="rolelist"></div>
+  <div id="roledetail" class="card hidden" style="margin-top:16px"></div>
+</section>
+
+<!-- ============ INSIGHTS ============ -->
+<section id="ins" class="hidden">
+  <div class="hero"><h1>Model & monitoring</h1><p>How well the recommender performs, how the job market moved from 2019 to 2025, and what real users are doing.</p></div>
+  <div class="card"><h2>Model quality</h2><p class="sub">Measured on held-out postings. The headline test gives the model only 5 random skills per posting, like a real user.</p><div id="model"></div></div>
+  <div class="card"><h2>Job market drift: 2019 → 2025</h2><p class="sub">A model trained on 2019 postings loses accuracy on 2025 postings, which is why the pipeline retrains.</p><div id="drift19"></div></div>
+  <div class="card"><h2>Live usage</h2><p class="sub">From this app's local request log. Drift compares skills users enter against the training data.</p><div id="live"></div></div>
+  <div class="card"><h2>Model versions</h2><p class="sub">A retrained challenger replaces the serving champion only if it scores at least as well.</p><div id="versions"></div></div>
+</section>
+<footer>Trained on Naukri postings (2019, 2025). Runs fully offline on your machine.</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pc = x => x == null ? '–' : Math.round(x * 100) + '%';
+const pc1 = x => x == null ? '–' : (x * 100).toFixed(1) + '%';
+const S = {skills: [], res: null, role: null, rid: null, sugg: [], act: -1, MIN: 5, MAX: 10};
+let timer;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : (j.detail?.[0]?.msg || 'Request failed'));
+  return j;
+}
+const store = {
+  get(){ try { return JSON.parse(localStorage.getItem('cg') || '{}'); } catch { return {}; } },
+  set(o){ try { localStorage.setItem('cg', JSON.stringify(o)); } catch {} }
+};
+
+/* ---------- input ---------- */
+function renderChips() {
+  $('#chips').innerHTML = S.skills.map((s, i) => `<span class="chip">${esc(s)}<button aria-label="Remove ${esc(s)}" data-i="${i}">×</button></span>`).join('');
+  const n = S.skills.length;
+  $('#count').textContent = n === 0 ? `Pick at least ${S.MIN}` : n < S.MIN ? `${n} of ${S.MIN} · add ${S.MIN - n} more` : `${n} of up to ${S.MAX} · ready`;
+  $('#go').disabled = n < S.MIN;
+  store.set({...store.get(), skills: S.skills, exp: $('#exp').value, edu: $('#edu').value});
+}
+function addSkill(s) {
+  s = s.trim().toLowerCase();
+  if (s && !S.skills.includes(s) && S.skills.length < S.MAX) S.skills.push(s);
+  $('#q').value = ''; hideSugg(); renderChips();
+}
+function hideSugg(){ $('#sugg').classList.add('hidden'); $('#q').setAttribute('aria-expanded', 'false'); S.act = -1; }
+function showSugg() {
+  const l = S.sugg.filter(s => !S.skills.includes(s));
+  if (!l.length) return hideSugg();
+  $('#sugg').innerHTML = l.map((s, i) => `<div role="option" data-s="${esc(s)}" class="${i === S.act ? 'act' : ''}">${esc(s)}</div>`).join('');
+  $('#sugg').classList.remove('hidden'); $('#q').setAttribute('aria-expanded', 'true');
+}
+$('#q').addEventListener('input', e => {
+  clearTimeout(timer); const q = e.target.value.trim();
+  if (!q) return hideSugg();
+  timer = setTimeout(async () => { try { S.sugg = (await api('/skills?limit=8&q=' + encodeURIComponent(q))).skills; S.act = -1; showSugg(); } catch {} }, 100);
+});
+$('#q').addEventListener('keydown', e => {
+  const l = S.sugg.filter(s => !S.skills.includes(s));
+  if (e.key === 'ArrowDown') { e.preventDefault(); S.act = Math.min(S.act + 1, l.length - 1); showSugg(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); S.act = Math.max(S.act - 1, 0); showSugg(); }
+  else if (e.key === 'Enter') { e.preventDefault(); const p = l[S.act >= 0 ? S.act : 0]; if (p) addSkill(p); }
+  else if (e.key === 'Backspace' && !e.target.value && S.skills.length) { S.skills.pop(); renderChips(); }
+  else if (e.key === 'Escape') hideSugg();
+});
+$('#sugg').addEventListener('mousedown', e => { const d = e.target.closest('[data-s]'); if (d) { e.preventDefault(); addSkill(d.dataset.s); $('#q').focus(); } });
+document.addEventListener('click', e => { if (!e.target.closest('.box')) hideSugg(); });
+$('#chips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { S.skills.splice(+b.dataset.i, 1); renderChips(); } });
+$('#clear').onclick = () => { S.skills = []; $('#exp').value = 0; $('#edu').selectedIndex = 0; renderChips(); $('#out').classList.add('hidden'); $('#err').textContent = ''; };
+$('#exp').addEventListener('change', renderChips); $('#edu').addEventListener('change', renderChips);
+
+$('#go').onclick = async () => {
+  $('#err').textContent = ''; $('#go').disabled = true; $('#out').classList.add('hidden'); $('#load').classList.remove('hidden');
+  try {
+    const edu = $('#edu').value;
+    const res = await api('/recommend', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({skills: S.skills, experience: parseFloat($('#exp').value) || 0, education: edu.startsWith('Select') ? null : edu})});
+    S.res = res; S.rid = res.request_id; S.role = res.top_roles[0].role; $('#fbmsg').textContent = '';
+    $('#load').classList.add('hidden'); $('#out').classList.remove('hidden'); renderResult();
+    $('#out').scrollIntoView({behavior: 'smooth', block: 'start'});
+  } catch (e) { $('#load').classList.add('hidden'); $('#err').textContent = e.message; }
+  finally { renderChips(); }
+};
+
+/* ---------- results ---------- */
+const trendPill = t => t === 'emerging' ? '<span class="pill g">↗ rising</span>' : t === 'fading' ? '<span class="pill m">↘ fading</span>' : '';
+function renderResult() {
+  const r = S.res;
+  $('#note').innerHTML = [r.note, r.education_note].filter(Boolean).map(n => `<div class="note">${esc(n)}</div>`).join('') +
+    (r.low_confidence && r.top_families ? `<div class="note"><b>Closest fields:</b> ${r.top_families.map(f => `${esc(f.family)} ${pc(f.confidence)}`).join(' · ')}</div>` : '') +
+    (r.unknown_skills.length ? `<div class="note">Not in the model vocabulary, ignored: ${r.unknown_skills.map(esc).join(', ')}</div>` : '');
+  $('#matches').innerHTML = r.top_roles.map((x, i) => `
+    <button class="match ${x.role === S.role ? 'on' : ''}" data-r="${esc(x.role)}" aria-pressed="${x.role === S.role}">
+      <div class="rk">#${i + 1} match</div><div class="nm">${esc(x.role)}</div>
+      <div class="hint">${esc(x.family)}</div>
+      <div class="pc">${pc(x.confidence)}</div><div class="bar"><i style="width:${Math.max(3, x.confidence * 100)}%"></i></div></button>`).join('');
+  const d = r.details[S.role], ex = d.experience_range;
+  const maxw = Math.max(...d.why.map(w => w.weight), 0.01);
+  $('#detail').innerHTML = `
+    <div class="head">
+      <div class="ring" style="--p:${Math.round(d.readiness * 100)}"><b>${pc(d.readiness)}</b></div>
+      <div><h2>${esc(S.role)}</h2>
+        <div class="hint">Readiness: the share of this role's core skills you already cover, weighted by how often postings ask for them.</div>
+        <div class="hint" style="margin-top:4px">Typically asks for ${ex.p25}–${ex.p75} years of experience · titles: ${d.typical_titles.slice(0, 3).map(esc).join(', ')}</div></div>
+    </div>
+    ${d.why.length ? `<div class="sec"><h3>Why this role</h3><div class="why">${d.why.map(w => `<div class="r"><span>${esc(w.skill)}</span><div class="bar"><i style="width:${w.weight / maxw * 100}%"></i></div><span>${pc(w.weight)}</span></div>`).join('')}</div></div>` : ''}
+    <div class="sec grid2">
+      <div><h3>Skills you have</h3><div class="tags">${d.have.map(s => `<span class="tag have">✓ ${esc(s)}</span>`).join('') || '<span class="hint">None of the core skills yet</span>'}</div></div>
+      <div><h3>Still missing</h3><div class="tags">${d.missing.map(s => `<span class="tag miss">${esc(s)}</span>`).join('') || '<span class="hint">You cover every core skill</span>'}</div></div>
+    </div>
+    <div class="sec"><h3>Your learning path</h3>
+      ${d.learning_path.length ? `<ol class="steps">${d.learning_path.map(p => `<li><div>
+        <div class="t">${esc(p.skill)} ${trendPill(p.trend)} ${p.match_gain != null && p.match_gain > 0.005 ? `<span class="pill">+${Math.round(p.match_gain * 100)} pts match</span>` : ''}</div>
+        <div class="hint">Asked in ${esc(p.asked_in)}</div>
+        <div style="margin-top:4px">${p.course ? `<a href="${esc(p.course.url)}" target="_blank" rel="noopener">${esc(p.course.title)} ↗</a> <span class="hint">· ${esc(p.course.provider)}</span>` : `<span class="hint">No free course matched · </span><a href="https://www.google.com/search?q=${encodeURIComponent('learn ' + p.skill + ' course')}" target="_blank" rel="noopener">search the web ↗</a>`}</div>
+      </div></li>`).join('')}</ol>` : '<div class="empty">Nothing missing, you already cover this role\'s core skills.</div>'}
+    </div>`;
+}
+$('#matches').addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b) { S.role = b.dataset.r; renderResult(); } });
+$('#fb').addEventListener('click', async e => {
+  const b = e.target.closest('[data-v]'); if (!b || !S.rid) return;
+  try { await api('/feedback', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({request_id: S.rid, helpful: b.dataset.v === '1', role: S.role})}); $('#fbmsg').textContent = 'Thanks for the feedback.'; } catch { $('#fbmsg').textContent = 'Could not save.'; }
+});
+$('#print').onclick = () => window.print();
+$('#copy').onclick = async () => {
+  const r = S.res, d = r.details[S.role];
+  const t = `Career Guide - ${S.role} (${pc(r.top_roles.find(x => x.role === S.role).confidence)} match, readiness ${pc(d.readiness)})\nSkills: ${S.skills.join(', ')}\nMissing: ${d.missing.join(', ')}\nLearning path:\n` + d.learning_path.map((p, i) => `${i + 1}. ${p.skill}${p.course ? ' - ' + p.course.title + ' ' + p.course.url : ''}`).join('\n');
+  try { await navigator.clipboard.writeText(t); $('#fbmsg').textContent = 'Copied.'; } catch { $('#fbmsg').textContent = 'Copy not available.'; }
+};
+
+/* ---------- explore roles ---------- */
+let ROLES = [];
+function renderRoleList() {
+  const q = $('#rq').value.toLowerCase(), f = $('#rf').value;
+  const l = ROLES.filter(r => (!q || r.role.toLowerCase().includes(q)) && (f === 'All families' || r.family === f));
+  $('#rolelist').innerHTML = l.map(r => `<button data-role="${esc(r.role)}"><b>${esc(r.role)}</b><small>${esc(r.family)} · ${r.n_postings.toLocaleString()} postings</small></button>`).join('') || '<div class="empty">No roles match.</div>';
+}
+async function openRole(name) {
+  const p = await api('/roles/' + encodeURIComponent(name));
+  const max = Math.max(...p.core_skills.map(s => s.share));
+  $('#roledetail').classList.remove('hidden');
+  $('#roledetail').innerHTML = `<div class="fade"><h2 style="font-size:20px">${esc(p.role)}</h2><div class="hint">${esc(p.family)} · ${p.n_postings.toLocaleString()} postings analysed · typically ${p.experience.p25}–${p.experience.p75} years of experience</div>
+    <div class="sec"><h3>Core skills (share of postings asking)</h3>${p.core_skills.map(s => `<div class="skbar"><span>${esc(s.skill)}</span><div class="bar"><i style="width:${s.share / max * 100}%"></i></div><span>${pc(s.share)}</span></div>
+      ${s.trend !== 'steady' || s.course ? `<div class="hint" style="margin:-2px 0 4px 160px;font-size:12.5px">${trendPill(s.trend)} ${s.course ? `<a href="${esc(s.course.url)}" target="_blank" rel="noopener">${esc(s.course.title)} ↗</a>` : ''}</div>` : ''}`).join('')}</div>
+    <div class="sec"><h3>Common job titles</h3><div class="tags">${p.top_titles.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div></div></div>`;
+  $('#roledetail').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+$('#rq').addEventListener('input', renderRoleList); $('#rf').addEventListener('change', renderRoleList);
+$('#rolelist').addEventListener('click', e => { const b = e.target.closest('[data-role]'); if (b) openRole(b.dataset.role); });
+
+/* ---------- insights ---------- */
+function moverBars(list, cls) {
+  const max = Math.max(...list.map(x => Math.abs(x.share_2025 - x.share_2019)), 0.001);
+  return list.map(x => { const d = x.share_2025 - x.share_2019; return `<div class="skbar ${cls}"><span>${esc(x.skill)}</span><div class="bar"><i style="width:${Math.abs(d) / max * 100}%"></i></div><span>${d > 0 ? '+' : ''}${(d * 100).toFixed(1)}</span></div>`; }).join('');
+}
+async function loadInsights() {
+  try {
+    const [m, dr, st] = await Promise.all([api('/model-info'), api('/drift'), api('/stats')]);
+    const mt = m.metrics, h = mt['5_skills'], f = mt.full_postings, lq = m.label_quality;
+    $('#model').innerHTML = h ? `<div class="kpi">
+      <div><b>${pc1(h.top3)}</b><span>Top-3 accuracy (5 skills)</span></div>
+      <div><b>${pc1(f.top3)}</b><span>Top-3 accuracy (full postings)</span></div>
+      <div><b>${pc1(mt.baseline_profile_matching.top3)}</b><span>Simple profile-matching baseline</span></div>
+      <div><b>${pc1(mt.in_vocabulary_5_skills?.top3)}</b><span>Top-3 with skills picked from the search box</span></div>
+      <div><b>${pc1(mt.independent_checks?.naukri_2019_recruiter_role?.top3_hit)}</b><span>Top-3 vs recruiter-chosen roles (2019, independent of our rules)</span></div>
+      <div><b>${pc1(lq.family_agreement_2019_plausible)}</b><span>Rule labels vs Naukri's categories (plausible-family)</span></div></div>
+      ${mt.by_n_skills ? `<table style="margin-top:14px"><tr><th>Skills entered</th>${Object.keys(mt.by_n_skills).map(k => `<th class="n">${k}</th>`).join('')}</tr><tr><td>Top-3 accuracy</td>${Object.values(mt.by_n_skills).map(v => `<td class="n">${pc1(v.top3)}</td>`).join('')}</tr></table><div class="hint" style="margin-top:6px">More skills means a sharper match, which is why the app asks for at least 5.</div>` : ''}
+      ${m.comparison.length ? `<table style="margin-top:14px"><tr><th>Model</th><th class="n">Top-3</th><th class="n">Top-1</th><th class="n">Macro-F1</th></tr>${m.comparison.map(r => `<tr><td>${esc(r.model)}</td><td class="n">${pc1(r.top3)}</td><td class="n">${pc1(r.top1)}</td><td class="n">${r.macro_f1.toFixed(3)}</td></tr>`).join('')}</table>` : ''}` : '<div class="empty">Run the pipeline to see metrics.</div>';
+    const d = m.drift_2019_2025;
+    $('#drift19').innerHTML = d.top3_on_2019 ? `<div class="kpi" style="margin-bottom:16px">
+      <div><b>${pc1(d.top3_on_2019)} → ${pc1(d.top3_on_2025)}</b><span>Top-3, 2019-trained model on 2019 vs 2025</span></div>
+      <div><b>−${(d.performance_drop * 100).toFixed(1)} pts</b><span>Performance drop</span></div>
+      <div><b>${d.js_distance}</b><span>Skill drift (JS distance) <span class="pill ${d.status === 'ok' ? 'g' : d.status === 'warning' ? 'w' : 'b'}">${esc(d.status)}</span></span></div></div>
+      <div class="drift2"><div class="up"><h3 style="font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em">Rising skills (pts of postings)</h3>${moverBars(d.risers, 'up')}</div>
+      <div class="dn"><h3 style="font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em">Fading skills</h3>${moverBars(d.fallers, 'dn')}</div></div>` : '<div class="empty">Run the pipeline to see the drift report.</div>';
+    $('#live').innerHTML = `<div class="kpi"><div><b>${st.requests}</b><span>Recommendations served</span></div><div><b>${st.feedback}</b><span>Feedback received</span></div><div><b>${st.helpful_rate == null ? '–' : pc(st.helpful_rate)}</b><span>Found helpful</span></div>
+      <div><b>${dr.status === 'insufficient_data' ? '–' : dr.js_distance}</b><span>Live drift ${dr.status === 'insufficient_data' ? `(needs ${dr.min_required} requests)` : `<span class="pill ${dr.status === 'ok' ? 'g' : dr.status === 'warning' ? 'w' : 'b'}">${esc(dr.status)}</span>`}</span></div></div>
+      ${st.retrain_recommended ? `<div class="note" style="margin-top:14px"><b>Retrain recommended:</b> ${st.retrain_reasons.map(esc).join('; ')}. Run <code>python manage.py retrain</code>.</div>` : ''}
+      ${st.least_helpful_roles.length ? `<table style="margin-top:14px"><tr><th>Least helpful roles (from feedback)</th><th class="n">Rated</th><th class="n">Helpful</th></tr>${st.least_helpful_roles.map(r => `<tr><td>${esc(r.role)}</td><td class="n">${r.rated}</td><td class="n">${pc(r.helpful_rate)}</td></tr>`).join('')}</table>` : ''}
+      ${st.top_roles.length ? `<table style="margin-top:14px"><tr><th>Most recommended roles</th><th class="n">Count</th></tr>${st.top_roles.map(r => `<tr><td>${esc(r.role)}</td><td class="n">${r.count}</td></tr>`).join('')}</table>` : ''}`;
+    $('#versions').innerHTML = m.promotions.length ? `<table><tr><th>When</th><th>Decision</th><th class="n">Challenger top-3</th><th class="n">Champion top-3</th></tr>${m.promotions.slice().reverse().map(p => `<tr><td>${esc(p.time)}</td><td>${esc(p.decision)}</td><td class="n">${pc1(p.challenger.top3)}</td><td class="n">${pc1(p.champion?.top3)}</td></tr>`).join('')}</table>` : '<div class="empty">No promotions yet. Run <code>make retrain</code>.</div>';
+  } catch (e) { $('#model').textContent = e.message; }
+}
+
+/* ---------- tabs ---------- */
+function tab(w) {
+  for (const [k, id] of [['find', 'find'], ['roles', 'roles'], ['ins', 'ins']]) { $('#' + id).classList.toggle('hidden', k !== w); $('#t-' + k).classList.toggle('on', k === w); }
+  window.scrollTo({top: 0});
+  if (w === 'ins') loadInsights();
+  history.replaceState(null, '', '#' + w);
+}
+$('#t-find').onclick = () => tab('find'); $('#t-roles').onclick = () => tab('roles'); $('#t-ins').onclick = () => tab('ins');
+
+/* ---------- init ---------- */
+(async () => {
+  try {
+    const [m, roles] = await Promise.all([api('/meta'), api('/roles')]);
+    S.MIN = m.min_skills; S.MAX = m.max_skills || 10;
+    $('#edu').innerHTML = ['Select…', ...m.education].map(x => `<option>${esc(x)}</option>`).join('');
+    ROLES = roles.roles;
+    $('#rf').innerHTML = ['All families', ...m.families].map(x => `<option>${esc(x)}</option>`).join('');
+    renderRoleList();
+    const st = store.get(); S.skills = st.skills || []; $('#exp').value = st.exp ?? 0; if (st.edu) $('#edu').value = st.edu;
+  } catch (e) { $('#err').textContent = 'Cannot reach the API: ' + e.message; }
+  renderChips();
+  const h = location.hash.slice(1); if (['roles', 'ins'].includes(h)) tab(h);
+})();
+</script>
+</body>
+</html>

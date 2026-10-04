@@ -1,0 +1,35 @@
+# variant -> canonical skill (all lower-case)
+react.js: react
+reactjs: react
+react js: react
+node: node.js
+nodejs: node.js
+node js: node.js
+js: javascript
+java script: javascript
+ms office: microsoft office
+m.s office: microsoft office
+ms excel: excel
+microsoft excel: excel
+advanced excel: excel
+ms word: microsoft word
+ms powerpoint: powerpoint
+power bi: power bi
+powerbi: power bi
+postgresql: postgres
+mysql database: mysql
+c plus plus: c++
+asp.net: .net
+dotnet: .net
+dot net: .net
+communication: communication skills
+good communication: communication skills
+good communication skills: communication skills
+english communication: communication skills
+tally erp 9: tally erp
+tally erp9: tally erp
+tally prime: tally
+gst filing: gst
+tds filing: tds
+ml: machine learning
+ai: artificial intelligence

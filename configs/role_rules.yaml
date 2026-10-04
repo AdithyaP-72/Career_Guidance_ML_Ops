@@ -1,0 +1,248 @@
+# Title regex -> specific role + family. Matched against the lower-cased posting title.
+# Rules are ordered specific -> general; the FIRST match wins. Reviewed like code
+# (see tests/test_labels.py). Use \b word boundaries: "unity" must not match "opportunity".
+families:
+  - Software Development
+  - QA & Testing
+  - Data & Analytics
+  - IT Infra & Support
+  - ERP / Enterprise Apps
+  - Sales & BD
+  - Customer Service / BPO
+  - HR & Recruitment
+  - Accounting & Finance
+  - Banking & Financial Services
+  - Marketing
+  - Content & Media
+  - Teaching & Training
+  - Design & Creative
+  - Healthcare & Pharma
+  - Manufacturing & Core Engg
+  - Construction & Site Engg
+  - Supply Chain & Logistics
+  - Office Admin & Data Entry
+  - Hospitality
+  - Legal
+  - Strategy & Consulting
+
+# Families that Naukri lumps together under one 'IT' functional area (agreement is also reported grouped).
+it_group: [Software Development, QA & Testing, Data & Analytics, IT Infra & Support, ERP / Enterprise Apps]
+
+# Naukri 2019 "Functional Area" keyword -> our family (used only to score label agreement).
+naukri_functional_area:
+  "it software": Software Development
+  "software": Software Development
+  "qa": QA & Testing
+  "testing": QA & Testing
+  "analytics": Data & Analytics
+  "data": Data & Analytics
+  "it hardware": IT Infra & Support
+  "network": IT Infra & Support
+  "system admin": IT Infra & Support
+  "dba": IT Infra & Support
+  "erp": ERP / Enterprise Apps
+  "sales": Sales & BD
+  "business development": Sales & BD
+  "customer service": Customer Service / BPO
+  "bpo": Customer Service / BPO
+  "call centre": Customer Service / BPO
+  "hr": HR & Recruitment
+  "recruitment": HR & Recruitment
+  "accounts": Accounting & Finance
+  "finance": Accounting & Finance
+  "taxation": Accounting & Finance
+  "banking": Banking & Financial Services
+  "insurance": Banking & Financial Services
+  "marketing": Marketing
+  "advertising": Marketing
+  "content": Content & Media
+  "journalism": Content & Media
+  "media": Content & Media
+  "teaching": Teaching & Training
+  "education": Teaching & Training
+  "training": Teaching & Training
+  "design": Design & Creative
+  "creative": Design & Creative
+  "medical": Healthcare & Pharma
+  "healthcare": Healthcare & Pharma
+  "pharma": Healthcare & Pharma
+  "production": Manufacturing & Core Engg
+  "manufacturing": Manufacturing & Core Engg
+  "maintenance": Manufacturing & Core Engg
+  "engineering": Manufacturing & Core Engg
+  "construction": Construction & Site Engg
+  "site engineering": Construction & Site Engg
+  "supply chain": Supply Chain & Logistics
+  "logistics": Supply Chain & Logistics
+  "procurement": Supply Chain & Logistics
+  "purchase": Supply Chain & Logistics
+  "admin": Office Admin & Data Entry
+  "secretarial": Office Admin & Data Entry
+  "hospitality": Hospitality
+  "travel": Hospitality
+  "legal": Legal
+  "strategic": Strategy & Consulting
+  "consulting": Strategy & Consulting
+
+# Many-to-many view of Naukri 2019 "Functional Area": families a posting under that area could sensibly belong to.
+# Matched by lower-case substring, first match wins (specific first). Used for the "plausible" agreement metric.
+naukri_plausible:
+  "it hardware": [IT Infra & Support, Customer Service / BPO]
+  "it software": [Software Development, QA & Testing, Data & Analytics, IT Infra & Support, ERP / Enterprise Apps, Strategy & Consulting, Design & Creative]
+  "ites": [Customer Service / BPO, Sales & BD, IT Infra & Support, Office Admin & Data Entry, Accounting & Finance, Banking & Financial Services, HR & Recruitment]
+  "engineering design": [Manufacturing & Core Engg, Construction & Site Engg, Design & Creative, Software Development]
+  "architecture": [Construction & Site Engg, Design & Creative]
+  "fashion": [Design & Creative, Manufacturing & Core Engg, Supply Chain & Logistics]
+  "sales , retail": [Sales & BD, Marketing, Banking & Financial Services, Customer Service / BPO]
+  "hr ,": [HR & Recruitment, Office Admin & Data Entry]
+  "accounts": [Accounting & Finance, Legal, Banking & Financial Services]
+  "financial services": [Banking & Financial Services, Accounting & Finance, Sales & BD]
+  "marketing": [Marketing, Content & Media, Design & Creative, Sales & BD]
+  "production": [Manufacturing & Core Engg, Supply Chain & Logistics, Construction & Site Engg]
+  "teaching": [Teaching & Training, Customer Service / BPO]
+  "medical": [Healthcare & Pharma]
+  "design ,": [Design & Creative, Software Development]
+  "executive assistant": [Office Admin & Data Entry, Customer Service / BPO]
+  "site engineering": [Construction & Site Engg, Strategy & Consulting, Manufacturing & Core Engg]
+  "analytics": [Data & Analytics, Office Admin & Data Entry]
+  "journalism": [Content & Media, Marketing]
+  "hotels": [Hospitality]
+  "travel": [Hospitality]
+  "purchase": [Supply Chain & Logistics, Manufacturing & Core Engg]
+  "supply chain": [Supply Chain & Logistics, Manufacturing & Core Engg]
+  "export": [Supply Chain & Logistics, Sales & BD, Manufacturing & Core Engg]
+  "strategy": [Strategy & Consulting]
+  "top management": [Strategy & Consulting, Sales & BD]
+  "legal": [Legal]
+
+rules:
+  # ---------------- Legal / Medical / Teaching (distinctive, check early) ----------------
+  - {role: Company Secretary, family: Legal, pattern: 'company secretary|\bcs\b.*(executive|assistant)'}
+  - {role: Legal Associate / Advocate, family: Legal, pattern: '\b(lawyer|advocate|legal|attorney|paralegal|litigation|counsel)\b'}
+  - {role: Staff Nurse, family: Healthcare & Pharma, pattern: '\b(nurse|nursing|gnm|anm)\b'}
+  - {role: Doctor / Physician, family: Healthcare & Pharma, pattern: '\b(doctor|physician|surgeon|dentist|mbbs|medical officer|consultant (cardio|ortho|gyn))'}
+  - {role: Pharmacist, family: Healthcare & Pharma, pattern: 'pharmacist|pharmacy'}
+  - {role: Lab Technician, family: Healthcare & Pharma, pattern: 'lab (technician|technologist|assistant)|phlebotom|pathology|radiolog|x-ray'}
+  - {role: Medical Representative, family: Healthcare & Pharma, pattern: 'medical (representative|rep)\b|\bmr\b|pharma sales|medical sales'}
+  - {role: Pharmacovigilance / Medical Reviewer, family: Healthcare & Pharma, pattern: 'pharmacovigilance|drug safety|medical review|safety (associate|scientist|physician)|case (processing|intake)'}
+  - {role: Clinical Research / Pharma Executive, family: Healthcare & Pharma, pattern: 'clinical|pharmacovigilance|drug safety|regulatory affairs|\bqa\b.*pharma'}
+  - {role: Medical Coder / Billing, family: Healthcare & Pharma, pattern: 'medical (coder|coding|billing)|\brcm\b'}
+  - {role: Physiotherapist / Therapist, family: Healthcare & Pharma, pattern: 'physio|therapist|dietician|dietitian|optometr'}
+  - {role: School Teacher, family: Teaching & Training, pattern: '\b(pgt|tgt|prt)\b|school teacher|primary teacher|nursery|kindergarten|(maths|math|science|english|hindi|social|computer|physics|chemistry|biology) teacher'}
+  - {role: Professor / Lecturer, family: Teaching & Training, pattern: 'professor|lecturer|faculty'}
+  - {role: Tutor / Trainer, family: Teaching & Training, pattern: '\b(teacher|tutor|trainer|instructor|coach|educator|mentor)\b|training (executive|specialist)'}
+  - {role: Academic Counsellor, family: Teaching & Training, pattern: 'academic (counsel|advis)|admission'}
+
+  # ---------------- Tech: very specific first ----------------
+  - {role: SAP ABAP Developer, family: ERP / Enterprise Apps, pattern: '\babap\b'}
+  - {role: Salesforce Developer, family: ERP / Enterprise Apps, pattern: 'salesforce|\bsfdc\b|\bcrm (developer|consultant)'}
+  - {role: ServiceNow Developer, family: ERP / Enterprise Apps, pattern: 'servicenow|service now'}
+  - {role: SAP Functional Consultant, family: ERP / Enterprise Apps, pattern: '\bsap\b|\bs/?4\s?hana|\bsuccessfactors'}
+  - {role: Oracle / Dynamics ERP Consultant, family: ERP / Enterprise Apps, pattern: 'oracle (apps|erp|fusion|financ|cloud)|dynamics 365|\bnetsuite|\bworkday|\bpeoplesoft|\bsiebel|\berp\b'}
+  - {role: Machine Learning / AI Engineer, family: Data & Analytics, pattern: '\b(ai|ml|nlp|genai|llm|deep learning|machine learning|computer vision)\b|generative ai|ai/ml|artificial intelligence'}
+  - {role: Data Scientist, family: Data & Analytics, pattern: 'data scien'}
+  - {role: Data Engineer, family: Data & Analytics, pattern: 'data engineer|\betl\b|big data|hadoop|spark|databricks|snowflake|data (warehouse|architect|platform)|\bdwh\b|data ops'}
+  - {role: BI / Reporting Developer, family: Data & Analytics, pattern: '\bbi\b|power ?bi|tableau|business intelligence|reporting (analyst|developer|executive)|mis (analyst|executive|developer)|\bmis\b'}
+  - {role: Data Analyst, family: Data & Analytics, pattern: 'data analy|analytics|insights? analyst|research analyst'}
+  - {role: Database Administrator, family: IT Infra & Support, pattern: '\bdba\b|database (admin|engineer|developer)|\boracle dba|sql (dba|developer)|postgres|mongodb'}
+  - {role: Cloud Engineer, family: IT Infra & Support, pattern: 'cloud (engineer|architect|admin|consultant|support|specialist)|\baws\b|\bazure\b|\bgcp\b'}
+  - {role: DevOps Engineer, family: IT Infra & Support, pattern: 'devops|\bsre\b|site reliability|kubernetes|platform engineer|infrastructure engineer|release engineer|build (and|&) release|\bsystem reliability'}
+  - {role: Cyber Security Analyst, family: IT Infra & Support, pattern: 'security (analyst|engineer|architect|consultant|specialist|operations)|cyber|\bsoc\b|infosec|penetration|vapt|iam\b'}
+  - {role: Network Engineer, family: IT Infra & Support, pattern: 'network (engineer|administrator|admin|security|support|specialist)|\bccna\b|\bnoc\b|firewall|routing'}
+  - {role: System Administrator, family: IT Infra & Support, pattern: 'system(s)? (admin|engineer|administrator)|\blinux\b|\bwindows (admin|server)|\bvmware|sysadmin|server (admin|engineer)'}
+  - {role: Application Support Engineer, family: IT Infra & Support, pattern: 'application (support|tech support)|infra tech support|tech support practitioner|production support|l[123] (support|engineer)|\bapp support'}
+  - {role: IT Support / Helpdesk Engineer, family: IT Infra & Support, pattern: 'help ?desk|desktop (support|engineer)|it support|technical support|service desk|l1 support|l2 support|it (executive|technician|engineer)|hardware (engineer|technician)|support engineer'}
+  - {role: Test / QA Engineer, family: QA & Testing, pattern: '\bqa\b|\bsdet\b|test(ing)? (engineer|analyst|lead|automation|manager|executive)|software testing|performance testing|quality assurance|\btester\b|selenium|automation (engineer|test)|manual test'}
+  - {role: Android Developer, family: Software Development, pattern: 'android|kotlin'}
+  - {role: iOS Developer, family: Software Development, pattern: '\bios\b|swift|iphone'}
+  - {role: Mobile / Flutter / React Native Developer, family: Software Development, pattern: 'flutter|react native|mobile (app|developer|application)|xamarin'}
+  - {role: Game Developer, family: Software Development, pattern: '\bunity (3d|developer|engineer|game)|game (developer|programmer|designer)|unreal'}
+  - {role: VLSI / Hardware Design Engineer, family: Software Development, pattern: 'vlsi|physical design|\brtl\b|\basic\b|\bfpga\b|verification engineer|hardware design|analog|layout engineer|\bsoc design'}
+  - {role: Embedded / Firmware Engineer, family: Software Development, pattern: 'embedded|firmware|\brtos\b|\bdevice driver'}
+  - {role: Full Stack Developer, family: Software Development, pattern: 'full ?-? ?stack|\bmern\b|\bmean\b'}
+  - {role: Frontend Developer, family: Software Development, pattern: 'front ?-? ?end|\breact\b|angular|\bvue\b|\bui developer|ui engineer|ui/ux developer|\bhtml\b|javascript|\bjs\b|web developer'}
+  - {role: Java Developer, family: Software Development, pattern: '\bjava\b|spring ?boot|j2ee|\bjvm\b|hibernate|microservices'}
+  - {role: Python Developer, family: Software Development, pattern: 'python|django|flask|fastapi'}
+  - {role: .NET Developer, family: Software Development, pattern: '\.net|dot ?net|\basp\b|c#|\bvb\b|blazor'}
+  - {role: PHP / Web Developer, family: Software Development, pattern: '\bphp\b|laravel|wordpress|codeigniter|drupal|magento|shopify'}
+  - {role: Mainframe Developer, family: Software Development, pattern: 'mainframe|cobol|\bas400|\bjcl\b'}
+  - {role: Backend Developer, family: Software Development, pattern: 'back ?-? ?end|node\.?js|\bgolang\b|\bgo (developer|engineer)|ruby|rails|\bc\+\+|\bc/c\+\+|scala|rust'}
+  - {role: Technical Lead / Architect, family: Software Development, pattern: '(software|solution|technical|tech|enterprise|business) (architect|lead)|architect|tech lead|engineering manager|technical lead'}
+  - {role: Software Engineer, family: Software Development, pattern: 'software (engineer|developer|development|programmer)|\bsde\b|\bsdet\b|application (developer|engineer|lead|designer)|programmer|\bdeveloper\b|senior engineer|technology (analyst|lead)|\bdev\b|systems? analyst|technical (analyst|consultant)'}
+  - {role: Business Analyst (IT), family: Strategy & Consulting, pattern: 'business analyst|\bba\b|functional (consultant|analyst)|product (owner|analyst)'}
+  - {role: Product Manager, family: Strategy & Consulting, pattern: 'product (manager|owner|lead|head)|\bapm\b'}
+  - {role: Project / Program Manager, family: Strategy & Consulting, pattern: 'program manager|programme manager|project manager|scrum master|delivery manager|project lead|\bpmo\b|project coordinator|project head'}
+
+  # ---------------- Design / Content / Marketing ----------------
+  - {role: UI/UX Designer, family: Design & Creative, pattern: '\bux\b|\bui\b|user (experience|interface)|interaction design|product designer'}
+  - {role: Video Editor / Animator, family: Design & Creative, pattern: 'video|animat|motion|vfx|\b3d\b|photograph|compositor|\beditor\b.*(video|film)'}
+  - {role: Graphic Designer, family: Design & Creative, pattern: 'graphic|visual design|creative (designer|artist|lead)|photoshop|illustrator|brand designer|\bdesigner\b'}
+  - {role: Interior / Fashion Designer, family: Design & Creative, pattern: 'interior|fashion|textile|jewel|merchandis|garment|pattern maker'}
+  - {role: SEO Specialist, family: Marketing, pattern: '\bseo\b|search engine|\bsem\b|\bsmo\b'}
+  - {role: Performance / Paid Marketing, family: Marketing, pattern: 'performance (marketing|marketer)|paid (media|marketing|social)|ppc|google ads|growth (marketing|manager|hacker)|user acquisition'}
+  - {role: Social Media Executive, family: Marketing, pattern: 'social media|community manager|influencer|instagram'}
+  - {role: E-commerce Executive, family: Marketing, pattern: 'e-?commerce|marketplace|amazon|flipkart|category (executive|associate)|catalog'}
+  - {role: Digital Marketing Executive, family: Marketing, pattern: 'digital|online marketing|e-?commerce|marketplace|email marketing|crm marketing'}
+  - {role: Brand / Product Marketing Manager, family: Marketing, pattern: 'brand (manager|executive|marketing)|product marketing|trade marketing|category manager|marketing manager|brand'}
+  - {role: Marketing Executive, family: Marketing, pattern: 'marketing|campaign|events?\b|promoter|activation'}
+  - {role: Technical Writer, family: Content & Media, pattern: 'technical writer|documentation (specialist|engineer)'}
+  - {role: Content Writer, family: Content & Media, pattern: 'content (writer|writing|creator|developer|executive|strategist|editor)|copywriting|copywriter|copy writer|technical writer|writer|blogger|scriptwriter|creative writer'}
+  - {role: Journalist / Editor, family: Content & Media, pattern: 'journalism|journalist|reporter|editor|correspondent|anchor|news|radio|\brj\b|producer|publishing|proofread'}
+  - {role: Public Relations Executive, family: Content & Media, pattern: '\bpr\b|public relations|communications? (executive|manager|specialist)|corporate communication|media relations'}
+
+  # ---------------- Banking / Accounting / Finance ----------------
+  - {role: Chartered Accountant, family: Accounting & Finance, pattern: 'chartered accountant|\bca\b|article|\bicwa\b|cost accountant|inter ca'}
+  - {role: Auditor, family: Accounting & Finance, pattern: 'audit(or)?\b|internal audit|statutory|concurrent audit|compliance (officer|executive|analyst|manager)|\bkyc\b|\baml\b'}
+  - {role: Tax / GST Executive, family: Accounting & Finance, pattern: '\btax\b|\bgst\b|\btds\b|taxation|income tax|indirect tax|direct tax'}
+  - {role: Accounts Payable / Receivable Executive, family: Accounting & Finance, pattern: 'accounts? (payable|receivable)|\bap\b|\bar\b|\bar (executive|analyst)|billing|invoice|collections?\b|credit control|reconciliation|record to report|\br2r\b|order to cash|\bo2c\b|procure to pay|\bp2p\b|general ledger|\bgl\b|payroll|fixed assets|vendor payment'}
+  - {role: Financial Analyst, family: Accounting & Finance, pattern: 'financial (analyst|planning|reporting|controller|advis)|\bfp&a|\bfp\b|\bfinance (manager|analyst|executive|lead|business partner|associate|controller)|treasury|investment (analyst|research|banking|associate)|equity research|portfolio|credit (analyst|risk)|risk analyst|financial modell|mutual fund|wealth'}
+  - {role: Accountant, family: Accounting & Finance, pattern: 'accountant|accounts? (executive|manager|officer|assistant|head|trainee)|accounting|book ?keep|tally|finance|cashier|\bfinal accounts|accounts and'}
+  - {role: Equity Dealer / Stock Broker, family: Banking & Financial Services, pattern: 'equity|\bdealer\b|broker|stock|trading|demat|derivative|forex|commodit'}
+  - {role: Wealth / Investment Advisor, family: Banking & Financial Services, pattern: 'wealth|investment (advis|consult)|financial (advis|planner)|mutual fund|\bpms\b'}
+  - {role: Loan / Credit Officer, family: Banking & Financial Services, pattern: 'loan|credit (officer|manager|executive)|\bmortgage|underwriter|underwriting|\bhome loan|personal loan|lending|collection (officer|executive|manager)|\bnbfc|recovery'}
+  - {role: Insurance Advisor, family: Banking & Financial Services, pattern: 'insurance|\bpos\b|bancassurance|\bbanca\b|policy|agency (manager|development)|life insur|claims?\b|health insur'}
+  - {role: Relationship Manager (Banking), family: Banking & Financial Services, pattern: 'relationship (manager|officer|executive)|\brm\b|branch (manager|officer|relationship|head|operations)|bank (officer|manager|executive)|banking|teller|\bpo\b|probationary officer|priority banking|wealth manager|\bbdm\b.*bank|clerk'}
+
+  # ---------------- Sales / BD / Customer service ----------------
+  - {role: Inside Sales / Pre-Sales, family: Sales & BD, pattern: 'inside sales|presales|pre-sales|pre sales|sales support|sales (and|&) support'}
+  - {role: Real Estate Sales Consultant, family: Sales & BD, pattern: 'property|real estate|\bplot\b|realty|site visit|home buyer'}
+  - {role: Business Development Executive, family: Sales & BD, pattern: 'business development|\bbde\b|\bbdm\b|\bbda\b|\bbd\b|partnership|channel (sales|partner|manager)|alliances?\b|lead generation|inside sales|presales|pre-sales|pre sales'}
+  - {role: Key Account Manager, family: Sales & BD, pattern: 'key account|account manager|client (servicing|partner|acquisition)|corporate sales'}
+  - {role: Area / Regional Sales Manager, family: Sales & BD, pattern: '(area|regional|zonal|territory|district|cluster|state|national|zone) (sales )?(manager|head|executive|officer)|\basm\b|\brsm\b|\bzsm\b|\bnsm\b|sales (manager|head|lead|director|team leader)|key account|national sales'}
+  - {role: Sales Engineer / Technical Sales, family: Sales & BD, pattern: 'sales engineer|technical sales|application engineer|solution sales'}
+  - {role: Retail Store Manager, family: Sales & BD, pattern: 'store (manager|executive|incharge|in-charge|head)|showroom|retail (manager|store)|outlet|\bstore\b'}
+  - {role: Field Sales Executive, family: Sales & BD, pattern: 'field (sales|executive|officer)|sales (officer|representative|rep|associate|trainee|engineer|coordinator|promoter)|retail sales|outside sales|direct sales|\bsales executive|sales (and|&) marketing|sales\b|sales ?man|sales ?girl|telesales|tele ?sales|b2b|b2c|account (executive|manager)|territory'}
+  - {role: Content Moderator / Trust & Safety, family: Customer Service / BPO, pattern: 'trust (&|and) safety|content (moderator|moderation|reviewer)|moderator|\bt&s\b'}
+  - {role: Telecaller / Telesales, family: Customer Service / BPO, pattern: 'tele ?caller|tele ?calling|telemarketing|tele ?sales|outbound'}
+  - {role: CRM / Client Relations Executive, family: Customer Service / BPO, pattern: '\bcrm\b|client relations|customer relationship|retention|customer onboarding'}
+  - {role: Customer Support Executive, family: Customer Service / BPO, pattern: 'customer (support|service|care|success|experience|relations|happiness)|\bcsr\b|\bcse\b|support (executive|associate|specialist)|helpline|call ?cent(re|er)|voice (process|support|executive)|non[- ]?voice|chat (support|process)|email support|\bbpo\b|\bbpm\b|process (executive|associate)|contact cent|client (service|support)|international (voice|process)|us shift|\bbilingual|\b(hindi|tamil|telugu|kannada|marathi|bengali|malayalam|gujarati|french|german|spanish|arabic) (voice|process|speaking|support)|\bkpo\b|\blpo\b'}
+  - {role: Customer Support Executive, family: Customer Service / BPO, pattern: 'executive - (customer|voice|chat)|front office|receptionist|reception'}
+
+  # ---------------- HR / Admin ----------------
+  - {role: Recruiter / Talent Acquisition, family: HR & Recruitment, pattern: 'recruit|talent acquisition|\bta\b|sourcer|sourcing|headhunt|staffing|\bhiring\b.*(executive|specialist)|\bhr (recruiter|exec.*recruit)'}
+  - {role: HR Executive, family: HR & Recruitment, pattern: '\bhr\b|human resource|\bhrbp\b|people (partner|operations|ops|manager|culture)|payroll|talent management|employee (relations|engagement)|\bhrms\b|learning (and|&) development|\bl&d\b|onboarding|compensation|c&b'}
+  - {role: Back Office Executive, family: Office Admin & Data Entry, pattern: 'back ?office|operations (executive|associate|analyst)|process (analyst|specialist)|transaction (processing|specialist)|\bmis\b'}
+  - {role: Security / Facility Staff, family: Office Admin & Data Entry, pattern: 'security (guard|supervisor|officer)|\bguard\b|watchman|facility|housekeeping|\bpeon\b|office boy|janitor'}
+  - {role: Executive Assistant / Admin, family: Office Admin & Data Entry, pattern: 'executive assistant|personal assistant|\bpa\b|secretary|admin(istrat(or|ion|ive))?\b|office (assistant|executive|manager|boy|coordinator)|receptionist|front desk|coordinator|\bea\b|facility|facilities|housekeeping|estate'}
+  - {role: Data Entry Operator, family: Office Admin & Data Entry, pattern: 'data entry|\bdeo\b|computer operator|typist|documentation|data (management|processing|operator)|form filling|clerk|record keeper|\boperator\b'}
+
+  # ---------------- Supply chain / manufacturing / construction ----------------
+  - {role: Purchase / Procurement Executive, family: Supply Chain & Logistics, pattern: 'purchas|procure|sourcing (executive|manager|specialist|engineer)|buyer|vendor (development|management)|strategic sourcing|category (lead|specialist)'}
+  - {role: Logistics / Warehouse Executive, family: Supply Chain & Logistics, pattern: 'logistic|warehouse|supply chain|inventory|\bscm\b|dispatch|\bstore (keeper|executive|manager|incharge|in-charge)|freight|shipping|import|export|exim|customs|fleet|transport|courier|delivery (executive|manager|associate|boy|partner|rider)|last mile|\bwms\b|material (handler|planner|management|controller)|demand planner|forecast|supply planner|planning executive|order management'}
+  - {role: Design Engineer (CAD), family: Manufacturing & Core Engg, pattern: 'design engineer|\bcad\b|draught|draft(sman|ing)|autocad|solidworks|catia|creo|\bnx\b|piping design'}
+  - {role: Service / Field Service Engineer, family: Manufacturing & Core Engg, pattern: 'service engineer|field service|after sales|installation|commissioning|customer service engineer'}
+  - {role: Maintenance Technician / Electrician, family: Manufacturing & Core Engg, pattern: 'maintenance|electrician|technician|fitter|\bhelper\b|mechanic|welder|welding|plumb|turner|machinist|\bcnc\b|\bvmc\b|operator'}
+  - {role: Mechanical Engineer, family: Manufacturing & Core Engg, pattern: 'mechanical|\bhvac\b|boiler|tool room|piping|fabricat|\bmep\b'}
+  - {role: Electrical / Electronics Engineer, family: Manufacturing & Core Engg, pattern: 'electrical|electronics|instrumentation|\bplc\b|scada|electrician|automation (engineer|executive)|power (engineer|plant)|substation|\bcircuit|panel'}
+  - {role: Quality Control / Assurance Engineer, family: Manufacturing & Core Engg, pattern: 'quality (engineer|control|inspector|executive|manager|analyst|officer|head)|\bqc\b|inspector|\bnpd\b|\bspc\b|\bcmm\b|\biso\b|six sigma|lean'}
+  - {role: Safety / EHS Officer, family: Manufacturing & Core Engg, pattern: '\bhse\b|\behs\b|safety (officer|engineer|supervisor|manager|executive)|fire (and|&) safety'}
+  - {role: Production Engineer / Supervisor, family: Manufacturing & Core Engg, pattern: 'production|process engineer|manufacturing|assembly|plant (manager|head|engineer)|shift (incharge|in-charge|engineer|supervisor)|supervisor|foreman|engineer trainee|graduate engineer|\bget\b|diploma engineer|\bdet\b|apprentice|trainee engineer'}
+  - {role: Project / Planning Engineer, family: Construction & Site Engg, pattern: 'project engineer|planning engineer|billing engineer|quantity surveyor|\bqs\b|estimation|estimator|contracts? (manager|engineer)|tender|proposal'}
+  - {role: Civil / Site Engineer, family: Construction & Site Engg, pattern: 'civil|site (engineer|supervisor|incharge|in-charge|manager|head)|structural|construction|surveyor|architect(ure)?\b|highway|land'}
+  - {role: Driver / Delivery Executive, family: Supply Chain & Logistics, pattern: 'driver|delivery|rider|chauffeur|helper|loader|packer'}
+
+  # ---------------- Hospitality / Consulting / catch-alls ----------------
+  - {role: Chef / Cook, family: Hospitality, pattern: '\bchef\b|\bcook\b|commis|kitchen|baker|bakery|tandoor|\bcdp\b|sous|culinary|pastry'}
+  - {role: Hotel / Restaurant Staff, family: Hospitality, pattern: 'hotel|restaurant|\bf&b\b|food (and|&) beverage|steward|waiter|captain|barista|bartender|housekeeping|front office|guest|hospitality|\bgre\b|concierge|reservation|travel (consultant|executive|advisor|agent)|ticketing|cabin crew|air hostess|ground staff|tour|resort|banquet'}
+  - {role: Research Analyst, family: Strategy & Consulting, pattern: 'research (analyst|associate|executive|scientist)|market research|equity research'}
+  - {role: Management Consultant / Strategy, family: Strategy & Consulting, pattern: 'consult(ant|ing)|strategy|management trainee'}

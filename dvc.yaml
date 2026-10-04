@@ -1,0 +1,47 @@
+stages:
+  ingest:
+    cmd: uv run python -m src.data.ingest
+    deps: [src/data/ingest.py, src/data/common.py, configs/skill_aliases.yaml, data/raw/naukri_2019, data/raw/naukri_2022, data/raw/naukri_2025, data/raw/internshala]
+    outs: [data/interim/postings_2019.parquet, data/interim/postings_2022.parquet, data/interim/postings_2025.parquet, data/interim/postings_internshala.parquet]
+  label:
+    cmd: uv run python -m src.data.label
+    deps: [src/data/label.py, configs/role_rules.yaml, configs/naukri_role_map.yaml, data/interim/postings_2019.parquet, data/interim/postings_2022.parquet, data/interim/postings_2025.parquet, data/interim/postings_internshala.parquet]
+    params: [label]
+    outs: [data/processed/labelled_2019.parquet, data/processed/labelled_2022.parquet, data/processed/labelled_2025.parquet, data/processed/labelled_internshala.parquet, data/processed/all_2019.parquet]
+    metrics: [reports/label_quality.json: {cache: false}]
+  eda:
+    cmd: uv run python -m src.data.eda
+    deps: [src/data/eda.py, data/interim/postings_2019.parquet, data/interim/postings_2022.parquet, data/interim/postings_2025.parquet, data/interim/postings_internshala.parquet, data/processed/labelled_2025.parquet]
+    outs: [reports/eda.json, reports/vocab_coverage.png]
+  split:
+    cmd: uv run python -m src.data.split
+    deps: [src/data/split.py, data/processed/labelled_2025.parquet, data/processed/labelled_2022.parquet, data/processed/labelled_internshala.parquet]
+    params: [split]
+    outs: [data/processed/train.parquet, data/processed/test.parquet]
+  train:
+    cmd: uv run python -m src.models.train
+    deps: [src/models/train.py, src/features/build.py, data/processed/train.parquet]
+    params: [features, train, split.seed]
+    outs: [models/model.pkl, models/mlflow_run.json]
+  evaluate:
+    cmd: uv run python -m src.models.evaluate
+    deps: [src/models/evaluate.py, src/models/common.py, src/features/build.py, configs/naukri_role_map.yaml, models/model.pkl, data/processed/train.parquet, data/processed/test.parquet, data/processed/all_2019.parquet]
+    params: [features.eval_n_skills, split.seed]
+    metrics: [reports/metrics.json: {cache: false}]
+    plots: [reports/confusion_matrix.png]
+    outs: [reports/per_role.csv]
+  profiles:
+    cmd: uv run python -m src.models.profiles
+    deps: [src/models/profiles.py, data/processed/labelled_2019.parquet, data/processed/labelled_2025.parquet]
+    params: [profiles]
+    outs: [models/skill_profiles.json]
+  lookups:
+    cmd: uv run python -m src.models.lookups
+    deps: [src/models/lookups.py, configs/education.yaml, configs/family_nco.yaml, configs/role_rules.yaml, models/model.pkl, data/raw/naukri_2017, data/raw/nptel, data/raw/coursera, data/raw/plfs]
+    params: [lookups]
+    outs: [models/education_prior.json, models/course_links.json]
+  drift:
+    cmd: uv run python -m src.monitoring.report
+    deps: [src/monitoring/report.py, src/monitoring/drift.py, src/models/evaluate.py, data/processed/labelled_2019.parquet, data/processed/labelled_2025.parquet, data/processed/test.parquet]
+    params: [features, train, split.seed]
+    outs: [reports/drift_2019_2025.json]

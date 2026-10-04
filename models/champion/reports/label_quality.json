@@ -1,0 +1,13 @@
+{
+  "coverage_2019": 0.8263574660633484,
+  "family_agreement_2019": 0.598382267506815,
+  "family_agreement_2019_it_grouped": 0.7088975287125173,
+  "family_agreement_2019_plausible": 0.8595205509690521,
+  "role_agreement_vs_naukri_role": 0.746772017729813,
+  "agreement_n": 22651,
+  "role_agreement_n": 15567,
+  "n_roles": 105,
+  "n_labelled_2025": 73424,
+  "n_labelled_2022": 23000,
+  "n_labelled_internshala": 6489
+}

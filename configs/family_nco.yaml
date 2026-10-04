@@ -1,0 +1,61 @@
+# NCO-2015 occupation code prefix (2-4 digits) -> our role family. Longest matching prefix wins.
+# Agriculture (6x), most elementary occupations and others with no clear family are left unmapped.
+plfs_levels:   # PLFS general-education code (b4q8_perv1), decoded from the occupation mix of each level
+  10: Higher secondary (12th)
+  11: Diploma / certificate
+  12: Graduate
+  13: Postgraduate and above
+prefixes:
+  "251": Software Development
+  "252": IT Infra & Support
+  "25": Software Development
+  "35": IT Infra & Support
+  "212": Data & Analytics
+  "2142": Construction & Site Engg
+  "214": Manufacturing & Core Engg
+  "21": Manufacturing & Core Engg
+  "311": Manufacturing & Core Engg
+  "312": Construction & Site Engg
+  "313": Manufacturing & Core Engg
+  "314": Manufacturing & Core Engg
+  "315": Manufacturing & Core Engg
+  "22": Healthcare & Pharma
+  "32": Healthcare & Pharma
+  "23": Teaching & Training
+  "241": Accounting & Finance
+  "242": Strategy & Consulting
+  "243": Marketing
+  "2411": Accounting & Finance
+  "26": Legal
+  "264": Content & Media
+  "265": Design & Creative
+  "331": Banking & Financial Services
+  "332": Sales & BD
+  "333": Sales & BD
+  "334": Office Admin & Data Entry
+  "335": Legal
+  "341": Legal
+  "343": Design & Creative
+  "41": Office Admin & Data Entry
+  "42": Customer Service / BPO
+  "43": Accounting & Finance
+  "44": Office Admin & Data Entry
+  "511": Hospitality
+  "512": Hospitality
+  "514": Hospitality
+  "52": Sales & BD
+  "541": Office Admin & Data Entry
+  "71": Construction & Site Engg
+  "72": Manufacturing & Core Engg
+  "73": Manufacturing & Core Engg
+  "74": Manufacturing & Core Engg
+  "75": Manufacturing & Core Engg
+  "81": Manufacturing & Core Engg
+  "82": Manufacturing & Core Engg
+  "83": Supply Chain & Logistics
+  "932": Manufacturing & Core Engg
+  "933": Supply Chain & Logistics
+  "91": Office Admin & Data Entry
+  "12": Strategy & Consulting
+  "13": Strategy & Consulting
+  "14": Hospitality

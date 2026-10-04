@@ -1,0 +1,66 @@
+# Independent validation labels: Naukri 2019 `Role` (picked by the recruiter, not by our title rules)
+# -> our roles that are an acceptable answer. Used to score (a) our rules and (b) the trained model.
+_sw: &sw [Software Engineer, Java Developer, Python Developer, .NET Developer, PHP / Web Developer, Frontend Developer, Backend Developer, Full Stack Developer, Android Developer, iOS Developer, Mobile / Flutter / React Native Developer, Mainframe Developer, Game Developer, SAP ABAP Developer, Salesforce Developer, ServiceNow Developer, Technical Lead / Architect, Embedded / Firmware Engineer, Application Support Engineer]
+_sales: &sales [Business Development Executive, Area / Regional Sales Manager, Key Account Manager, Inside Sales / Pre-Sales, Field Sales Executive, Sales Engineer / Technical Sales, Telecaller / Telesales, Retail Store Manager, Real Estate Sales Consultant]
+_mkt: &mkt [Marketing Executive, Brand / Product Marketing Manager, Digital Marketing Executive, Performance / Paid Marketing, SEO Specialist, Social Media Executive, E-commerce Executive]
+_design: &design [Graphic Designer, UI/UX Designer, Video Editor / Animator, Frontend Developer]
+_it_ops: &itops [System Administrator, IT Support / Helpdesk Engineer, Cloud Engineer, DevOps Engineer, Network Engineer, Application Support Engineer, Cyber Security Analyst]
+
+map:
+  "Software Developer": *sw
+  "Team Lead/Technical Lead": *sw
+  "Technical Architect": *sw
+  "System Analyst": *sw
+  "Sales/Business Development Manager": *sales
+  "Sales Executive/Officer": *sales
+  "Area Sales Manager": *sales
+  "Head/VP/GM/National Manager -Sales": *sales
+  "Regional Manager": *sales
+  "Telecalling/Telemarketing Executive": [Telecaller / Telesales, Customer Support Executive, Inside Sales / Pre-Sales]
+  "Telesales/Telemarketing Executive/Officer": [Telecaller / Telesales, Customer Support Executive, Inside Sales / Pre-Sales]
+  "Client Servicing/Key Account Manager": [Key Account Manager, Business Development Executive, Customer Support Executive, CRM / Client Relations Executive]
+  "Accounts Executive/Accountant": [Accountant, Accounts Payable / Receivable Executive, Tax / GST Executive, Auditor]
+  "Accounts Manager": [Accountant, Accounts Payable / Receivable Executive, Tax / GST Executive, Auditor, Financial Analyst]
+  "Chartered Accountant": [Chartered Accountant, Auditor, Tax / GST Executive, Accountant, Financial Analyst]
+  "Financial Analyst": [Financial Analyst, Accountant, Wealth / Investment Advisor, Research Analyst, Equity Dealer / Stock Broker]
+  "Finance Executive": [Accountant, Financial Analyst, Accounts Payable / Receivable Executive, Auditor]
+  "Recruitment Executive": [Recruiter / Talent Acquisition, HR Executive]
+  "HR Executive": [HR Executive, Recruiter / Talent Acquisition]
+  "HR Manager": [HR Executive, Recruiter / Talent Acquisition]
+  "Testing Engineer": [Test / QA Engineer]
+  "System Administrator": *itops
+  "Network Administrator": *itops
+  "System Security": *itops
+  "Technical Support Engineer": *itops
+  "Customer Support Engineer/Technician": [IT Support / Helpdesk Engineer, Application Support Engineer, Customer Support Executive, Service / Field Service Engineer]
+  "DBA": [Database Administrator, Data Engineer]
+  "Business Analyst": [Business Analyst (IT), Data Analyst, Research Analyst, Product Manager]
+  "Data Analyst": [Data Analyst, BI / Reporting Developer, Business Analyst (IT), Data Scientist, Research Analyst]
+  "Design Engineer": [Design Engineer (CAD), Mechanical Engineer, Electrical / Electronics Engineer, VLSI / Hardware Design Engineer, Embedded / Firmware Engineer]
+  "Senior Design Engineer": [Design Engineer (CAD), Mechanical Engineer, Electrical / Electronics Engineer, VLSI / Hardware Design Engineer, Embedded / Firmware Engineer]
+  "Project Manager-IT/Software": [Project / Program Manager, Product Manager, Technical Lead / Architect]
+  "Program Manager": [Project / Program Manager, Product Manager]
+  "Product Manager": [Product Manager, Brand / Product Marketing Manager, Project / Program Manager]
+  "Product/Brand Manager": [Product Manager, Brand / Product Marketing Manager]
+  "Marketing Manager": *mkt
+  "Direct Marketing Executive": [Marketing Executive, Field Sales Executive, Telecaller / Telesales, Digital Marketing Executive]
+  "Graphic Designer": *design
+  "Graphic/Web Designer": *design
+  "Web Designer": *design
+  "Content Developer": [Content Writer, Technical Writer, Journalist / Editor]
+  "Lecturer/Professor": [Professor / Lecturer, School Teacher, Tutor / Trainer]
+  "Assistant Professor": [Professor / Lecturer, School Teacher, Tutor / Trainer]
+  "Teacher/ Private Tutor": [School Teacher, Tutor / Trainer, Professor / Lecturer]
+  "Counselor": [Academic Counsellor, CRM / Client Relations Executive]
+  "Training Manager": [Tutor / Trainer, HR Executive]
+  "Quality Assurance/Quality Control Executive": [Quality Control / Assurance Engineer, Test / QA Engineer, Production Engineer / Supervisor]
+  "Quality Assurance/Quality Control Manager": [Quality Control / Assurance Engineer, Test / QA Engineer, Production Engineer / Supervisor]
+  "Secretary/PA": [Executive Assistant / Admin, Back Office Executive]
+  "Receptionist": [Executive Assistant / Admin, Customer Support Executive, Back Office Executive]
+  "Executive/ Sr Executive - Administration": [Executive Assistant / Admin, Back Office Executive, Security / Facility Staff]
+  "Medical Officer": [Doctor / Physician]
+  "Service/Maintenance Engineer": [Service / Field Service Engineer, Maintenance Technician / Electrician, Mechanical Engineer, Electrical / Electronics Engineer]
+  "Workman/Foreman/Technician": [Maintenance Technician / Electrician, Production Engineer / Supervisor, Mechanical Engineer]
+  "Production Manager": [Production Engineer / Supervisor, Mechanical Engineer, Quality Control / Assurance Engineer]
+  "Purchase/Vendor Development Manager": [Purchase / Procurement Executive]
+  "Branch Manager": [Relationship Manager (Banking), Retail Store Manager, Loan / Credit Officer, Insurance Advisor]

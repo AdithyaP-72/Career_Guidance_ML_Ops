@@ -1,0 +1,8 @@
+* text=auto
+*.sh text eol=lf
+*.bat text eol=crlf
+*.py text eol=lf
+*.yaml text eol=lf
+*.html text eol=lf
+*.pkl binary
+*.parquet binary

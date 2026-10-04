@@ -1,0 +1,93 @@
+{
+  "n_roles_compared": 101,
+  "js_distance": 0.4093,
+  "psi": 0.6779,
+  "status": "alert",
+  "top3_on_2019": 0.6708,
+  "top3_on_2025": 0.6185,
+  "performance_drop": 0.0523,
+  "risers": [
+    {
+      "skill": "sap",
+      "share_2019": 0.0106,
+      "share_2025": 0.053
+    },
+    {
+      "skill": "project management",
+      "share_2019": 0.0254,
+      "share_2025": 0.0503
+    },
+    {
+      "skill": "sales",
+      "share_2019": 0.0694,
+      "share_2025": 0.091
+    },
+    {
+      "skill": "software testing",
+      "share_2019": 0.0031,
+      "share_2025": 0.0212
+    },
+    {
+      "skill": "management",
+      "share_2019": 0.0292,
+      "share_2025": 0.047
+    },
+    {
+      "skill": "python",
+      "share_2019": 0.0434,
+      "share_2025": 0.0601
+    },
+    {
+      "skill": "continuous integration",
+      "share_2019": 0.0034,
+      "share_2025": 0.0194
+    },
+    {
+      "skill": "development",
+      "share_2019": 0.0237,
+      "share_2025": 0.0393
+    }
+  ],
+  "fallers": [
+    {
+      "skill": "javascript",
+      "share_2019": 0.0901,
+      "share_2025": 0.0346
+    },
+    {
+      "skill": "html",
+      "share_2019": 0.0599,
+      "share_2025": 0.0172
+    },
+    {
+      "skill": "jquery",
+      "share_2019": 0.0443,
+      "share_2025": 0.0063
+    },
+    {
+      "skill": "mysql",
+      "share_2019": 0.0365,
+      "share_2025": 0.008
+    },
+    {
+      "skill": "business executive",
+      "share_2019": 0.0284,
+      "share_2025": 0.0
+    },
+    {
+      "skill": "web technologies",
+      "share_2019": 0.0313,
+      "share_2025": 0.0044
+    },
+    {
+      "skill": "php",
+      "share_2019": 0.0295,
+      "share_2025": 0.0026
+    },
+    {
+      "skill": ".net",
+      "share_2019": 0.0376,
+      "share_2025": 0.0117
+    }
+  ]
+}

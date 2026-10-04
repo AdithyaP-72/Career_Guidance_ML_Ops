@@ -1,0 +1,14 @@
+# UI education option -> how the prior is built.
+#   naukri : regex over Naukri 2015-17 `education` text (what employers ask for), lower-cased
+#   plfs   : PLFS education level code (what people with that education actually do), see family_nco.yaml
+"12th":        {plfs: 10}
+"Diploma":     {naukri: 'diploma|\biti\b|polytechnic', plfs: 11}
+"B.Tech":      {naukri: 'b\.?\s?tech|b\.?\s?e\b|b\.?e\.?/', plfs: 12}
+"B.Com":       {naukri: 'b\.?\s?com', plfs: 12}
+"BBA/MBA":     {naukri: '\bbba\b|\bmba\b|pgdm|\bbms\b|m\.?\s?b\.?\s?a', plfs: 13}
+"B.Sc":        {naukri: 'b\.?\s?sc', plfs: 12}
+"BA":          {naukri: '\bb\.?\s?a\b', plfs: 12}
+"CA/CS":       {naukri: '\bc\.?a\b|icwa|\bc\.?s\b|chartered|cost accountant', plfs: 13}
+"MBBS/Pharma/Nursing": {naukri: 'mbbs|pharm|nursing|\bbds\b|\bbams\b|\bbhms\b|\bbpt\b|\bgnm\b', plfs: 13}
+"LLB":         {naukri: 'll\.?\s?b|\blaw\b', plfs: 12}
+"B.Ed":        {naukri: 'b\.?\s?ed', plfs: 12}

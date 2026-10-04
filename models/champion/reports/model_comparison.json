@@ -1,0 +1,23 @@
+[
+  {
+    "model": "logreg",
+    "top3": 0.7687,
+    "top1": 0.5529,
+    "macro_f1": 0.5206,
+    "family_top3": 0.8588
+  },
+  {
+    "model": "rf",
+    "top3": 0.7325,
+    "top1": 0.505,
+    "macro_f1": 0.4535,
+    "family_top3": 0.8258
+  },
+  {
+    "model": "lgbm",
+    "top3": 0.758,
+    "top1": 0.5455,
+    "macro_f1": 0.5282,
+    "family_top3": 0.8477
+  }
+]

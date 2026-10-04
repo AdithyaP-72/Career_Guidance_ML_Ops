@@ -1,0 +1,6 @@
+label: {min_role_size: 100}
+split: {test_size: 0.2, seed: 42, extra_sources: [2022, internshala]}
+features: {top_k_skills: 6000, exp_clip: 20, dropout_copies: 2, dropout_min: 2, dropout_max: 6, eval_n_skills: 5}
+train: {model: logreg, C: 0.5, class_weight: null, max_iter: 300}
+profiles: {top_n_skills: 15, top_n_titles: 5, core_skill_min_share: 0.08}
+lookups: {education_alpha: 0.35, min_edu_postings: 40}

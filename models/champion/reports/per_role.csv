@@ -1,0 +1,106 @@
+role,n,top1_recall
+CRM / Client Relations Executive,20,0.0
+Journalist / Editor,22,0.13636363636363635
+Research Analyst,14,0.14285714285714285
+E-commerce Executive,26,0.15384615384615385
+Chartered Accountant,58,0.1724137931034483
+Key Account Manager,34,0.17647058823529413
+Cloud Engineer,157,0.20382165605095542
+Brand / Product Marketing Manager,70,0.24285714285714285
+Driver / Delivery Executive,53,0.24528301886792453
+Management Consultant / Strategy,218,0.26146788990825687
+System Administrator,76,0.27631578947368424
+Back Office Executive,67,0.2835820895522388
+Financial Analyst,143,0.3006993006993007
+Mechanical Engineer,43,0.3023255813953488
+Marketing Executive,181,0.30386740331491713
+Inside Sales / Pre-Sales,98,0.32653061224489793
+Sales Engineer / Technical Sales,40,0.35
+Real Estate Sales Consultant,48,0.3541666666666667
+Professor / Lecturer,42,0.35714285714285715
+Python Developer,84,0.36904761904761907
+Interior / Fashion Designer,64,0.375
+Data Entry Operator,77,0.37662337662337664
+Digital Marketing Executive,121,0.38016528925619836
+Service / Field Service Engineer,44,0.38636363636363635
+Social Media Executive,51,0.39215686274509803
+Academic Counsellor,32,0.40625
+Backend Developer,125,0.408
+Security / Facility Staff,48,0.4166666666666667
+Loan / Credit Officer,122,0.4180327868852459
+Electrical / Electronics Engineer,74,0.4189189189189189
+Full Stack Developer,278,0.420863309352518
+Physiotherapist / Therapist,19,0.42105263157894735
+Data Analyst,106,0.42452830188679247
+Embedded / Firmware Engineer,40,0.425
+BI / Reporting Developer,94,0.425531914893617
+Oracle / Dynamics ERP Consultant,103,0.42718446601941745
+Project / Planning Engineer,70,0.42857142857142855
+Data Scientist,70,0.42857142857142855
+Telecaller / Telesales,65,0.4307692307692308
+Frontend Developer,170,0.4411764705882353
+Equity Dealer / Stock Broker,38,0.4473684210526316
+Tutor / Trainer,134,0.44776119402985076
+Performance / Paid Marketing,49,0.4489795918367347
+Civil / Site Engineer,81,0.4567901234567901
+Android Developer,37,0.4594594594594595
+Salesforce Developer,78,0.46153846153846156
+Technical Lead / Architect,299,0.4682274247491639
+Mobile / Flutter / React Native Developer,32,0.46875
+Quality Control / Assurance Engineer,132,0.4696969696969697
+Production Engineer / Supervisor,202,0.47029702970297027
+Logistics / Warehouse Executive,138,0.47101449275362317
+Application Support Engineer,91,0.4725274725274725
+PHP / Web Developer,38,0.47368421052631576
+DevOps Engineer,141,0.475177304964539
+.NET Developer,107,0.4766355140186916
+Doctor / Physician,50,0.48
+Mainframe Developer,27,0.48148148148148145
+IT Support / Helpdesk Engineer,151,0.48344370860927155
+Relationship Manager (Banking),288,0.4930555555555556
+Lab Technician,28,0.5
+Auditor,92,0.5
+Database Administrator,64,0.5
+Business Analyst (IT),156,0.5128205128205128
+Hotel / Restaurant Staff,75,0.52
+Machine Learning / AI Engineer,230,0.5217391304347826
+Area / Regional Sales Manager,414,0.5241545893719807
+Business Development Executive,353,0.5269121813031161
+Field Sales Executive,615,0.5349593495934959
+Design Engineer (CAD),134,0.5373134328358209
+Executive Assistant / Admin,274,0.5437956204379562
+Video Editor / Animator,64,0.546875
+Product Manager,51,0.5490196078431373
+SAP ABAP Developer,77,0.5584415584415584
+Maintenance Technician / Electrician,196,0.5612244897959183
+VLSI / Hardware Design Engineer,37,0.5675675675675675
+Project / Program Manager,198,0.5707070707070707
+Cyber Security Analyst,132,0.5757575757575758
+Tax / GST Executive,63,0.5873015873015873
+Java Developer,225,0.5911111111111111
+ServiceNow Developer,71,0.5915492957746479
+Clinical Research / Pharma Executive,50,0.6
+Medical Coder / Billing,51,0.6078431372549019
+Accountant,425,0.6164705882352941
+Graphic Designer,157,0.6178343949044586
+Insurance Advisor,139,0.6187050359712231
+Network Engineer,51,0.6274509803921569
+Retail Store Manager,61,0.639344262295082
+Accounts Payable / Receivable Executive,307,0.6514657980456026
+Staff Nurse,32,0.65625
+UI/UX Designer,47,0.6595744680851063
+SEO Specialist,39,0.6666666666666666
+Test / QA Engineer,381,0.6719160104986877
+Content Writer,84,0.6785714285714286
+Data Engineer,249,0.6947791164658634
+Legal Associate / Advocate,46,0.6956521739130435
+Purchase / Procurement Executive,122,0.6967213114754098
+School Teacher,61,0.7049180327868853
+iOS Developer,17,0.7058823529411765
+HR Executive,247,0.708502024291498
+Software Engineer,1257,0.7191726332537789
+Recruiter / Talent Acquisition,255,0.7490196078431373
+Chef / Cook,54,0.7777777777777778
+Safety / EHS Officer,32,0.78125
+SAP Functional Consultant,471,0.7834394904458599
+Customer Support Executive,752,0.8470744680851063

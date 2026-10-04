@@ -1,0 +1,407 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: uv run python -m src.data.ingest
+    deps:
+    - path: configs/skill_aliases.yaml
+      hash: md5
+      md5: 645ac73da574abaf5abfff933c2c9a0a
+      size: 799
+    - path: data/raw/internshala
+      hash: md5
+      md5: 7634c57416d799d7c6e87073dc489b24.dir
+      size: 5136464
+      nfiles: 10
+    - path: data/raw/naukri_2019
+      hash: md5
+      md5: 820fb03b201bff6a0e0a4fa17c0ab951.dir
+      size: 11258599
+      nfiles: 1
+    - path: data/raw/naukri_2022
+      hash: md5
+      md5: 2dab3358321aa333458e73818dcd4e4b.dir
+      size: 9855664
+      nfiles: 1
+    - path: data/raw/naukri_2025
+      hash: md5
+      md5: ef9b0177f7d1515deed83c12bbf80f0a.dir
+      size: 31709363
+      nfiles: 1
+    - path: src/data/common.py
+      hash: md5
+      md5: aa65139b61df39d60b65f2862b25c65f
+      size: 1044
+    - path: src/data/ingest.py
+      hash: md5
+      md5: 69b7208863d4810fee2a49cdd6a03ff6
+      size: 3294
+    outs:
+    - path: data/interim/postings_2019.parquet
+      hash: md5
+      md5: 83d23af46f16ae37c7716447c9e13315
+      size: 1288856
+    - path: data/interim/postings_2022.parquet
+      hash: md5
+      md5: 8a5f4de12c309248d857d66603881fab
+      size: 947356
+    - path: data/interim/postings_2025.parquet
+      hash: md5
+      md5: 84524b57d93c10dfad45d79dc938081f
+      size: 3637562
+    - path: data/interim/postings_internshala.parquet
+      hash: md5
+      md5: 0a6958e7e0fa8b6d41bbce119d83af32
+      size: 190205
+  label:
+    cmd: uv run python -m src.data.label
+    deps:
+    - path: configs/naukri_role_map.yaml
+      hash: md5
+      md5: 4a3e0ab53dd7e930534c67427ed5a66c
+      size: 6068
+    - path: configs/role_rules.yaml
+      hash: md5
+      md5: c40fabd95e8e0ec942d967e6047f14b9
+      size: 26777
+    - path: data/interim/postings_2019.parquet
+      hash: md5
+      md5: 83d23af46f16ae37c7716447c9e13315
+      size: 1288856
+    - path: data/interim/postings_2022.parquet
+      hash: md5
+      md5: 8a5f4de12c309248d857d66603881fab
+      size: 947356
+    - path: data/interim/postings_2025.parquet
+      hash: md5
+      md5: 84524b57d93c10dfad45d79dc938081f
+      size: 3637562
+    - path: data/interim/postings_internshala.parquet
+      hash: md5
+      md5: 0a6958e7e0fa8b6d41bbce119d83af32
+      size: 190205
+    - path: src/data/label.py
+      hash: md5
+      md5: b28f0fd0ba32173892fd4a92ccabcc70
+      size: 4430
+    params:
+      params.yaml:
+        label:
+          min_role_size: 100
+    outs:
+    - path: data/processed/all_2019.parquet
+      hash: md5
+      md5: 40477bd241ccd0c28b9d07a75a21e064
+      size: 1343770
+    - path: data/processed/labelled_2019.parquet
+      hash: md5
+      md5: df1fd9596b1081326813f4acf596e47f
+      size: 1107590
+    - path: data/processed/labelled_2022.parquet
+      hash: md5
+      md5: ed096359cee15546ea72ceb20c85a36b
+      size: 871021
+    - path: data/processed/labelled_2025.parquet
+      hash: md5
+      md5: 078e22a40a3259e8629679b652efc8e8
+      size: 3166759
+    - path: data/processed/labelled_internshala.parquet
+      hash: md5
+      md5: 623552ce7b78e129c6d1e720a5c78028
+      size: 177670
+    - path: reports/label_quality.json
+      hash: md5
+      md5: 2383d57be8caac1b064da01cc031b8e1
+      size: 417
+  split:
+    cmd: uv run python -m src.data.split
+    deps:
+    - path: data/processed/labelled_2022.parquet
+      hash: md5
+      md5: ed096359cee15546ea72ceb20c85a36b
+      size: 871021
+    - path: data/processed/labelled_2025.parquet
+      hash: md5
+      md5: 078e22a40a3259e8629679b652efc8e8
+      size: 3166759
+    - path: data/processed/labelled_internshala.parquet
+      hash: md5
+      md5: 623552ce7b78e129c6d1e720a5c78028
+      size: 177670
+    - path: src/data/split.py
+      hash: md5
+      md5: cd67f5cfc3425aa160ef6d43e45465a9
+      size: 1474
+    params:
+      params.yaml:
+        split:
+          test_size: 0.2
+          seed: 42
+          extra_sources:
+          - 2022
+          - internshala
+    outs:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 1157a4941afef47046ca5b3a6c878fc8
+      size: 768104
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f41aebf482a30970699f55a1ab06316e
+      size: 3686804
+  train:
+    cmd: uv run python -m src.models.train
+    deps:
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f41aebf482a30970699f55a1ab06316e
+      size: 3686804
+    - path: src/features/build.py
+      hash: md5
+      md5: 0ab9c4245000c6003b99d7b48168f179
+      size: 2555
+    - path: src/models/train.py
+      hash: md5
+      md5: dd6586626bd4f8696e918148160e2790
+      size: 3406
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          dropout_copies: 2
+          dropout_min: 2
+          dropout_max: 6
+          eval_n_skills: 5
+        split.seed: 42
+        train:
+          model: logreg
+          C: 0.5
+          class_weight:
+          max_iter: 300
+    outs:
+    - path: models/mlflow_run.json
+      hash: md5
+      md5: 0dbed32673e6f88eac08921ff517d89e
+      size: 65
+    - path: models/model.pkl
+      hash: md5
+      md5: 1c56c9a215ea2960de7d72502fb88228
+      size: 5254945
+  evaluate:
+    cmd: uv run python -m src.models.evaluate
+    deps:
+    - path: configs/naukri_role_map.yaml
+      hash: md5
+      md5: 4a3e0ab53dd7e930534c67427ed5a66c
+      size: 6068
+    - path: data/processed/all_2019.parquet
+      hash: md5
+      md5: 40477bd241ccd0c28b9d07a75a21e064
+      size: 1343770
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 1157a4941afef47046ca5b3a6c878fc8
+      size: 768104
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f41aebf482a30970699f55a1ab06316e
+      size: 3686804
+    - path: models/model.pkl
+      hash: md5
+      md5: 1c56c9a215ea2960de7d72502fb88228
+      size: 5254945
+    - path: src/features/build.py
+      hash: md5
+      md5: 0ab9c4245000c6003b99d7b48168f179
+      size: 2555
+    - path: src/models/common.py
+      hash: md5
+      md5: 239af0c2ae6dc89817321556be6bb017
+      size: 292
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 2ea06b66788c950cb56df9d93d4cbffc
+      size: 7426
+    params:
+      params.yaml:
+        features.eval_n_skills: 5
+        split.seed: 42
+    outs:
+    - path: reports/confusion_matrix.png
+      hash: md5
+      md5: 244181246637e799d14ac353d1f944fa
+      size: 87859
+    - path: reports/metrics.json
+      hash: md5
+      md5: 76886955b1ce13be3a487a1a178b8638
+      size: 1261
+    - path: reports/per_role.csv
+      hash: md5
+      md5: 8e35ff58084c5527ace853773d5e3f0b
+      size: 4630
+  profiles:
+    cmd: uv run python -m src.models.profiles
+    deps:
+    - path: data/processed/labelled_2019.parquet
+      hash: md5
+      md5: df1fd9596b1081326813f4acf596e47f
+      size: 1107590
+    - path: data/processed/labelled_2025.parquet
+      hash: md5
+      md5: 078e22a40a3259e8629679b652efc8e8
+      size: 3166759
+    - path: src/models/profiles.py
+      hash: md5
+      md5: 2276e280026d445c3394dd6595bf7ea8
+      size: 2788
+    params:
+      params.yaml:
+        profiles:
+          top_n_skills: 15
+          top_n_titles: 5
+          core_skill_min_share: 0.08
+    outs:
+    - path: models/skill_profiles.json
+      hash: md5
+      md5: 265234a61961569ef9e8df5da01bfc98
+      size: 1864761
+  lookups:
+    cmd: uv run python -m src.models.lookups
+    deps:
+    - path: configs/education.yaml
+      hash: md5
+      md5: c60bb2249d45cd056ea7402afc437d7f
+      size: 933
+    - path: configs/family_nco.yaml
+      hash: md5
+      md5: 8355747324513991f436d1f8e2548eb3
+      size: 1960
+    - path: configs/role_rules.yaml
+      hash: md5
+      md5: c40fabd95e8e0ec942d967e6047f14b9
+      size: 26777
+    - path: data/raw/coursera
+      hash: md5
+      md5: dee2fe4fd10c56d516f21b9ec41da48d.dir
+      size: 22093231
+      nfiles: 2
+    - path: data/raw/naukri_2017
+      hash: md5
+      md5: a0ece9d28932870aea48585d37434f80.dir
+      size: 52262246
+      nfiles: 1
+    - path: data/raw/nptel
+      hash: md5
+      md5: 496e38d1dd874d91da48e3b3459cf9e9.dir
+      size: 28539523
+      nfiles: 1
+    - path: data/raw/plfs
+      hash: md5
+      md5: eedc7c088d9e7ce2b2d3a77371343d0c.dir
+      size: 119224634
+      nfiles: 1
+    - path: models/model.pkl
+      hash: md5
+      md5: 1c56c9a215ea2960de7d72502fb88228
+      size: 5254945
+    - path: src/models/lookups.py
+      hash: md5
+      md5: c17b7eb47f805fe26c8c4dce5f3d4683
+      size: 6100
+    params:
+      params.yaml:
+        lookups:
+          education_alpha: 0.35
+          min_edu_postings: 40
+    outs:
+    - path: models/course_links.json
+      hash: md5
+      md5: 36838e9b1cb0beb830e4bbef0737e313
+      size: 200118
+    - path: models/education_prior.json
+      hash: md5
+      md5: 0023d29760dbddb626692b4cea09db75
+      size: 7917
+  drift:
+    cmd: uv run python -m src.monitoring.report
+    deps:
+    - path: data/processed/labelled_2019.parquet
+      hash: md5
+      md5: df1fd9596b1081326813f4acf596e47f
+      size: 1107590
+    - path: data/processed/labelled_2025.parquet
+      hash: md5
+      md5: 078e22a40a3259e8629679b652efc8e8
+      size: 3166759
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 1157a4941afef47046ca5b3a6c878fc8
+      size: 768104
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 2ea06b66788c950cb56df9d93d4cbffc
+      size: 7426
+    - path: src/monitoring/drift.py
+      hash: md5
+      md5: 32120e82f88758cd704df6c4f64ac2ba
+      size: 2047
+    - path: src/monitoring/report.py
+      hash: md5
+      md5: 451cb561ba9c4146e3693a9bfdc53f64
+      size: 3188
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          dropout_copies: 2
+          dropout_min: 2
+          dropout_max: 6
+          eval_n_skills: 5
+        split.seed: 42
+        train:
+          model: logreg
+          C: 0.5
+          class_weight:
+          max_iter: 300
+    outs:
+    - path: reports/drift_2019_2025.json
+      hash: md5
+      md5: 9bb17f934ced17f39e184fa0defcc623
+      size: 1753
+  eda:
+    cmd: uv run python -m src.data.eda
+    deps:
+    - path: data/interim/postings_2019.parquet
+      hash: md5
+      md5: 83d23af46f16ae37c7716447c9e13315
+      size: 1288856
+    - path: data/interim/postings_2022.parquet
+      hash: md5
+      md5: 8a5f4de12c309248d857d66603881fab
+      size: 947356
+    - path: data/interim/postings_2025.parquet
+      hash: md5
+      md5: 84524b57d93c10dfad45d79dc938081f
+      size: 3637562
+    - path: data/interim/postings_internshala.parquet
+      hash: md5
+      md5: 0a6958e7e0fa8b6d41bbce119d83af32
+      size: 190205
+    - path: data/processed/labelled_2025.parquet
+      hash: md5
+      md5: 078e22a40a3259e8629679b652efc8e8
+      size: 3166759
+    - path: src/data/eda.py
+      hash: md5
+      md5: 9f49d3da1e35d20634590018f7c5163d
+      size: 2309
+    outs:
+    - path: reports/eda.json
+      hash: md5
+      md5: d9deaf0cf363094da8813f99910e7fc8
+      size: 947
+    - path: reports/vocab_coverage.png
+      hash: md5
+      md5: 1635ad4c6094c4064b446ef27a68f66d
+      size: 25435
