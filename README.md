@@ -6,33 +6,40 @@
 
 ## 1. What the final product could look like
 
-The seniors' project is a useful template: **text goes in, a trained model predicts, the prediction is shown in a UI, and the MLOps tooling wraps around it.** Our project has the same shape. The difference is that the model predicts career paths instead of emotions.
+The seniors' project is a useful template: **user input goes in, a trained model predicts, the prediction is shown in a UI, and the MLOps tooling wraps around it.** They used NLP because sentiment analysis is a text problem. Career guidance doesn't have to be one: if users describe themselves with a structured form (skills, tools, education, experience), it becomes a **tabular** problem. We use NLP only if we decide we need free-text input such as resumes.
 
 | # | Product | Input → Output | Model type | Good datasets | Verdict |
 |---|---|---|---|---|---|
-| **A** | **Resume / profile → career match + skill-gap report** | Resume PDF or skills text → top‑3 job roles with confidence, skills you have vs. skills you're missing, suggested next steps | Text classification (TF‑IDF/embeddings → classifier), plus skill matching | Kaggle *Resume Dataset* (~2.4k resumes, ~24 categories), Kaggle *LinkedIn Job Postings*, **O\*NET** (skills per occupation, free, CC‑BY) | ⭐ **Recommended.** Closest to the seniors' pipeline, with real NLP and a clear demo |
-| B | Student stream/major recommender | Marks, interests, personality quiz (RIASEC) → recommended stream or degree | Tabular classifier (XGBoost/RF) | O\*NET interest profiles, Kaggle student-career datasets | Easy, but thin. Little to version, tune or monitor |
+| **A** | **Skills profile → career match + skill-gap report** | Checklist of languages/tools/frameworks, education, years of experience → top‑3 job roles with confidence, skills you have vs. skills people in that role typically have, what to learn next | Tabular classifier (LogReg / Random Forest / XGBoost / LightGBM), no NLP | **Stack Overflow Developer Survey** (real responses, ~50–90k per year, open ODbL license, new release every year), O\*NET for role descriptions | ⭐ **Recommended.** Real data, simple features, and yearly releases give a genuine data-drift story for monitoring |
+| A′ | Same as A, but from a **resume upload** | Resume PDF → same output | Needs NLP (text classification or skill extraction) | Kaggle *Resume Dataset* (~2.4k resumes, ~24 categories), O\*NET skills lists | Only if we specifically want resume upload. Could be bolted onto A later as a simple keyword-matching step |
+| B | Student stream/major recommender | Marks, interests, personality quiz (RIASEC) → recommended stream or degree | Tabular classifier | O\*NET interest profiles, Kaggle student-career datasets | Easy, but thin. Small or synthetic datasets, little to version, tune or monitor |
 | C | Career chatbot (LLM + RAG) | Chat → advice | Pretrained LLM, no training | O\*NET, job descriptions | Impressive demo, but there's no model to train, track or retrain, so it fits Phase 1 badly |
 | D | **A + a small LLM layer** | Same as A, plus a chat box that explains *why* | A is the MLOps-managed model; the LLM only rephrases its output | Same as A | Good stretch goal for later phases |
 
-**Recommendation: A, with D as an optional add-on later.** Roughly what users would see:
+**Recommendation: A.** A′ and D are optional add-ons later. Roughly what users would see:
 
 ```
 ┌─ CareerCompass ─────────────────────────────────┐
-│  [ Upload resume.pdf ]   or   paste your skills  │
+│  Languages:  [x] Python [x] SQL [ ] Java [ ] Go   │
+│  Tools:      [x] Git [ ] Docker [x] Excel …       │
+│  Education:  [ B.E./B.Tech ▾ ]  Experience: [ 0 ] │
 │  [ Analyze ]                                      │
 ├───────────────────────────────────────────────────┤
 │  Top matches                                      │
 │   1. Data Analyst ............ 78%                │
-│   2. Business Analyst ........ 61%                │
-│   3. ML Engineer ............. 34%                │
+│   2. Data Scientist .......... 52%                │
+│   3. Back-end Developer ...... 31%                │
 │  Skill gap → Data Analyst                         │
-│   ✔ Python  ✔ SQL  ✘ Tableau  ✘ Statistics        │
-│  Next steps: learn Tableau basics, stats course…  │
+│   ✔ Python  ✔ SQL  ✘ Power BI  ✘ Tableau          │
+│  Next steps: Power BI basics, a statistics course │
 └───────────────────────────────────────────────────┘
 ```
 
 Behind the UI, the full system ends up like this: a Streamlit or React frontend calls a FastAPI service, which runs a Dockerized model pulled from the MLflow registry ("champion"). Predictions are logged to a monitoring stack (Prometheus, Grafana and a drift check). When drift shows up, GitHub Actions runs `dvc repro` to retrain, and the new "challenger" model is compared against the champion.
+
+**Why the Stack Overflow survey suits MLOps:** a new release comes out every year. We can train on one year and treat the next year's respondents as "live traffic". Tech popularity really does shift between years, so the drift we detect in later phases is real, not simulated.
+
+**Limitation to accept:** the survey covers tech/software roles only. That fits an audience of engineering students, but it isn't career guidance for every field.
 
 ---
 
@@ -51,8 +58,8 @@ and get the **same metrics**, with every run visible in MLflow. Every step below
 ### Step 0: Decisions to lock in on day 1 (seniors' "versions!!!" advice)
 - **One package manager: `uv`.** It's fast, it writes a lockfile (`uv.lock`) and it pins the Python version. Never mix in `pip install` or conda. Install: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 - **Python 3.12.**
-- **Choose the deep learning framework now (TensorFlow or PyTorch), even though Phase 1 only uses scikit-learn.** The choice decides the serving setup later. TensorFlow pairs with TF Serving and has built-in Prometheus metrics, which is exactly what the seniors used. It also pins NumPy, so read its compatibility notes before adding anything else.
-- **Dataset approval:** get the dataset choice approved by faculty before building on it.
+- **Decide now whether a neural model (e.g. a Keras MLP) comes later, or whether we stay with scikit-learn/XGBoost.** It decides the serving setup. A TensorFlow model pairs with TF Serving and has built-in Prometheus metrics, which is what the seniors used, and TFLite makes quantization easy. Tree models get served through FastAPI or MLflow serving and are quantized through ONNX. If TensorFlow is coming, read its NumPy compatibility notes before adding other packages.
+- **Dataset approval:** get the dataset choice (and which survey year(s)) approved by faculty before building on it.
 
 ### Step 1: Repository structure (cookiecutter-data-science style)
 ```
@@ -77,7 +84,7 @@ career-guidance/
 
 ```bash
 uv init --python 3.12
-uv add pandas scikit-learn nltk spacy mlflow dvc ydata-profiling
+uv add pandas scikit-learn xgboost mlflow dvc ydata-profiling
 uv add --dev ruff jupyter pytest
 ```
 "Pandas Profiler" is now called **`ydata-profiling`**. It has lagged behind new NumPy releases before, so check its supported versions before adding it.
@@ -87,35 +94,37 @@ uv add --dev ruff jupyter pytest
 - **Storage** is the DVC *remote* that holds the actual bytes.
 ```bash
 dvc init
-dvc add data/raw/resumes.csv          # creates data/raw/resumes.csv.dvc → commit it
+dvc add data/raw/survey_2024.csv      # creates data/raw/survey_2024.csv.dvc → commit it
 dvc remote add -d storage <remote>
 dvc push
 ```
 - **Remote choice:** the Google Drive remote now needs your own Google Cloud OAuth client or service account, because the default DVC app is blocked. Read DVC's gdrive docs first. **DagsHub** is a simpler option for a team: it gives a free DVC remote *and* a hosted MLflow server.
-- Raw data never goes into Git. Add a `.gitignore` before the first commit (100 MB push limit).
+- Raw data never goes into Git (the survey CSV is large). Add a `.gitignore` before the first commit (100 MB push limit).
+- Adding a new survey year later is just another `dvc add` and commit. That makes it a clean demonstration of data versioning.
 
 ### Step 3: Data exploration (`notebooks/01_eda.ipynb`)
 - Run a `ydata-profiling` report and save it to `reports/`.
-- **Class balance:** some job categories will be rare, so use macro-F1 rather than accuracy.
-- Look at text-length distributions and duplicates (resume datasets often contain near-duplicates).
-- **Leakage check:** many scraped resumes start with the job title, which is often the label itself. Strip the title line or we'll see fake 95% accuracy.
-- **PII:** resumes contain names, emails and phone numbers. Scrub them during preprocessing; examiners notice this.
+- **Target column:** look at the job-role column (`DevType`). Check whether it is single- or multi-select in the year we pick, since that decides multi-class vs. multi-label. Drop respondents with no role, and decide what to do with students and "Other".
+- **Class balance:** a few roles (e.g. full-stack) dominate. Merge or drop very rare roles, and use macro-F1 rather than accuracy.
+- **Missing values:** many survey questions are optional. Measure how much is missing per column.
+- **Multi-select columns** (e.g. `LanguageHaveWorkedWith`) are semicolon-separated strings. Look at how many distinct values each one has.
+- **Train/serve consistency:** use only features a user could actually enter in our form (skills, tools, education, experience). Columns such as salary or company size may predict the role, but the app can't ask for them, so they don't belong in the model.
 
 ### Step 4: Feature engineering (`src/features/`)
-- Cleaning: lowercase the text and remove URLs, emails, phone numbers and stopwords. Lemmatize with NLTK or spaCy.
-- **TF‑IDF** on word 1–2 grams, optionally with character n‑grams as well.
-- **Skill extraction:** match text against O\*NET's technology-skills list with spaCy's `PhraseMatcher`. This produces multi-hot skill features *and* the skill-gap feature of the product, so one step serves both.
-- Optional stronger features: sentence embeddings (`all-MiniLM-L6-v2`).
-- Put the vectorizer **inside an sklearn `Pipeline`** so it is fit only on the training split (no leakage). The whole pipeline is then one artifact to serve later.
+- **Multi-hot encode** the multi-select skill columns (one 0/1 column per language/tool/framework). Group very rare skills into "other".
+- **Ordinal encode** education level and years of experience (convert values like "Less than 1 year" to numbers).
+- Impute or flag missing values.
+- **Skill-gap profiles:** for each role, compute the share of people in that role who use each skill. The app compares a user against these profiles to show "✘ missing" skills. It's plain pandas, not a model, but it is a pipeline output, so version it with DVC too.
+- Optionally use the `…WantToWorkWith` columns to drive "what to learn next" suggestions.
+- Put preprocessing **inside an sklearn `Pipeline`/`ColumnTransformer`** so it is fit only on the training split (no leakage). The whole pipeline is then one artifact to serve later.
 
 ### Step 5: Baseline models
 | Model | Why |
 |---|---|
 | `DummyClassifier` (majority class) | The floor that every other model must beat |
-| TF‑IDF + Logistic Regression | Strong, interpretable baseline |
-| TF‑IDF + LinearSVC | Usually the best classic text model |
-| TF‑IDF + MultinomialNB | Fast reference point |
-| Embeddings + LogReg *(optional)* | Previews Phase 2 deep learning |
+| Logistic Regression | Simple, interpretable baseline |
+| Random Forest | Handles feature interactions without tuning |
+| XGBoost / LightGBM | Usually the strongest model on tabular data |
 
 Use a stratified split with a fixed seed, both set in `params.yaml`.
 **Metrics:** macro-F1, **top‑3 accuracy** (`top_k_accuracy_score`, since the product shows three careers), a per-class report and a confusion matrix.
@@ -148,7 +157,7 @@ uv run mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 ```python
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 mlflow.set_experiment("career-baselines")
-with mlflow.start_run(run_name="tfidf-logreg"):
+with mlflow.start_run(run_name="xgboost"):
     mlflow.set_tags({"git_commit": commit, "data_md5": raw_dvc_md5})  # ← links MLflow to DVC
     mlflow.log_params(params["train"])
     pipe.fit(X_train, y_train)
@@ -159,11 +168,11 @@ with mlflow.start_run(run_name="tfidf-logreg"):
 Tagging each run with the **git commit and DVC data hash** is what makes a run reproducible: we can always trace which code and which data produced it. Register the best baseline in the Model Registry now; the champion/challenger aliases are needed in later phases.
 
 ### Step 8: Initial evaluation
-Compare runs in the MLflow UI and pick the best baseline. Write up its metrics, its confusion patterns (which careers get mixed up) and the leakage and imbalance findings in `journey.md`.
+Compare runs in the MLflow UI and pick the best baseline. Write up its metrics, its confusion patterns (which roles get mixed up, e.g. data analyst vs. data scientist) and the imbalance and missing-data findings in `journey.md`. Feature importances from the tree models are a quick first look at what drives predictions, ahead of SHAP in a later phase.
 
 ### Suggested team split
-1. Data acquisition, EDA and PII cleaning
-2. Feature engineering and skill extraction
+1. Data acquisition, EDA and target/class cleanup
+2. Feature engineering and skill-gap profiles
 3. Baselines and evaluation
 4. Repo, uv, DVC remote and MLflow server setup
 
@@ -175,18 +184,18 @@ The infrastructure person shouldn't do everyone's setup. The seniors said to set
 
 | # | MLOps stage | Tools for this project | Phase 1? |
 |---|---|---|---|
-| 1 | Problem definition & data collection | Kaggle resumes, job postings, O\*NET | ✅ Done |
-| 2 | Data cleaning & preprocessing | pandas, ydata-profiling, NLTK/spaCy | ✅ Done |
+| 1 | Problem definition & data collection | Stack Overflow Developer Survey, O\*NET | ✅ Done |
+| 2 | Data cleaning & preprocessing | pandas, ydata-profiling, scikit-learn encoders | ✅ Done |
 | 3 | Data versioning & storage | Git, DVC with a GDrive or DagsHub remote | ✅ Done (dataset versioning plus a basic pipeline) |
-| 4a | Model development: baselines & tracking | scikit-learn, MLflow | ✅ Done |
-| 4b | Model development: deep models & tuning | DistilBERT or BiLSTM, Optuna / keras-tuner | ⏳ Later |
-| 5 | Validation & testing | MLflow registry (champion/challenger), pytest, SHAP/LIME, CodeCarbon | 🟡 Partly (initial evaluation only) |
-| 6 | Packaging & CI/CD | Docker or Podman, TF Serving, **quantization** (TFLite/ONNX), GitHub Actions | ⏳ Later |
+| 4a | Model development: baselines & tracking | scikit-learn, XGBoost, MLflow | ✅ Done |
+| 4b | Model development: tuning (and optional neural model) | Optuna, optional Keras MLP | ⏳ Later |
+| 5 | Validation & testing | MLflow registry (champion/challenger), pytest, SHAP, CodeCarbon | 🟡 Partly (initial evaluation only) |
+| 6 | Packaging & CI/CD | Docker or Podman, TF Serving (if neural), **quantization** (TFLite/ONNX), GitHub Actions | ⏳ Later |
 | 7 | Deployment | FastAPI with Render or Hugging Face Spaces (or SageMaker) | ⏳ Later |
-| 8 | Monitoring | Prometheus + Grafana **run as Docker images**. For drift, **not Evidently** (per seniors): use NannyML, Alibi Detect or custom KS/JS-distance tests | ⏳ Later |
+| 8 | Monitoring | Prometheus + Grafana **run as Docker images**. For drift, **not Evidently** (per seniors): use NannyML, Alibi Detect or custom chi-square/JS-distance tests, with the next survey year as "live" data | ⏳ Later |
 | 9 | Continuous training & feedback | GitHub Actions → `dvc repro` → challenger vs. champion, plus user feedback ("was this helpful?") | ⏳ Later |
 
-**What Phase 1 covers:** stages 1–4a and the start of 5. That means approved and explored data, versioned with DVC, run through a reproducible pipeline, with tracked baseline experiments in MLflow and an initial evaluation. Everything after that (deep models, tuning, packaging, serving, monitoring, retraining) builds on this foundation.
+**What Phase 1 covers:** stages 1–4a and the start of 5. That means approved and explored data, versioned with DVC, run through a reproducible pipeline, with tracked baseline experiments in MLflow and an initial evaluation. Everything after that (tuning, packaging, serving, monitoring, retraining) builds on this foundation.
 
 ---
 
