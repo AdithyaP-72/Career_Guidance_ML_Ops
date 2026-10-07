@@ -18,7 +18,7 @@ The product covers **all careers, not just developers.** Sales, accounting, HR, 
 
 ### How the user enters skills (no endless checklist)
 A checklist of every skill doesn't scale: the job data has 44,000 distinct skill tags. Instead:
-- **Skills:** a search box (like LinkedIn's) over a **fixed vocabulary of the ~1,500 most common skills**. The user types `pyth…`, picks from suggestions and must choose **at least 5** (up to ~10). They never see the full list. Because the box can only offer skills the model was trained on, what the app collects always matches what the model expects. The minimum of 5 is there because accuracy falls sharply with fewer skills (section 2.4). With only `html, css`, even a person couldn't tell PHP developer from frontend developer from SEO.
+- **Skills:** a search box (like LinkedIn's) over a **fixed vocabulary of the ~6,000 most common skills**. The user types `pyth…`, picks from suggestions and must choose **at least 5** (up to ~10). They never see the full list. Because the box can only offer skills the model was trained on, what the app collects always matches what the model expects. The minimum of 5 is there because accuracy falls sharply with fewer skills (section 2.4). With only `html, css`, even a person couldn't tell PHP developer from frontend developer from SEO.
 - **Experience:** a number.
 - **Education:** a dropdown with ~12 options (12th, Diploma, B.Tech, B.Com, BBA/MBA, B.Sc, BA, CA/CS, MBBS/Pharma/Nursing, LLB, B.Ed…). It feeds a separate education prior, not the skills model; see O4 below.
 
@@ -189,7 +189,7 @@ Current rules, as measured by the pipeline:
 ### 2.5 Which roles become classes: the cross-snapshot comparison
 Produced by `uv run dvc repro` → `reports/taxonomy/role_support.csv` (every role's usable postings per snapshot, its share change 2019 → 2025, and what Naukri's own 2019 `Role` label calls those postings). Explore it in notebook section 7.
 
-With the current thresholds (≥ 100 postings in 2025, ≥ 20 in 2019): **113 candidates → 103 classes (100 stable + 3 emerging), 10 excluded.** The classes cover all 22 families and 77.8% of usable 2025 postings. The 100 stable classes cover 78.9% of usable 2019 postings, giving a **20,186-posting 2019 reference set** for the drift experiment.
+With the current thresholds (≥ 100 postings in 2025, ≥ 20 in 2019): **113 candidates → 103 classes (100 stable + 3 emerging), 10 excluded.** The classes cover all 22 families and 77.8% of usable 2025 postings. The 100 stable classes cover 78.9% of usable 2019 postings, giving a **20,183-posting 2019 reference set** for the drift experiment.
 
 | Finding | Detail |
 |---|---|
@@ -225,8 +225,10 @@ and get the **same metrics**, with every run visible in MLflow. Every step below
 ### Status
 | Steps | State |
 |---|---|
-| 0–4 (setup, repo, data + DVC, EDA, features) | ✅ **Code written and tested end-to-end** (28 unit tests; full `dvc repro` in ~2 min). **Your setup still to do**, see the checklist below |
-| 5–8 (baselines, `dvc.yaml` train/evaluate stages, MLflow, evaluation) | ⏳ Next |
+| 0–4 (setup, repo, data + DVC, EDA, features) | ✅ Done and pushed (checklist A–H) |
+| 5–8 (baselines, MLflow tracking, initial evaluation) | ✅ **Code written and tested end-to-end** (43 unit tests; full `dvc repro` ~23 min, mostly LightGBM). **Your run still to do:** checklist I |
+
+**That completes Phase 1** as the course defines it: dataset acquisition/approval, data exploration, feature engineering, baseline models, Git repository, DVC dataset versioning, MLflow experiment tracking, initial model evaluation. Everything else in section 4 belongs to later phases.
 
 ### Your setup checklist (do this yourselves, per the seniors)
 Every command below was run on a clean machine with the versions uv resolves today. Run them from the repo root.
@@ -245,7 +247,7 @@ Every command below was run on a clean machine with the versions uv resolves tod
 uv init --bare --python 3.12 --name career-guidance --pin-python   # only writes pyproject.toml + .python-version
 uv add pandas pyarrow openpyxl scikit-learn pyyaml matplotlib fg-data-profiling "dvc[s3]"
 uv add --dev pytest ruff jupyter
-uv run pytest -q                                                    # expect: 28 passed
+uv run pytest -q                                                    # 28 passed at this point (43 after step I)
 git add pyproject.toml uv.lock .python-version && git commit -m "uv project + lockfile"
 ```
 - Plain `uv init` (without `--bare`) would create a `src/career_guidance/` package layout that clashes with our `src/`.
@@ -298,66 +300,119 @@ uv run dvc push && git push
 - Open `notebooks/01_eda.ipynb` in VS Code (kernel: `.venv`) or with `uv run jupyter lab`.
 - The profiling reports are in `reports/profiling/naukri_<year>.html`. Open them in a browser.
 
-**H. Every other teammate**
+**H. Teammates: reproduce everything on your machine**
 
-Before you start:
-- Install uv (step A).
-- Make a DagsHub account (signing up with GitHub is easiest) and send your GitHub and DagsHub usernames to the repo owner.
-- The owner invites you **twice**: on GitHub (Settings → Collaborators) so you can push code, and on DagsHub (Settings → Collaborators, **write** access) so you can push data and MLflow runs.
-- Accept both invites, then create your own token: DagsHub → User Settings → Tokens. Never paste it into chat or commit it.
+> **What's on GitHub right now:** Steps 0–4 (data pipeline, EDA, features) plus this README.
+> **Coming next:** the Steps 5–8 model code (baselines, MLflow, `journey.md`). Wherever a step below says *after the model push*, wait until the repo owner has pushed it. The commands stay the same.
 
+*H1. Accounts and access (once)*
+1. Create a **GitHub** account and a **DagsHub** account (sign up on DagsHub *with* GitHub; it's easiest).
+2. Send the repo owner your GitHub and DagsHub usernames. They invite you **twice**:
+   - GitHub repo → Settings → Collaborators, so you can push code;
+   - DagsHub repo → Settings → Collaborators, with **write** access, so you can push data and log MLflow runs.
+
+   DagsHub requires a login even for reading, so you need this before `dvc pull` works.
+3. Accept both invites (check your email or notifications).
+4. Create your own token: DagsHub → avatar → **User Settings → Tokens → New token**. Keep it private: **never paste it into chat, screenshots or commits**. If it leaks, revoke it there and make a new one.
+
+*H2. Install the tools (once)*
+
+| | Linux / macOS (terminal) | Windows (PowerShell, no admin needed) |
+|---|---|---|
+| Git | usually preinstalled (`git --version`) | `winget install --id Git.Git -e --source winget` |
+| uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 \| iex"` |
+| Check | reopen the terminal, then `git --version` and `uv --version` | **close and reopen PowerShell**, then `git --version` and `uv --version` |
+
+You don't install Python yourself: uv downloads Python 3.12 for the project. On Windows, keep the project **out of OneDrive-synced folders** (e.g. use `C:\dev`), because syncing `.venv` and `.dvc/cache` is slow and can lock files.
+
+*H3. Get the project and its environment*
 ```bash
-git clone https://github.com/AdithyaP-72/Career_Guidance_ML_Ops.git && cd Career_Guidance_ML_Ops
-uv sync                                   # installs the exact versions from uv.lock
-read -rs DAGSHUB_TOKEN                    # type this line, Enter, then paste your token, Enter
+git clone https://github.com/AdithyaP-72/Career_Guidance_ML_Ops.git
+cd Career_Guidance_ML_Ops
+uv sync                      # creates .venv with the exact versions in uv.lock
+```
+(Same three lines in PowerShell. Windows PowerShell 5.1 doesn't understand `&&`, so keep them on separate lines.)
+
+*H4. Connect DVC to DagsHub with your token*
+
+Linux / macOS / Git Bash:
+```bash
+read -rs DAGSHUB_TOKEN       # type exactly this, Enter, then paste your token, Enter (nothing shows: normal)
 uv run dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
 uv run dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
 unset DAGSHUB_TOKEN
-uv run dvc pull                           # raw data + all pipeline outputs from DagsHub
-uv run pytest -q                          # 28 passed
-uv run dvc repro                          # must print "Data and pipelines are up to date."
 ```
-**H (Windows): the same steps in PowerShell**
+Windows PowerShell:
+```powershell
+$sec = Read-Host "Paste your DagsHub token" -AsSecureString
+$tok = [System.Net.NetworkCredential]::new("", $sec).Password
+uv run dvc remote modify origin --local access_key_id $tok
+uv run dvc remote modify origin --local secret_access_key $tok
+Remove-Variable sec, tok
+```
+`--local` saves the token in `.dvc/config.local`, which Git never sees. Don't use `read -rs <your-token>`: the token goes on the *next* line, not after the command.
 
-1. Install the tools. Open **PowerShell** (Start → "PowerShell"); admin isn't needed:
-   ```powershell
-   winget install --id Git.Git -e --source winget                            # Git (skip if `git --version` works)
-   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"   # uv
-   ```
-   **Close and reopen PowerShell** so `git` and `uv` are on your PATH, then check:
-   ```powershell
-   git --version
-   uv --version
-   ```
-2. Clone and install. Use separate lines: Windows PowerShell 5.1 doesn't understand `&&`.
-   ```powershell
-   cd $HOME\Documents                      # or wherever you keep projects; avoid OneDrive-synced folders
-   git clone https://github.com/AdithyaP-72/Career_Guidance_ML_Ops.git
-   cd Career_Guidance_ML_Ops
-   uv sync                                 # downloads Python 3.12 itself + exact versions from uv.lock
-   ```
-3. Store your DagsHub token without it appearing on screen or in PowerShell's history:
-   ```powershell
-   $sec = Read-Host "Paste your DagsHub token" -AsSecureString
-   $tok = [System.Net.NetworkCredential]::new("", $sec).Password
-   uv run dvc remote modify origin --local access_key_id $tok
-   uv run dvc remote modify origin --local secret_access_key $tok
-   Remove-Variable sec, tok
-   ```
-4. Pull and verify:
-   ```powershell
-   uv run dvc pull                         # raw data + pipeline outputs from DagsHub
-   uv run pytest -q                        # 28 passed
-   uv run dvc repro                        # must print "Data and pipelines are up to date."
-   ```
-5. Notebook: same as step G. In VS Code the kernel is `.venv\Scripts\python.exe` (not `.venv/bin/python`).
+*H5. Download the data and check you can reproduce*
+```bash
+uv run dvc pull              # raw data + every pipeline output (and, after the model push, the trained models)
+uv run pytest -q             # now: 28 passed · after the model push: 43 passed
+uv run dvc repro             # must print: "Data and pipelines are up to date."
+```
+**That last line is the Phase 1 reproducibility check.** It means your code, data and outputs match `dvc.lock` exactly, with nothing rerun. If instead it starts rerunning stages:
+- **On Windows:** you probably cloned before `.gitattributes` existed; delete the folder and clone again.
+- **Otherwise:** check `git status` for local edits.
 
-Windows notes:
-- **Line endings:** `.gitattributes` forces LF endings on checkout. Without it, Git for Windows would convert files to CRLF, DVC's hashes would no longer match `dvc.lock`, and `dvc repro` would rerun everything. If you cloned *before* `.gitattributes` was added, delete the folder and clone again.
-- **OneDrive:** don't put the repo in a OneDrive-synced folder. Syncing `.venv` and `.dvc/cache` is slow and can lock files mid-run.
-- **Git Bash** (installed with Git) also works. In it, the Linux commands above run as written, including `read -rs`.
-- PLFS isn't on DagsHub (see step D). Nobody needs it until the education-prior stage. If you do: `uv run python -m src.data.download --only plfs`.
-That last line is the Phase 1 reproducibility check.
+*H6. MLflow (after the model push)*
+
+You only need this when you train or retrain models yourself:
+```bash
+cp .env.example .env         # PowerShell: Copy-Item .env.example .env
+```
+Edit `.env`: put your DagsHub username in `MLFLOW_TRACKING_USERNAME` and your token in `MLFLOW_TRACKING_PASSWORD`. `.env` is gitignored, so never commit it. To *view* runs you need nothing locally: open the repo on DagsHub → **Experiments** (or `https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow`). You'll see the experiment `career-role-baselines` with one run per baseline.
+
+*H7. Look around*
+- **EDA notebook:** open `notebooks/01_eda.ipynb` in VS Code with the **Python** and **Jupyter** extensions, choose the `.venv` kernel (Linux/macOS `.venv/bin/python`, Windows `.venv\Scripts\python.exe`) and click **Run All**. Or run `uv run jupyter lab`.
+- **Data profiling reports:** open `reports/profiling/naukri_<year>.html` in a browser.
+- **Metrics:** `uv run dvc metrics show`.
+- **After the model push:** `reports/model_comparison.csv`, `reports/eval/<model>/` and [journey.md](journey.md).
+
+*H8. Everyday workflow*
+- **Get teammates' latest work:** `git pull`, then `uv sync` and `uv run dvc pull`.
+- **Change something** (a rule in `configs/role_rules.yaml`, a value in `params.yaml`, code in `src/`):
+  1. `uv run pytest -q`, then `uv run dvc repro` (it reruns only what your change affects);
+  2. `git add -A && git commit -m "what you changed and why"`;
+  3. `uv run dvc push && git push`. **Both** are needed: Git carries the code and `dvc.lock`, DVC carries the data and models.
+- **Before committing:** clear notebook outputs, and run `git status` to make sure no `.env` or token file is listed.
+- **PLFS** isn't on DagsHub (step D: possible redistribution limits). You only need it for a later phase: `uv run python -m src.data.download --only plfs`.
+
+**I. Models + MLflow (Steps 5–8)**: once Steps A–H work
+1. Add the model packages (one person; everyone else just runs `uv sync` after pulling):
+   ```bash
+   uv add lightgbm mlflow python-dotenv
+   uv run pytest -q                                   # now 43 passed (the model tests need these packages)
+   git add pyproject.toml uv.lock && git commit -m "Add model + MLflow packages"
+   ```
+2. Point MLflow at DagsHub (**each person**, with their own token):
+   ```bash
+   cp .env.example .env      # Windows PowerShell: Copy-Item .env.example .env
+   ```
+   Open `.env` and set your DagsHub username and token. `.env` is gitignored, so it never gets committed. Without a `.env`, runs go to a local `mlflow.db` instead (view with `uv run mlflow ui --backend-store-uri sqlite:///mlflow.db`).
+3. Train, evaluate and compare the baselines:
+   ```bash
+   uv run dvc repro            # data stages rerun once (ingest changed), then train@<model> ×5 and select: ~23 min
+   uv run dvc metrics show     # every model's metrics side by side
+   cat reports/model_comparison.csv
+   ```
+   You should get the numbers in Step 5 below (same seed and data; LightGBM may differ in the last decimal).
+4. See it in MLflow: on DagsHub, open the repo → **Experiments** tab (or `https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow`). The experiment `career-role-baselines` has 5 runs:
+   - each run has its params, metrics, git commit + data hashes, and its `eval/` charts and CSVs;
+   - the best one (tag `best_baseline = true`, logistic regression) also carries the saved model.
+   Sort by `top3_5skills` to compare.
+5. Save everything:
+   ```bash
+   git add -A && git commit -m "Phase 1 Steps 5-8: baselines, MLflow tracking, initial evaluation"
+   uv run dvc push && git push
+   ```
 
 ### Step 0: Decisions locked in (seniors' "versions!!!" advice)
 - **One package manager: `uv`.** It writes `uv.lock`, which pins every package including sub-dependencies. Never `pip install` into this project.
@@ -382,18 +437,20 @@ That last line is the Phase 1 reproducibility check.
 │   ├── raw/<source>/            # as downloaded; one .dvc file per folder
 │   ├── interim/                 # postings.parquet (all snapshots, tidy), labelled.parquet
 │   └── processed/               # classes.json, train / test / reference_2019 .parquet
-├── models/                      # skill_profiles.json, skill_cooccurrence.npz, skill_vocab.json (+ model in Step 5)
+├── models/                      # skill profiles, baselines/<model>.joblib, model.joblib (best baseline)
 ├── notebooks/01_eda.ipynb
-├── reports/                     # metrics JSON, labels/ and taxonomy/ CSVs, profiling/ HTML
+├── reports/                     # metrics JSON, labels/ taxonomy/ eval/ CSVs + charts, profiling/ HTML
 ├── src/
 │   ├── utils.py                 # paths, config loading, skill + experience parsing
 │   ├── data/                    # download, ingest, profile, label, taxonomy, split
 │   ├── features/build.py        # the sklearn feature pipeline + skill dropout
-│   └── models/profiles.py       # per-role skill profiles (train/evaluate come in Step 5)
-├── tests/                       # pytest: skills, labelling rules, features
+│   └── models/                  # profiles, estimators, train, evaluate, tracking (MLflow), select
+├── tests/                       # pytest: skills, labelling rules, features, models
 ├── dvc.yaml  params.yaml        # the pipeline and every tunable value
 ├── pyproject.toml  uv.lock  .python-version   # created by you in step B
 ├── ruff.toml  conftest.py  .gitignore  .gitattributes
+├── .env.example                 # MLflow → DagsHub settings template (copy to .env)
+├── journey.md                   # Phase 1 initial model evaluation
 └── README.md
 ```
 Every pipeline script runs as `uv run python -m src.<module>` from the repo root.
@@ -421,14 +478,14 @@ What cleaning does (`ingest` stage), and what we found:
 | Distinct skills (after aliases) | n/a | 14,462 | 14,982 | 43,833 |
 
 - **Separators differ per snapshot:** `,` in 2025, `|` in 2019, newlines in 2022. Normalisation also removes the spaces Naukri puts around punctuation ("c + +" → "c++", "ci / cd" → "ci/cd") and maps ~50 synonym groups (`configs/skill_aliases.yaml`, mined from the 4,000 most common tags).
-- **Vocabulary size:** with the top 1,500 skills, **87%** of 2025 postings keep ≥ 3 known skills (top 500: 69%, top 1,000: 82%). That's why `top_k_skills = 1500`.
+- **Vocabulary size:** with the top 1,500 skills, 87% of 2025 postings keep ≥ 3 known skills (top 500: 69%, top 5,000: 97%). We first chose 1,500, but in model tests **6,000 beat 1,500 by ~5 points of top‑3 accuracy** (79.4% vs 74.6%, logistic regression), because specific roles need specific skills. So `top_k_skills = 6000`. It's still a search box, never a list the user scrolls.
 - **Skill drift 2019 → 2025** (% of postings): javascript 8.0 → 3.2, html 6.4 → 1.7, jquery 3.8 → 0.6, mysql 3.3 → 0.7 · sap 1.1 → 5.1, software testing 0.3 → 2.1, continuous integration 0.3 → 1.8, kubernetes 0.01 → 1.6.
 - **Experience:** median minimum experience is 2–3 years in every snapshot. The model uses the posting's **minimum** (`exp_min`), since a user enters one number.
 - **Train/serve consistency:** only features the form collects (skills, experience). Company, location and salary stay out of the model.
 
 ### Step 4: Features (`src/features/build.py`)
 - `make_preprocessor(top_k, exp_clip)` is an sklearn `ColumnTransformer` with two parts:
-  - **skills:** `CountVectorizer(analyzer=identity, binary=True, max_features=1500)` straight on the skill lists, giving a sparse 0/1 vector;
+  - **skills:** `CountVectorizer(analyzer=identity, binary=True, max_features=6000)` straight on the skill lists, giving a sparse 0/1 vector;
   - **experience:** median-impute → clip to 0–20 → scale to 0–1.
 
   It's fit on the train split only, so there's no leakage. The fitted vocabulary *is* the search box's list. Skills outside it are ignored at serving time (tested). `identity` and `clip_experience` are top-level functions so the fitted pipeline can be pickled (tested).
@@ -437,31 +494,38 @@ What cleaning does (`ingest` stage), and what we found:
 - **Skill profiles** (`profiles` stage, from the *train* split only, since the profile-matching baseline predicts from them):
   - per role, the core skills (≥ 8% of the role's postings, max 12), the top 30 skills with shares, common titles, and experience quartiles (`models/skill_profiles.json`);
   - skill growth 2019 → 2025;
-  - a 1,500×1,500 skill co-occurrence matrix that orders the learning path (`models/skill_cooccurrence.npz` + `skill_vocab.json`).
-- **Splits** (`split` stage): 2025 class postings with ≥ 3 skills → **54,752 train / 13,688 test** (stratified by role, seed 42). Plus **20,186** 2019 postings in the 100 stable classes as the drift reference.
+  - a 6,000×6,000 skill co-occurrence matrix (sparse) that orders the learning path (`models/skill_cooccurrence.npz` + `skill_vocab.json`).
+- **Splits** (`split` stage): 2025 class postings with ≥ 3 skills → **54,752 train / 13,688 test** (stratified by role, seed 42). Plus **20,183** 2019 postings in the 100 stable classes as the drift reference.
 
-### Step 5: Baseline models
-| Model | Why |
+### Step 5: Baseline models (results)
+All five share the same feature pipeline (Step 4) and training data: 54,752 postings plus 2 skill-dropout copies each, so 164,256 rows over 103 roles. Each model's settings live in `params.yaml → train.<model>`. The headline metric is **top‑3 accuracy on 5-skill test inputs**: 13,688 held-out 2025 postings, each cut to 5 random skills, which is what a user types.
+
+| Model | What it does | Top‑3 | Top‑1 | Top‑5 | Macro‑F1 | Right family | Top‑3, full postings | Train | Predict 1k | Size |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Dummy | Ignores skills; always the 3 most common roles | 19.8% | 8.5% | 25.7% | 0.002 | 17.5% | 19.8% | 2 s | 19 ms | 0.07 MB |
+| Profile matching | Cosine similarity to each role's average posting (no learning) | 66.3% | 43.5% | 75.5% | 0.455 | 62.9% | 73.9% | 2 s | 35 ms | 0.3 MB |
+| **Logistic regression** ✅ | One weight per skill per role | **79.4%** | 56.5% | **85.8%** | 0.553 | **72.1%** | 84.6% | 3 min | **21 ms** | 4.6 MB |
+| Random forest | 100 trees, leaf ≥ 5 | 73.8% | 49.3% | 80.7% | 0.440 | 66.8% | 79.3% | 42 s | 149 ms | 107 MB |
+| LightGBM | 120 boosting rounds × 103 trees each | 78.2% | **56.8%** | 84.5% | **0.560** | 72.0% | **84.8%** | 15.5 min | 807 ms | 7.8 MB |
+
+What the columns mean:
+- **Top‑k:** is the true role among the model's k best guesses? The product shows 3.
+- **Macro‑F1:** per-role F1 averaged so small roles count as much as big ones.
+- **Right family:** is the #1 role at least in the correct family?
+- **Full postings:** the same top‑3 test, but with all of a posting's skills.
+
+Settings that mattered, measured with logistic regression on the 5-skill test (both first spotted in a teammate's exploratory branch, then confirmed on our data):
+
+| Setting | Top‑3 |
 |---|---|
-| `DummyClassifier` (majority class) | The floor: 8% for roles |
-| **Profile matching** (no training) | Cosine similarity between the user's skills and each role's skill profile. The ML model has to beat this, or ML isn't adding anything |
-| Logistic Regression | Simple, interpretable: 66–67% top‑3 on 5-skill inputs in our check |
-| Random Forest | Handles feature interactions without tuning |
-| LightGBM | Usually the strongest model on tabular data and handles sparse input well |
+| 1,500 skills, `class_weight: balanced` | 68.9% |
+| 1,500 skills, no class weights | 74.6% |
+| **6,000 skills, no class weights (used)** | **79.4%** |
 
-Use a stratified split with a fixed seed, both set in `params.yaml`.
-**Metrics:**
-- **Headline: top‑3 accuracy on 5-skill test inputs**, since the product shows three roles and users enter about five skills;
-- top‑3 accuracy on full postings;
-- top‑3 accuracy of the family implied by the predicted role;
-- macro‑F1;
-- a per-role report;
-- a confusion matrix at family level (103×103 is unreadable).
-
-Expect confusion between neighbouring roles: Java vs. Full Stack, Data Analyst vs. BI Developer, Sales Executive vs. BDE.
+LightGBM needed small, regularised settings. Library defaults diverge with 103 classes, and 200 larger rounds took over 20 minutes.
 
 ### Step 6: The DVC pipeline (`dvc.yaml`)
-Built so far (Steps 2–4). `train` and `evaluate` get added in Step 5.
+All of Phase 1:
 
 | Stage | Command | Reads | Writes |
 |---|---|---|---|
@@ -471,12 +535,13 @@ Built so far (Steps 2–4). `train` and `evaluate` get added in Step 5.
 | `taxonomy` | `src.data.taxonomy` | labelled; params `taxonomy`, `data.min_skills` | `data/processed/classes.json`, `reports/taxonomy/role_support.csv`, metric `reports/taxonomy_summary.json` |
 | `split` | `src.data.split` | labelled, classes; params `split`, `features.eval_n_skills` | `train` / `test` / `reference_2019.parquet`, metric `reports/split_summary.json` |
 | `profiles` | `src.models.profiles` | train, labelled, classes; params `profiles`, `features.top_k_skills` | `models/skill_profiles.json`, `skill_cooccurrence.npz`, `skill_vocab.json` |
-| *(Step 5)* `train`, `evaluate` | `src.models.train` / `.evaluate` | train, test, reference; params `features`, `train` | model, `reports/metrics.json`, plots |
-| *(later)* `lookups` | `src.models.lookups` | Naukri 2017, PLFS, NCO, courses | education prior, skill → course links |
+| `train@<model>` ×5 | `src.models.train <model>` | train, test, reference_2019; params `features`, `train.<model>` | `models/baselines/<model>.joblib`, `reports/eval/<model>/`, `reports/runs/<model>.json`, metric `reports/metrics/<model>.json`, + an MLflow run |
+| `select` | `src.models.select` | every model's metrics + run | `models/model.joblib` (best), `reports/model_comparison.csv`, metric `reports/metrics.json`, + the best model uploaded to its MLflow run |
 
 `dvc repro` reruns only stages whose inputs changed:
 - editing `role_rules.yaml` reruns label → taxonomy → split → profiles, but not ingest or profiling;
-- changing `taxonomy.min_train_postings` reruns taxonomy onward.
+- changing `taxonomy.min_train_postings` reruns taxonomy onward;
+- changing one model's block, e.g. `train.lightgbm`, retrains only that model (then `select`).
 
 Useful commands:
 - `uv run dvc dag` draws the graph;
@@ -484,30 +549,29 @@ Useful commands:
 - `uv run dvc exp run -S taxonomy.min_reference_postings=50` followed by `uv run dvc exp show` gives the experiment table the seniors showed on slide 14.
 
 ### Step 7: MLflow experiment tracking
-Two options; the code is the same, only the tracking URI changes:
-- **Team server on DagsHub (recommended):** every DagsHub repo has an MLflow server at `https://dagshub.com/<user>/<repo>.mlflow`. Authenticate with `MLFLOW_TRACKING_USERNAME=<user>` and `MLFLOW_TRACKING_PASSWORD=<token>` in a `.env` file (already gitignored). All four of you then see the same runs.
-- **Local, for offline work:** `uv run mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000`.
-```python
-mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000"))
-mlflow.set_experiment("career-baselines")
-with mlflow.start_run(run_name="logreg"):
-    mlflow.set_tags({"git_commit": commit, "data_md5": raw_dvc_md5})  # ← links MLflow to DVC
-    mlflow.log_params({**params["features"], **params["train"]})
-    pipe.fit(X_train, y_train)
-    mlflow.log_metrics({"top3_acc": top3, "macro_f1": f1, "label_agreement_2019": agree})
-    mlflow.log_artifact("reports/confusion_matrix.png")
-    mlflow.sklearn.log_model(pipe, name="model")
-```
-Tagging each run with the **git commit and DVC data hash** is what makes a run reproducible: we can always trace which code and which data produced it. Logging label agreement next to model metrics shows whether a gain came from better labels or a better model. Register the best baseline in the Model Registry now; the champion/challenger aliases are needed in later phases.
+`src/models/tracking.py` points MLflow at the server in `.env`, which is our DagsHub MLflow, or falls back to a local `mlflow.db`. Each `train@<model>` stage logs one run to the `career-role-baselines` experiment:
+
+| Logged | What |
+|---|---|
+| Tags | `git_commit`, `code_dirty` (uncommitted code/config edits), `data.train_md5` / `data.test_md5` / `data.reference_2019_md5` (the same hashes DVC uses), `model`, `dvc_stage` |
+| Params | the model's block, the `features` block, the taxonomy thresholds, training rows, number of classes |
+| Metrics | everything in Step 5 plus the 2019-reference scores, fit time, model size, prediction latency |
+| Artifacts | `eval/`: per-role report, top confusions, family confusion matrix (CSV + chart) |
+| Model | **best baseline only**, uploaded by `select`: the full pipeline in skops format with our `src/` code, so it loads anywhere |
+
+How each row helps:
+- **Tags make a run traceable:** from any run you can get back to the exact code (git) and data (DVC hashes) that produced it.
+- **The model is uploaded for the best baseline only** because the random forest alone is ~375 MB in MLflow's format, and all five model files are versioned in DVC anyway.
+- **skops** is MLflow's safer replacement for pickle. It only loads types listed in `TRUSTED_TYPES` (`src/models/train.py`), and a test checks that every model reloads with that list.
+
+Registering the model in the MLflow Model Registry (champion/challenger aliases) is a later-phase step.
 
 ### Step 8: Initial evaluation
-Compare runs in the MLflow UI and pick the best baseline. Write the following up in `journey.md`:
-- its top‑3 accuracy and macro‑F1 against the profile-matching baseline;
-- which families get confused (e.g. Software vs. ERP vs. QA, Sales vs. Banking);
-- the labelling agreement and how it moved as the rules improved;
-- the class imbalance.
-
-Also run the 2019-trained model on 2025 once and record the drop. It's the first evidence for the monitoring phase.
+Written up in **[journey.md](journey.md)**: results, what moved the numbers, where the best model goes wrong, and limitations. In short:
+- **Logistic regression is the best baseline:** 79.4% top‑3 on 5-skill input, **+13.1 points over profile matching**, 4× the dummy baseline. It's also the fastest to predict (21 ms per 1,000 users).
+- **LightGBM is close** on top‑1 and macro‑F1 but loses on top‑3, takes 5× longer to train and is 40× slower to predict. Random forest is worse and 23× bigger.
+- **Most errors are between neighbouring roles:** Customer Service ↔ Voice Support, BDE ↔ Sales Executive, specific developer roles → Software Engineer (general). At family level, Banking postings often land in Sales (26%), and Strategy & Consulting is the hardest family (48% correct).
+- **More skills help:** 84.6% top‑3 with full postings vs 79.4% with 5 skills, which supports the "at least 5 skills" rule in the form.
 
 ### Suggested team split
 1. **Data:** `sources.yaml` / download, `ingest.py`, `skill_aliases.yaml` (start with notebook section 3), EDA notebook
@@ -526,9 +590,9 @@ The infrastructure person shouldn't do everyone's setup. The seniors said to set
 | 1 | Problem definition & data collection | Naukri 2025 + 2019 (core), 2017 + 2022 (comparison); PLFS, NCO‑2015, NPTEL/SWAYAM, Coursera, O\*NET (supporting) | ✅ Built: `download.py` + `sources.yaml` |
 | 2 | Data cleaning & preprocessing | pandas, fg-data-profiling, rule-based labelling, cross-snapshot taxonomy, scikit-learn feature pipeline | ✅ Built: `ingest` / `profiling` / `label` / `taxonomy` / `split` / `profiles` stages |
 | 3 | Data versioning & storage | Git, DVC with DagsHub remote | 🟡 Code ready; your setup (checklist E) |
-| 4a | Model development: baselines & tracking | scikit-learn, LightGBM, MLflow (DagsHub) | ⏳ Next (Steps 5–8) |
+| 4a | Model development: baselines & tracking | scikit-learn, LightGBM, MLflow (DagsHub) | ✅ Built: 5 baselines, MLflow runs, logistic regression best at 79.4% top‑3 |
 | 4b | Model development: tuning (and optional neural model) | Optuna, optional Keras MLP | ⏳ Later |
-| 5 | Validation & testing | pytest (28 tests: skills, rules, features), MLflow registry (champion/challenger), SHAP, CodeCarbon | 🟡 Tests built; rest later |
+| 5 | Validation & testing | pytest (43 tests: skills, rules, features, models), MLflow registry (champion/challenger), SHAP, CodeCarbon | 🟡 Tests built; rest later |
 | 6 | Packaging & CI/CD | Docker or Podman, TF Serving (if neural), **quantization** (ONNX for sklearn/LightGBM, TFLite if neural), GitHub Actions | ⏳ Later |
 | 7 | Deployment | FastAPI with Render or Hugging Face Spaces (or SageMaker) | ⏳ Later |
 | 8 | Monitoring | Prometheus + Grafana **run as Docker images**. For drift, **not Evidently** (per seniors): use NannyML, Alibi Detect or custom chi-square/JS-distance tests on skill frequencies. 2019 = reference (`reference_2019.parquet` is already built), 2025 = live; later a fresh scrape | ⏳ Later |
