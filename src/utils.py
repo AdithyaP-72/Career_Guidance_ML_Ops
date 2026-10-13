@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import json
 import logging
 import math
@@ -58,8 +59,8 @@ _EDGE_JUNK = " \t\"'`,;:*•·|"
 
 
 def normalise_skill(raw: str, aliases: dict[str, str] | None = None) -> str:
-    """Lower-case, tidy spacing/punctuation, then map known synonyms to one name."""
-    s = re.sub(r"\s+", " ", str(raw).lower()).strip()
+    """Decode HTML entities, lower-case, tidy spacing/punctuation, then map known synonyms to one name."""
+    s = re.sub(r"\s+", " ", html.unescape(str(raw)).lower()).strip()
     s = _SPACE_AROUND_PUNCT.sub(r"\1", s)
     s = s.strip(_EDGE_JUNK).rstrip(".").strip(_EDGE_JUNK)
     if aliases:

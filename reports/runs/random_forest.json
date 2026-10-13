@@ -1,0 +1,6 @@
+{
+  "model": "random_forest",
+  "run_id": "bcb2bf171afa409d8e0b51c0116da5e7",
+  "experiment": "career-role-baselines",
+  "tracking": "https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow"
+}

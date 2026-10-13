@@ -1,0 +1,41 @@
+true_role,predicted_role,n
+Customer Service Executive,Customer Support (Voice),106
+Sales Executive,Business Development Executive,103
+Software Engineer (general),Python Developer,94
+Customer Support (Voice),Customer Service Executive,75
+Software Engineer (general),Frontend Developer,75
+Software Engineer (general),SAP Consultant,65
+Manual Test Engineer,Automation Test Engineer,65
+Software Engineer (general),Java Developer,63
+Sales Executive,Marketing Executive,62
+Sales Executive,Area / Territory Sales Manager,59
+Software Engineer (general),Embedded / Firmware Engineer,53
+Business Development Executive,Sales Executive,52
+Software Engineer (general),Oracle Apps Consultant,51
+Full Stack Developer,Frontend Developer,45
+Sales Executive,Inside Sales / Telesales,44
+Sales Executive,Relationship Manager (Banking),43
+Sales Executive,Insurance Advisor,41
+Software Engineer (general),.NET Developer,40
+Software Engineer (general),DevOps Engineer,40
+Area / Territory Sales Manager,Sales Executive,36
+Software Engineer (general),BI Developer,36
+ML / AI Engineer,Data Scientist,36
+Software Engineer (general),Data Engineer,35
+Sales Executive,Key Account Manager,34
+Full Stack Developer,Java Developer,31
+Data Analyst,BI Developer,30
+Management Consultant,Business Analyst,29
+Customer Service Executive,Customer Support (Non-voice),26
+HR Executive / Generalist,Recruiter / Talent Acquisition,26
+SAP Consultant,Architect (Building),26
+Software Engineer (general),Architect (Building),25
+Sales Executive,Retail Sales Associate,25
+Management Consultant,Project Manager,25
+Full Stack Developer,.NET Developer,24
+Accountant,Finance Manager,24
+Customer Support (Voice),Inside Sales / Telesales,24
+Sales Executive,Architect (Building),24
+Sales Executive,Real Estate Sales,24
+Software Engineer (general),Cloud Engineer,24
+Software Engineer (general),Database Administrator,24

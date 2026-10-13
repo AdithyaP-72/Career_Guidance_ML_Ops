@@ -1,0 +1,41 @@
+true_role,predicted_role,n
+Business Development Executive,Sales Executive,149
+Area / Territory Sales Manager,Sales Executive,112
+Customer Service Executive,Customer Support (Voice),111
+Full Stack Developer,Software Engineer (general),95
+Frontend Developer,Software Engineer (general),93
+Relationship Manager (Banking),Sales Executive,83
+Customer Support (Voice),Customer Service Executive,76
+Marketing Executive,Sales Executive,75
+Java Developer,Software Engineer (general),68
+Inside Sales / Telesales,Sales Executive,63
+Sales Executive,Business Development Executive,58
+Cloud Engineer,Software Engineer (general),57
+Data Analyst,Software Engineer (general),52
+Automation Test Engineer,Manual Test Engineer,50
+Data Scientist,ML / AI Engineer,49
+.NET Developer,Software Engineer (general),48
+Manual Test Engineer,Software Engineer (general),48
+Branch Banking Officer,Sales Executive,45
+ML / AI Engineer,Software Engineer (general),43
+Finance Manager,Accountant,43
+Data Engineer,Software Engineer (general),42
+SAP Consultant,Software Engineer (general),39
+Management Consultant,Software Engineer (general),39
+HR Executive / Generalist,Recruiter / Talent Acquisition,39
+Python Developer,Software Engineer (general),39
+DevOps Engineer,Software Engineer (general),38
+Software Engineer (general),Data Engineer,36
+Software Engineer (general),Java Developer,35
+Full Stack Developer,Java Developer,33
+Embedded / Firmware Engineer,Software Engineer (general),32
+Retail Sales Associate,Sales Executive,30
+Key Account Manager,Sales Executive,30
+Admin Executive,Sales Executive,29
+Software Engineer (general),SAP Consultant,28
+Admin Executive,Software Engineer (general),28
+Production Engineer,Software Engineer (general),28
+Architect (Building),Software Engineer (general),27
+Oracle Apps Consultant,Software Engineer (general),26
+Accounts Payable / Receivable,Accountant,25
+Insurance Advisor,Sales Executive,24

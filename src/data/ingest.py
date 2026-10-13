@@ -13,6 +13,8 @@ per snapshot. Counts go to reports/ingest_summary.json.
 
 from __future__ import annotations
 
+import html
+
 import numpy as np
 import pandas as pd
 
@@ -116,6 +118,8 @@ def main() -> None:
     frames, summary = [], {}
     for year, loader in LOADERS.items():
         df = loader(aliases).reindex(columns=COLUMNS)
+        # Some scraped titles carry HTML entities ("Sales &amp; Marketing"), which hide them from the rules.
+        df["title"] = df["title"].map(lambda t: html.unescape(t) if isinstance(t, str) else t)
         df["title"] = df["title"].astype("string").str.strip()
         df = df[df["title"].notna() & (df["title"] != "")]
         df["n_skills"] = df["skills"].map(len)

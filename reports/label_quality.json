@@ -6,10 +6,10 @@
     "n_compared": 16491
   },
   "2019": {
-    "rows": 29249,
+    "rows": 29244,
     "coverage": 0.799,
     "family_agreement": 0.6715,
-    "n_compared": 22684
+    "n_compared": 22682
   },
   "2022": {
     "rows": 26252,

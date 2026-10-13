@@ -1,11 +1,12 @@
-# The Phase 1 data pipeline (Steps 3–4). Run everything with:  uv run dvc repro
-# Steps 5–8 (train, evaluate, MLflow) get added here next.
+# The Phase 1 pipeline. Run everything with:  uv run dvc repro   (graph: uv run dvc dag)
 #
 #   data/raw/* ──ingest──▶ postings ──label──▶ labelled ──taxonomy──▶ classes
 #                             │                    │                     │
 #                         profiling                └─────────split◀──────┘
-#                       (ydata reports)                      │
-#                                                        profiles
+#                     (profiling reports)          ┌──────┴───────┐
+#                                               profiles    train@<model>   (one stage per baseline, each an MLflow run)
+#                                                                 │
+#                                                               select ──▶ models/model.joblib + reports/model_comparison.csv
 
 stages:
   ingest:
@@ -100,3 +101,52 @@ stages:
       - models/skill_profiles.json
       - models/skill_cooccurrence.npz
       - models/skill_vocab.json
+
+  train:
+    foreach: ${train.models}
+    do:
+      cmd: uv run python -m src.models.train ${item}
+      deps:
+        - src/models/train.py
+        - src/models/estimators.py
+        - src/models/evaluate.py
+        - src/models/tracking.py
+        - src/features/build.py
+        - data/processed/train.parquet
+        - data/processed/test.parquet
+        - data/processed/reference_2019.parquet
+      params:
+        - features
+        - train.skill_dropout
+        - train.${item}
+      outs:
+        - models/baselines/${item}.joblib
+        - reports/eval/${item}:
+            cache: false
+        - reports/runs/${item}.json:
+            cache: false
+      metrics:
+        - reports/metrics/${item}.json:
+            cache: false
+
+  select:
+    cmd: uv run python -m src.models.select
+    deps:
+      - src/models/select.py
+      - src/models/train.py
+      - src/models/tracking.py
+      - reports/metrics
+      - reports/runs
+      - models/baselines
+      - data/processed/test.parquet
+    params:
+      - select
+      - train.models
+    outs:
+      - models/model.joblib
+      - reports/model_comparison.csv:
+          cache: false
+    metrics:
+      - reports/metrics.json:
+          cache: false
+

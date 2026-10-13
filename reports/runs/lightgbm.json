@@ -1,0 +1,6 @@
+{
+  "model": "lightgbm",
+  "run_id": "65dfb4c9009c40cca5d612ca51b644d1",
+  "experiment": "career-role-baselines",
+  "tracking": "https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow"
+}

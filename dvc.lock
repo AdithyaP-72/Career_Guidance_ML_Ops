@@ -29,28 +29,28 @@ stages:
       nfiles: 1
     - path: src/data/ingest.py
       hash: md5
-      md5: 3805d11c3c7658a8ef7fb33c521c2055
-      size: 5695
+      md5: 727c333dd6701abbab4e811fb183d8a8
+      size: 5912
     - path: src/utils.py
       hash: md5
-      md5: caf7cd050a365bf58b36ed79836b5319
-      size: 3648
+      md5: 286f890481c553069b6bbd6b82a6a222
+      size: 3697
     outs:
     - path: data/interim/postings.parquet
       hash: md5
-      md5: 4210b74bc81e1c8b0c891a0fdca13c6c
-      size: 10184097
+      md5: 5f884cc3b05f377dfb2604d90893d226
+      size: 10188413
     - path: reports/ingest_summary.json
       hash: md5
-      md5: cf54f872e63bcc85d30b15813fe679c7
+      md5: f34e03594f812a6fa1aeced6e8b68497
       size: 823
   profiling:
     cmd: uv run python -m src.data.profile
     deps:
     - path: data/interim/postings.parquet
       hash: md5
-      md5: 4210b74bc81e1c8b0c891a0fdca13c6c
-      size: 10184097
+      md5: 5f884cc3b05f377dfb2604d90893d226
+      size: 10188413
     - path: src/data/profile.py
       hash: md5
       md5: 8cb082a4dd8a1b3ab7134a43a5a422be
@@ -67,8 +67,8 @@ stages:
     outs:
     - path: reports/profiling
       hash: md5
-      md5: 932568132f4f14b9dc7e3412b636bb93.dir
-      size: 10554744
+      md5: f1fd3d4abb49da6fe6c79d74be1a52d0.dir
+      size: 10576732
       nfiles: 4
   label:
     cmd: uv run python -m src.data.label
@@ -83,8 +83,8 @@ stages:
       size: 18235
     - path: data/interim/postings.parquet
       hash: md5
-      md5: 4210b74bc81e1c8b0c891a0fdca13c6c
-      size: 10184097
+      md5: 5f884cc3b05f377dfb2604d90893d226
+      size: 10188413
     - path: src/data/label.py
       hash: md5
       md5: 8d9a9e5acbb3d780f5f90282ab5cc667
@@ -92,24 +92,24 @@ stages:
     outs:
     - path: data/interim/labelled.parquet
       hash: md5
-      md5: da7fb225330dca577d29eb748283e784
-      size: 10466142
+      md5: 65ebdf0da0cc048a2de821f556d93b9c
+      size: 10470239
     - path: reports/label_quality.json
       hash: md5
-      md5: 7ac8829e80c96fd07b9af89398706875
+      md5: 911bbd7a7203ea699256e4cf4d87c9e2
       size: 352
     - path: reports/labels
       hash: md5
-      md5: 2142edd75d8b39d5a4291a2d9c13cd1b.dir
-      size: 18488
+      md5: cbe34e452139790c74135e7812d94a4d.dir
+      size: 18494
       nfiles: 2
   taxonomy:
     cmd: uv run python -m src.data.taxonomy
     deps:
     - path: data/interim/labelled.parquet
       hash: md5
-      md5: da7fb225330dca577d29eb748283e784
-      size: 10466142
+      md5: 65ebdf0da0cc048a2de821f556d93b9c
+      size: 10470239
     - path: src/data/taxonomy.py
       hash: md5
       md5: 57adf968bfa379299313bd2a582334ec
@@ -129,20 +129,20 @@ stages:
       size: 11911
     - path: reports/taxonomy
       hash: md5
-      md5: 7dbb4967e8d5be8458c1c3dc9b896f9c.dir
-      size: 14461
+      md5: 17b07afd96b4ad2c58a4cdb83230ec4f.dir
+      size: 14457
       nfiles: 1
     - path: reports/taxonomy_summary.json
       hash: md5
-      md5: 617298470dcf0b94b4f4a6064f856598
+      md5: eb65944b7e577b710dabd43116eb904e
       size: 234
   split:
     cmd: uv run python -m src.data.split
     deps:
     - path: data/interim/labelled.parquet
       hash: md5
-      md5: da7fb225330dca577d29eb748283e784
-      size: 10466142
+      md5: 65ebdf0da0cc048a2de821f556d93b9c
+      size: 10470239
     - path: data/processed/classes.json
       hash: md5
       md5: 6721bafbb67cfd0e9bd03a31bf50ee75
@@ -165,35 +165,35 @@ stages:
     outs:
     - path: data/processed/reference_2019.parquet
       hash: md5
-      md5: ce6e1b560f8017bee3ae53daea056823
-      size: 1884625
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
     - path: data/processed/test.parquet
       hash: md5
       md5: d2912e9d775530b6d72dbaaf1d68cf66
       size: 1116202
     - path: data/processed/train.parquet
       hash: md5
-      md5: 135e6bb77c2be0b2f2864a3d3c38771c
-      size: 3095884
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
     - path: reports/split_summary.json
       hash: md5
-      md5: efd53fdb57dffc1a665827344b51fa03
+      md5: 4d5d289848682c0815e1f2dc898ff0dd
       size: 265
   profiles:
     cmd: uv run python -m src.models.profiles
     deps:
     - path: data/interim/labelled.parquet
       hash: md5
-      md5: da7fb225330dca577d29eb748283e784
-      size: 10466142
+      md5: 65ebdf0da0cc048a2de821f556d93b9c
+      size: 10470239
     - path: data/processed/classes.json
       hash: md5
       md5: 6721bafbb67cfd0e9bd03a31bf50ee75
       size: 11911
     - path: data/processed/train.parquet
       hash: md5
-      md5: 135e6bb77c2be0b2f2864a3d3c38771c
-      size: 3095884
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
     - path: src/features/build.py
       hash: md5
       md5: 7241049124b0d558fda1914c17824df0
@@ -205,7 +205,7 @@ stages:
     params:
       params.yaml:
         data.min_skills: 3
-        features.top_k_skills: 1500
+        features.top_k_skills: 6000
         profiles:
           core_min_share: 0.08
           max_core_skills: 12
@@ -214,13 +214,419 @@ stages:
     outs:
     - path: models/skill_cooccurrence.npz
       hash: md5
-      md5: 16540a7dd98944617e81e670be7651ab
-      size: 521484
+      md5: 01868d37f2a0c6e23bc79f3fb8963910
+      size: 1539321
     - path: models/skill_profiles.json
       hash: md5
-      md5: d4aa5dbc3390e3ce28c4b8d3aaf34e53
-      size: 328312
+      md5: 574e5777b7b711976ea836b7e1e6ccb6
+      size: 328309
     - path: models/skill_vocab.json
       hash: md5
-      md5: 9e7338175a727d10c88357c6d98e9f63
-      size: 27631
+      md5: 6ae92e4b7b5b6ce462064651973d32b9
+      size: 112733
+  train@dummy:
+    cmd: uv run python -m src.models.train dummy
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
+      size: 2721
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 89cb9fd6313b23472dcb2218f04be879
+      size: 5333
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.dummy:
+          strategy: prior
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/dummy.joblib
+      hash: md5
+      md5: 4853403093e7fd047961a8f3686f06e6
+      size: 65702
+    - path: reports/eval/dummy
+      hash: md5
+      md5: 835fe46556da0a745a33811062e59ee7.dir
+      size: 189626
+      nfiles: 4
+    - path: reports/metrics/dummy.json
+      hash: md5
+      md5: 9022d9462b329f508c3c1b291fe0a6c0
+      size: 523
+    - path: reports/runs/dummy.json
+      hash: md5
+      md5: e4126691a85d20491dd97ab59cb585e5
+      size: 191
+  train@profile:
+    cmd: uv run python -m src.models.train profile
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
+      size: 2721
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 89cb9fd6313b23472dcb2218f04be879
+      size: 5333
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.profile:
+          temperature: 0.05
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/profile.joblib
+      hash: md5
+      md5: 94065b852338af68bbdde64462d0481e
+      size: 306038
+    - path: reports/eval/profile
+      hash: md5
+      md5: 3a8399222e8079306aef9857df2d35a7.dir
+      size: 223394
+      nfiles: 4
+    - path: reports/metrics/profile.json
+      hash: md5
+      md5: 7530d2e14c3b3f038ddff56fce67c462
+      size: 526
+    - path: reports/runs/profile.json
+      hash: md5
+      md5: b1315ce86313d48b5369d5166ea3ebc8
+      size: 193
+  train@logreg:
+    cmd: uv run python -m src.models.train logreg
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
+      size: 2721
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 89cb9fd6313b23472dcb2218f04be879
+      size: 5333
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.logreg:
+          C: 0.5
+          max_iter: 2000
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/logreg.joblib
+      hash: md5
+      md5: a65cf5a316877920b7e6aaa81d2028c5
+      size: 4797416
+    - path: reports/eval/logreg
+      hash: md5
+      md5: af107da5a0eb67be40fa214d6f2dd665.dir
+      size: 214814
+      nfiles: 4
+    - path: reports/metrics/logreg.json
+      hash: md5
+      md5: d663c50c70ba9a1a13054e072a9881b6
+      size: 525
+    - path: reports/runs/logreg.json
+      hash: md5
+      md5: bf3ec301d20585cbb6731cb34224d348
+      size: 192
+  train@random_forest:
+    cmd: uv run python -m src.models.train random_forest
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
+      size: 2721
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 89cb9fd6313b23472dcb2218f04be879
+      size: 5333
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.random_forest:
+          n_estimators: 100
+          min_samples_leaf: 5
+          max_features: sqrt
+          n_jobs: -1
+          random_state: 42
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/random_forest.joblib
+      hash: md5
+      md5: f40eafed490e218998684cc8d311a0df
+      size: 111961258
+    - path: reports/eval/random_forest
+      hash: md5
+      md5: cb43047031d50d3a0293196b44aed576.dir
+      size: 224156
+      nfiles: 4
+    - path: reports/metrics/random_forest.json
+      hash: md5
+      md5: 06fc5e4e98f1d7368a8e4ea27531c944
+      size: 530
+    - path: reports/runs/random_forest.json
+      hash: md5
+      md5: a16ea6d704854679b7aacb7c15603a1c
+      size: 199
+  train@lightgbm:
+    cmd: uv run python -m src.models.train lightgbm
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
+      size: 2721
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 89cb9fd6313b23472dcb2218f04be879
+      size: 5333
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.lightgbm:
+          n_estimators: 120
+          learning_rate: 0.08
+          num_leaves: 15
+          min_child_samples: 10
+          colsample_bytree: 0.2
+          reg_lambda: 1.0
+          force_col_wise: true
+          n_jobs: -1
+          random_state: 42
+          verbose: -1
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/lightgbm.joblib
+      hash: md5
+      md5: 4cb00cc8bd9f458d45b8fe1041f73d8f
+      size: 8150360
+    - path: reports/eval/lightgbm
+      hash: md5
+      md5: fdee0637284257c907a1bdef16e0f359.dir
+      size: 215933
+      nfiles: 4
+    - path: reports/metrics/lightgbm.json
+      hash: md5
+      md5: e4388b846ef7d798e94c31622e67fcb6
+      size: 529
+    - path: reports/runs/lightgbm.json
+      hash: md5
+      md5: b118562994453668179bc715a4ab1894
+      size: 194
+  select:
+    cmd: uv run python -m src.models.select
+    deps:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: models/baselines
+      hash: md5
+      md5: 1e261c90bd2494e87b2ecf48fe462224.dir
+      size: 125280858
+      nfiles: 6
+    - path: reports/metrics
+      hash: md5
+      md5: d745d3aff6bdf4cd904ffb7561ad7adc.dir
+      size: 2633
+      nfiles: 5
+    - path: reports/runs
+      hash: md5
+      md5: d62932980aecf6e114bf26e82fcdca8e.dir
+      size: 969
+      nfiles: 5
+    - path: src/models/select.py
+      hash: md5
+      md5: bde2e3a93b468e4007f9dbbd876f2707
+      size: 2727
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 89cb9fd6313b23472dcb2218f04be879
+      size: 5333
+    params:
+      params.yaml:
+        select:
+          metric: top3_5skills
+        train.models:
+        - dummy
+        - profile
+        - logreg
+        - random_forest
+        - lightgbm
+    outs:
+    - path: models/model.joblib
+      hash: md5
+      md5: a65cf5a316877920b7e6aaa81d2028c5
+      size: 4797416
+    - path: reports/metrics.json
+      hash: md5
+      md5: fbccc6578276d79ae21f186c4ebd05b0
+      size: 808
+    - path: reports/model_comparison.csv
+      hash: md5
+      md5: 67a4759b7daf8babb202bb58bd3c479a
+      size: 524

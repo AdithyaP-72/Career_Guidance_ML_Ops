@@ -9,6 +9,7 @@ def test_normalise_spacing_and_case():
     assert normalise_skill("E - Commerce") == "e-commerce"
     assert normalise_skill(".NET") == ".net"
     assert normalise_skill("English Proficiency (Spoken)") == "english proficiency (spoken)"
+    assert normalise_skill("R&amp;D") == "r&d"  # scraped HTML entities are decoded
 
 
 def test_aliases_map_variants_to_one_name():
