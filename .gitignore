@@ -25,5 +25,10 @@ mlflow.db
 # until MoSPI's redistribution terms are checked. See README, section 2.1 #4.
 data/raw/plfs/
 
+# Generated PPT and temporary slide charts
+ppt/Phase1_Career_Guidance_Presentation.pptx
+ppt/*.png
+ppt/*.jpg
+
 # Data and model files are tracked by DVC, which writes its own .gitignore entries
 # (e.g. data/raw/.gitignore) when you run `dvc add` or `dvc repro`.
