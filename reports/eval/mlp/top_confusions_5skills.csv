@@ -1,0 +1,41 @@
+true_role,predicted_role,n
+Sales Executive,Business Development Executive,102
+Customer Support (Voice),Customer Service Executive,94
+Customer Service Executive,Customer Support (Voice),87
+Business Development Executive,Sales Executive,68
+Sales Executive,Area / Territory Sales Manager,58
+Full Stack Developer,Software Engineer (general),50
+Inside Sales / Telesales,Sales Executive,49
+Java Developer,Software Engineer (general),40
+Full Stack Developer,Frontend Developer,39
+Frontend Developer,Software Engineer (general),38
+Relationship Manager (Banking),Sales Executive,36
+Software Engineer (general),Data Engineer,35
+SAP Consultant,Software Engineer (general),34
+ML / AI Engineer,Software Engineer (general),34
+Software Engineer (general),Frontend Developer,34
+Sales Executive,Marketing Executive,33
+Software Engineer (general),Java Developer,32
+Area / Territory Sales Manager,Sales Executive,32
+Manual Test Engineer,Software Engineer (general),30
+Recruiter / Talent Acquisition,HR Executive / Generalist,30
+Finance Manager,Accountant,28
+Data Analyst,Software Engineer (general),28
+Data Engineer,Software Engineer (general),28
+.NET Developer,Software Engineer (general),28
+Manual Test Engineer,Automation Test Engineer,28
+Sales Executive,Relationship Manager (Banking),27
+Software Engineer (general),.NET Developer,26
+ML / AI Engineer,Data Scientist,26
+Software Engineer (general),Full Stack Developer,26
+Accountant,Finance Manager,26
+Software Engineer (general),SAP Consultant,25
+Management Consultant,SAP Consultant,24
+Data Scientist,ML / AI Engineer,23
+Inside Sales / Telesales,Business Development Executive,22
+Marketing Executive,Sales Executive,22
+Frontend Developer,Full Stack Developer,22
+DevOps Engineer,Software Engineer (general),22
+Digital Marketing Executive,Marketing Executive,21
+Cloud Engineer,Software Engineer (general),20
+Full Stack Developer,Java Developer,20

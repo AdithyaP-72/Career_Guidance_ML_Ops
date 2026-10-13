@@ -1,0 +1,20 @@
+{
+  "top1_5skills": 0.5675,
+  "top3_5skills": 0.7622,
+  "top5_5skills": 0.8112,
+  "macro_f1_5skills": 0.5492,
+  "family_top1_5skills": 0.7183,
+  "top1_full": 0.6288,
+  "top3_full": 0.8316,
+  "top5_full": 0.8737,
+  "macro_f1_full": 0.615,
+  "family_top1_full": 0.7682,
+  "ref2019_top1_5skills": 0.4167,
+  "ref2019_top3_5skills": 0.6205,
+  "ref2019_top5_5skills": 0.6795,
+  "ref2019_macro_f1_5skills": 0.386,
+  "ref2019_family_top1_5skills": 0.6337,
+  "predict_ms_per_1k": 9.31,
+  "fit_seconds": 4.7,
+  "model_size_mb": 2.89
+}

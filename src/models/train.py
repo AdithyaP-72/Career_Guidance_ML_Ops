@@ -42,6 +42,10 @@ TRUSTED_TYPES = [
     "sklearn.tree._tree.Tree",
     "lightgbm.basic.Booster",
     "lightgbm.sklearn.LGBMClassifier",
+    "sklearn.neural_network._multilayer_perceptron.MLPClassifier",
+    "sklearn.neural_network._stochastic_optimizers.AdamOptimizer",
+    "sklearn.linear_model._stochastic_gradient.SGDClassifier",
+    "sklearn.naive_bayes.ComplementNB",
 ]
 
 

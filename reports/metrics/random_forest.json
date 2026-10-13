@@ -14,7 +14,7 @@
   "ref2019_top5_5skills": 0.7051,
   "ref2019_macro_f1_5skills": 0.3322,
   "ref2019_family_top1_5skills": 0.613,
-  "predict_ms_per_1k": 144.2,
-  "fit_seconds": 45.4,
+  "predict_ms_per_1k": 82.33,
+  "fit_seconds": 19.9,
   "model_size_mb": 111.96
 }
