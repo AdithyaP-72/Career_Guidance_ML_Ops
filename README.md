@@ -102,6 +102,16 @@ Five baseline models were trained across 164,256 augmented postings (54,752 uniq
 
 ---
 
+logistic regression-     Construction worker
+1.Engineer
+2.Teacher
+3.Janitor
+4.Police
+5.Constructor worker
+6.
+7.
+8.
+
 ## 4. Repository Structure
 
 ```
