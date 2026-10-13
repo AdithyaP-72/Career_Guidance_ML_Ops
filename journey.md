@@ -1,75 +1,132 @@
-# Phase 1 · Initial model evaluation
+# Phase 1 · Project Journey & Evaluation Report
 
-What the first baselines show, what moved the numbers, and where the best model goes wrong.
-Every number here comes from `uv run dvc repro` (seed 42). The sources are `reports/model_comparison.csv`, `reports/metrics/*.json` and `reports/eval/<model>/`, and the same runs are in MLflow (experiment `career-role-baselines`).
+This document records the architectural decisions, alternatives evaluated, baseline experiments, and evaluation findings for Phase 1.
+Every baseline number here comes from `uv run dvc repro` (seed 42). The sources are `reports/model_comparison.csv`, `reports/metrics/*.json`, and `reports/eval/<model>/`, tracked under MLflow experiment `career-role-baselines`.
 
-## The task
-- **Input:** the skills a person has (5 in the headline test) and their years of experience.
-- **Output:** the top‑3 of **103 specific roles**, grouped into 22 families, across all sectors.
-- **Data:** Naukri 2025 job postings, labelled from their titles by rules (`configs/role_rules.yaml`).
-  - **Train:** 54,752 postings, plus 2 cut-down copies of each ("skill dropout"), so the model sees short inputs like a real user's.
-  - **Test:** 13,688 held-out postings, each cut to **5 random skills**.
-- **Headline metric:** top‑3 accuracy on that 5-skill test, because the product shows three roles and users type about five skills.
+---
 
-## Results
+## 1. Product & Architecture Choices Considered
 
-| Model | Top‑3 | Top‑1 | Macro‑F1 | Right family | Top‑3 with all skills | Train | Predict 1k users |
-|---|---|---|---|---|---|---|---|
-| Dummy (3 most common roles) | 19.8% | 8.5% | 0.002 | 17.5% | 19.8% | 2 s | 19 ms |
-| Profile matching (no learning) | 66.3% | 43.5% | 0.455 | 62.9% | 73.9% | 2 s | 35 ms |
-| **Logistic regression** | **79.4%** | 56.5% | 0.553 | **72.1%** | 84.6% | 3 min | **21 ms** |
-| Random forest | 73.8% | 49.3% | 0.440 | 66.8% | 79.3% | 42 s | 149 ms |
-| LightGBM | 78.2% | **56.8%** | **0.560** | 72.0% | **84.8%** | 15.5 min | 807 ms |
+During initial project scoping, several problem framings and approaches were evaluated before settling on the tabular multi-class architecture:
 
-**Best baseline: logistic regression.**
-- **Headline:** it beats the no-ML approach (profile matching) by **+13.1 points of top‑3**, so the learned skill weights clearly add value.
-- **Against LightGBM:** LightGBM is within 0.3 points on top‑1 and macro‑F1 but 1.2 points behind on top‑3, takes 5× longer to train and is 40× slower to predict.
-- **Against random forest:** it does worse here and its model file is 23× bigger (107 MB).
+| Option | Description | Verdict & Rationale |
+|---|---|---|
+| **A. Skills Profile $\to$ Role Match + Skill Gap (Selected)** | Tabular classifier over a fixed ~6k skill vocabulary + experience $\to$ top-3 of 103 canonical roles. | **Adopted.** Pure tabular classification without NLP overhead; fast, deterministic, reproducible, transparent feature contributions. |
+| **A′. Resume Upload / Free-text Parsing** | Parsing PDF/Docx resumes and extracting skills using NLP/NER models. | **Rejected for Phase 1.** Introduces heavy NLP dependencies, extraction variance, and unstructured errors; potential future extension by matching extracted tokens against our skill vocabulary. |
+| **B. Student Stream Recommender** | Recommending college degree/stream based on school subjects or psychometric tests. | **Rejected.** Available open-source datasets (Kaggle) were either tiny, synthetic, or disconnected from real employment outcomes. |
+| **C. Pure LLM Chatbot** | Prompting an LLM (e.g. Claude, GPT-4) with skills to suggest careers. | **Rejected for MLOps.** No trainable weights, no data versioning, no drift tracking, high inference cost, non-deterministic outputs. |
+| **D. Hybrid (Option A + LLM Explainer)** | Model predicts roles deterministically; LLM drafts custom learning advice. | **Saved for later phases.** Feasible as a UI polish once serving and monitoring are established. |
 
-The likely reason the linear model wins: "which skills point to which role" is mostly a sum of independent clues (`gst` → accounting, `react.js` → frontend). With only ~5 active skills out of 6,000, tree models see too little per split to learn interactions that pay off.
+### Framing Constraint
+The model is trained on **job postings**, not individual career histories. The model learns *"postings requiring these skills belong to this role"*, so the product phrasing must state *"your skills match what X jobs ask for"*, not *"people with your profile became X"*.
 
-## What moved the numbers
-Measured with logistic regression on the 5-skill test:
+---
 
-| Change | Top‑3 |
+## 2. Dataset Evaluations & Rejections
+
+Every dataset was audited for schema validity, real-world distribution, and licensing:
+
+| Dataset | Why Rejected / Omitted |
 |---|---|
-| Start: 1,500-skill vocabulary, `class_weight: balanced` | 68.9% |
-| No class weights | 74.6% (+5.7) |
-| 6,000-skill vocabulary | **79.4%** (+4.8) |
+| **Stack Overflow Developer Survey** | Software engineering only; fails the multi-industry scope (sales, finance, healthcare, etc.). |
+| **Indeed India 2021 (PromptCloud, 60k)** | Contains category labels but **no skills column** — only free-text descriptions requiring full NLP. |
+| **Naukri Job Listings 2020** | No structured skills column. |
+| **Indian Fresher Job Market** | **Synthetic data:** exact uniform distribution across roles (~3.6%), roles completely independent of degree. |
+| **Indian Tech Job Market 2026 (23k)** | Restricted strictly to Data/AI roles (only 6 categories). |
+| **LinkedIn Jobs India (949 rows)** | Insufficient sample size. |
+| **1.3M LinkedIn Jobs 2024** | Real and comprehensive, but restricted to US/UK/CA/AU; high storage footprint (6.2 GB). Kept as a potential future international benchmark. |
+| **PLFS Microdata (MoSPI)** | Kept locally only (`.gitignore`); excluded from public DVC remote due to MoSPI redistribution restrictions. Aggregated priors will be published instead. |
 
-- **Class weights:** `balanced` pushes predictions toward rare roles, which costs top‑k accuracy on the real role mix.
-- **Vocabulary:** specific roles need specific skills (`kotlin`, `tds`, `gnm`), and many of those sit outside the top 1,500.
-- **Credit:** both ideas came from a teammate's exploratory branch and were re-measured on our pipeline before adopting them.
+---
 
-Data fixes that came out of the same review:
-- HTML entities in titles (`Sales &amp; Marketing`) hid 215 postings from the title rules. They're now decoded in `ingest`.
-- Earlier rule fixes are recorded in README §2.3: the "unity" in "opportunity" trap, "hiring" BPO ads labelled as Recruiter, Company Secretary filed as Executive Assistant, and "Solution Architect" caught by the building-Architect rule.
+## 3. Toolchain Choices & Senior Guidance
 
-## Where the best model goes wrong
-From `reports/eval/logreg/`:
-- **Most errors are between neighbouring roles** (`top_confusions_5skills.csv`):
-  - Customer Service Executive ↔ Customer Support (Voice) (109 / 83 test postings);
-  - Business Development Executive ↔ Sales Executive (99 / 55);
-  - Area/Territory Sales Manager, Relationship Manager (Banking) and Inside Sales → Sales Executive;
-  - Full Stack, Java, Frontend and ML/AI Engineer → Software Engineer (general).
+* **Package Management (`uv`):** Single tool replacing pip, virtualenv, and poetry. Pinned Python 3.12 via `.python-version` and locked sub-dependencies via `uv.lock`.
+* **Data Profiling (`fg-data-profiling`):** Chose `fg-data-profiling` over `ydata-profiling` because `ydata-profiling 4.18` is deprecated and crashes on modern setuptools due to removed `pkg_resources`.
+* **Data Versioning vs. Storage:** DVC manages hashes and pipeline DAGs committed in Git; DagsHub S3 remote acts purely as binary storage.
+* **Drift Detection (Phase 8 note):** Evidently AI was explicitly avoided per senior advice. Future drift monitoring will leverage custom JS-divergence / chi-square tests or NannyML.
+* **Containerization & Observability (Future):** Docker/Podman images for serving and Prometheus/Grafana instead of raw host binaries.
 
-  Many of these are arguably *also right*. The generic catch-all roles (Sales Executive, Software Engineer (general)) attract postings that share their skills.
-- **Family level** (`family_confusion_5skills.png`):
-  - Software Development (86%), Customer Service/BPO (82%), HR (81%) and Sales (81%) are reliable;
-  - **Banking postings often land in Sales (26%)**, since bank RM/branch jobs are sales jobs with banking words;
-  - **Strategy & Consulting is the weakest family (48%)**: consultants, project managers and business analysts share generic skills with Data & Analytics and Software.
-- **Weakest roles** (`per_role_5skills.csv`, F1 < 0.4, 8 of 103 roles): Brand/Product Marketing Manager, Financial Analyst, Finance Manager, Cloud Engineer, Management Consultant, Automation Test Engineer, Warehouse/Inventory, Microsoft Dynamics Consultant. 12 roles reach F1 ≥ 0.7, e.g. Trust & Safety, School Teacher, Recruiter, Staff Nurse, SAP Consultant.
-- **More skills help:** 79.4% top‑3 with 5 skills vs 84.6% with all of a posting's skills (~8). That supports the "at least 5 skills" rule in the form.
-- **On 2019 postings** (the 100 roles that existed then), the same 2025-trained model scores 66.8% top‑3, 12.6 points lower. Older postings use partly different skills (e.g. jQuery and PHP then, Kubernetes and Power BI now). This is the first sign of the drift the monitoring phase will track.
+---
 
-## Limitations to keep in mind
-- **Labels come from title rules, not people.** Family-level agreement with Naukri's own 2017/2019 labels is ~67%, but much of the gap is Naukri's coarser taxonomy (README §2.3). Some test "errors" are label noise, and some model "hits" could be too.
-- **Postings, not people:** the model learns what job ads ask for. It says "your skills match what these jobs ask for", not "people like you became…".
-- **Only top‑3 was used to choose the best model.** Top‑1 and macro‑F1 are near-tied between logistic regression and LightGBM.
+## 4. The Task & Experimental Setup
 
-## Next phases (not Phase 1)
-- **Tuning:** Optuna on logistic regression and LightGBM, using these runs as the baseline.
-- **Labelling:** tighter rules for the catch-all roles (Sales Executive, Software Engineer (general), Management Consultant).
-- **Model Registry:** champion/challenger aliases for the selected model.
-- **Possible neural-net challenger:** a skill-embedding layer, which could help the sparse 5-skill inputs.
-- **Monitoring:** the 2019 vs 2025 comparison above as the drift baseline.
+* **Input:** The skills a user possesses (5 in headline evaluation) and years of experience.
+* **Output:** Top-3 of **103 specific roles**, grouped into 22 families across all sectors.
+* **Training Data:** Naukri 2025 postings rule-labelled by `configs/role_rules.yaml`.
+  * **Train Set:** 54,752 postings augmented with 2 cut-down copies each via **skill dropout** (164,256 training rows).
+  * **Test Set:** 13,688 held-out postings, each downsampled to **5 random skills**.
+* **Headline Metric:** Top-3 accuracy on the 5-skill test set (reflecting real user input patterns).
+
+---
+
+## 5. Baseline Evaluation Results
+
+| Model | Top‑3 (5 skills) | Top‑1 (5 skills) | Macro‑F1 | Right Family | Top‑3 (All skills) | Train Time | Predict 1k Users | Model Size |
+|---|---|---|---|---|---|---|---|---|
+| **Dummy** (Prior baseline) | 19.8% | 8.5% | 0.002 | 17.5% | 19.8% | 1 s | 11 ms | 0.07 MB |
+| **Profile Matching** (Cosine) | 66.3% | 43.5% | 0.455 | 62.9% | 73.9% | 2 s | 14 ms | 0.31 MB |
+| **Logistic Regression** | **79.4%** | 56.5% | 0.553 | **72.1%** | 84.6% | 200 s | **27 ms** | 4.8 MB |
+| **Random Forest** | 73.8% | 49.3% | 0.440 | 66.8% | 79.3% | 45 s | 144 ms | 112 MB |
+| **LightGBM** | 78.2% | **56.8%** | **0.560** | 72.0% | **84.8%** | 843 s | 1026 ms | 8.1 MB |
+
+### Key Findings
+1. **Champion Model: Logistic Regression.**
+   * Beats the non-learning baseline (Profile Matching) by **+13.1% top-3 accuracy**.
+   * Outperforms LightGBM on top-3 accuracy by +1.2%, trains 4× faster, and predicts 38× faster (27 ms vs 1,026 ms per 1k users).
+   * Random Forest performs significantly worse and produces an unwieldy model artifact (112 MB).
+2. **Why Linear Models Win Here:**
+   Job role prediction with sparse one-hot skill indicators is largely additive (`gst` + `tally` $\to$ Accountant; `react` + `javascript` $\to$ Frontend). Because inputs are extremely sparse (~5 active features out of 6,000), decision trees struggle to find split interactions that generalize better than additive log-odds.
+
+---
+
+## 6. What Moved the Numbers
+
+Hyperparameter iterations measured on the 5-skill test set with Logistic Regression:
+
+| Experiment / Modification | Top-3 Accuracy | $\Delta$ |
+|---|---|---|
+| 1,500-skill vocabulary, `class_weight: balanced` | 68.9% | Baseline |
+| 1,500-skill vocabulary, unweighted (`class_weight: None`) | 74.6% | **+5.7%** |
+| 6,000-skill vocabulary, unweighted | **79.4%** | **+4.8%** |
+
+* **Class Weighting:** Enforcing `balanced` weights penalized frequent classes too aggressively, causing common postings to misclassify into niche roles.
+* **Vocabulary Size:** Specific roles require specialized skill tags (e.g. `gnm` for Staff Nurse, `tds` for Accounts, `kotlin` for Android). Expanding the vocabulary from 1.5k to 6k gave immediate coverage gains without overfitting.
+* **Data Ingestion Fix:** HTML entities in titles (`Sales &amp; Marketing`) previously broke title matching for 215 postings. Adding entity unescaping in `src/data/ingest.py` recovered them.
+* **Label Rule Fixes:**
+  * Fixed `unity` regex falsely matching *"Opportunity"* $\to$ Game Developer.
+  * Fixed `hiring` pattern mislabelling BPO ads as Recruiter.
+  * Fixed `secretary` catching *Company Secretary* and mapping to Executive Assistant.
+  * Fixed generic *Architect* rule catching *Solution Architect* instead of Building Architect.
+
+---
+
+## 7. Error Analysis & Model Weaknesses
+
+Detailed analysis from `reports/eval/logreg/`:
+
+1. **Neighbouring Role Confusions (`reports/eval/logreg/top_confusions_5skills.csv`):**
+   * *Customer Service Executive* $\leftrightarrow$ *Customer Support (Voice)* (109 / 83 confusions).
+   * *Business Development Executive* $\leftrightarrow$ *Sales Executive* (99 / 55 confusions).
+   * *Full Stack*, *Java*, *Frontend*, and *ML/AI Engineer* $\to$ *Software Engineer (general)*.
+   * *Note:* Catch-all roles naturally absorb sparse inputs because their skill distributions overlap heavily with specialized roles.
+2. **Family-Level Misclassifications (`reports/eval/logreg/family_confusion_5skills.png`):**
+   * Software Development (86%), Customer Service/BPO (82%), HR (81%), and Sales (81%) have strong family precision.
+   * **Banking postings often fall into Sales (26%)**, as branch/relationship management roles emphasize sales terminology.
+   * **Strategy & Consulting is the weakest family (48%)**: business analysts and project managers share generic management skills across tech and analytics.
+3. **Weakest Roles ($F_1 < 0.40$):**
+   * Brand/Product Marketing Manager, Financial Analyst, Finance Manager, Cloud Engineer, Management Consultant, Automation Test Engineer, Warehouse/Inventory Executive, Microsoft Dynamics Consultant.
+4. **Input Length Sensitivity:**
+   * 5-skill inputs achieve 79.4% top-3 accuracy vs. 84.6% when all posting skills (~8) are provided. This confirms the product decision to enforce a minimum of 5 skills in the UI search box.
+5. **Observed Temporal Drift (2019 $\to$ 2025):**
+   * Evaluating the 2025-trained model against the 2019 reference set (100 stable classes) shows a drop to **66.8% top-3 accuracy** (-12.6%).
+   * Rapidly rising skills (Kubernetes, Power BI, AWS, GenAI) were virtually absent in 2019, while declining skills (jQuery, PHP) had higher representation. This forms the foundation for Phase 8 drift monitoring.
+
+---
+
+## 8. Next Steps (Beyond Phase 1)
+
+1. **Phase 4b (Tuning):** Run Optuna Bayesian optimization on Logistic Regression (regularization $C$, solver, tolerance) and LightGBM hyperparameters.
+2. **Phase 5 (Testing & Registry):** Setup model cards, SHAP explainability for top skill attributions, and register the champion model under the MLflow Model Registry.
+3. **Phase 6–7 (Packaging & Serving):** Quantize champion model to ONNX for sub-10ms inference and wrap in a FastAPI endpoint containerized via Docker.
+4. **Phase 8 (Monitoring):** Establish baseline distribution metrics against the 2019/2025 split to detect incoming production skill drift.
