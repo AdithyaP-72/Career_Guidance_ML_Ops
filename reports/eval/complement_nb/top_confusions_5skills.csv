@@ -1,0 +1,41 @@
+true_role,predicted_role,n
+Business Development Executive,Sales Executive,154
+Customer Service Executive,Customer Support (Voice),134
+Area / Territory Sales Manager,Sales Executive,87
+Inside Sales / Telesales,Sales Executive,80
+Relationship Manager (Banking),Sales Executive,80
+Frontend Developer,Software Engineer (general),72
+Marketing Executive,Sales Executive,72
+Full Stack Developer,Software Engineer (general),70
+Java Developer,Software Engineer (general),57
+Finance Manager,Accountant,53
+Automation Test Engineer,Manual Test Engineer,51
+Customer Support (Voice),Customer Service Executive,48
+Software Engineer (general),Java Developer,41
+Software Engineer (general),SAP Consultant,41
+ML / AI Engineer,Software Engineer (general),40
+Software Engineer (general),Data Engineer,40
+Data Scientist,ML / AI Engineer,39
+.NET Developer,Software Engineer (general),37
+Cloud Engineer,Software Engineer (general),35
+Data Engineer,Software Engineer (general),34
+Data Analyst,Software Engineer (general),32
+Full Stack Developer,Java Developer,32
+Branch Banking Officer,Sales Executive,31
+DevOps Engineer,Software Engineer (general),29
+Retail Sales Associate,Sales Executive,29
+Python Developer,Software Engineer (general),27
+Accounts Payable / Receivable,Accountant,27
+Admin Executive,Sales Executive,26
+HR Executive / Generalist,Recruiter / Talent Acquisition,26
+Frontend Developer,Full Stack Developer,25
+Management Consultant,SAP Consultant,25
+Architect (Building),Software Engineer (general),25
+Management Consultant,Software Engineer (general),24
+Insurance Advisor,Sales Executive,24
+Key Account Manager,Sales Executive,23
+Chartered Accountant,Accountant,22
+Credit / Loan Officer,Sales Executive,22
+Recruiter / Talent Acquisition,HR Executive / Generalist,20
+Management Consultant,Data Analyst,19
+Oracle Apps Consultant,Software Engineer (general),19

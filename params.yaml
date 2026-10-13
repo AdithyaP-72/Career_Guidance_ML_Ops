@@ -36,7 +36,7 @@ profiling:
   snapshots: [2017, 2019, 2022, 2025]
 
 train:                     # Step 5 baselines (src/models/train.py; one dvc stage per model)
-  models: [dummy, profile, logreg, random_forest, lightgbm]
+  models: [dummy, profile, logreg, random_forest, lightgbm, mlp, sgd, complement_nb]
   skill_dropout: true      # train on postings + their cut-down copies (features.dropout)
   experiment: career-role-baselines   # MLflow experiment name
   # Each block below is passed straight to the model's constructor.
@@ -65,6 +65,25 @@ train:                     # Step 5 baselines (src/models/train.py; one dvc stag
     n_jobs: -1
     random_state: 42
     verbose: -1
+  mlp:                     # Phase 4b challenger: learns dense skill embeddings & non-linear synergy
+    hidden_layer_sizes: [256, 128]
+    activation: relu
+    solver: adam
+    alpha: 0.0001          # L2 regularisation
+    early_stopping: true
+    validation_fraction: 0.1
+    max_iter: 200
+    random_state: 42
+  sgd:                     # Phase 4b challenger: strong linear margin in high-dimensional space
+    loss: modified_huber   # calibrated probabilities, robust to outliers
+    alpha: 0.0001
+    max_iter: 1000
+    tol: 0.001
+    random_state: 42
+    n_jobs: -1
+  complement_nb:           # Phase 4b challenger: purpose-built for imbalanced sparse counts
+    alpha: 1.0             # Laplace smoothing
+    norm: false
 
 select:                    # src/models/select.py
   metric: top3_5skills     # best baseline = highest top-3 accuracy on 5-skill test inputs

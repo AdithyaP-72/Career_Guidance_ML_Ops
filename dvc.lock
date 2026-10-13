@@ -245,8 +245,8 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
-      size: 2721
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
     - path: src/models/evaluate.py
       hash: md5
       md5: e72603b3c595e97ceab67bc81a874443
@@ -257,8 +257,8 @@ stages:
       size: 2444
     - path: src/models/train.py
       hash: md5
-      md5: 89cb9fd6313b23472dcb2218f04be879
-      size: 5333
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
     params:
       params.yaml:
         features:
@@ -280,17 +280,17 @@ stages:
       size: 65702
     - path: reports/eval/dummy
       hash: md5
-      md5: 835fe46556da0a745a33811062e59ee7.dir
-      size: 189626
+      md5: 84912f8bb55e5902d81d7c7b4e67f7fe.dir
+      size: 159025
       nfiles: 4
     - path: reports/metrics/dummy.json
       hash: md5
-      md5: 9022d9462b329f508c3c1b291fe0a6c0
-      size: 523
+      md5: 3358a222f5d5d17c226816d53e0f5d41
+      size: 543
     - path: reports/runs/dummy.json
       hash: md5
-      md5: e4126691a85d20491dd97ab59cb585e5
-      size: 191
+      md5: 50a19a9fe1ea4c8c82264478e95b66ad
+      size: 141
   train@profile:
     cmd: uv run python -m src.models.train profile
     deps:
@@ -312,8 +312,8 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
-      size: 2721
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
     - path: src/models/evaluate.py
       hash: md5
       md5: e72603b3c595e97ceab67bc81a874443
@@ -324,8 +324,8 @@ stages:
       size: 2444
     - path: src/models/train.py
       hash: md5
-      md5: 89cb9fd6313b23472dcb2218f04be879
-      size: 5333
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
     params:
       params.yaml:
         features:
@@ -347,17 +347,17 @@ stages:
       size: 306038
     - path: reports/eval/profile
       hash: md5
-      md5: 3a8399222e8079306aef9857df2d35a7.dir
-      size: 223394
+      md5: 1bcee4c45b36c80d54235d336ef79202.dir
+      size: 190889
       nfiles: 4
     - path: reports/metrics/profile.json
       hash: md5
-      md5: 7530d2e14c3b3f038ddff56fce67c462
-      size: 526
+      md5: 5c8f7b414a26ad3d01c6f53299385dca
+      size: 547
     - path: reports/runs/profile.json
       hash: md5
-      md5: b1315ce86313d48b5369d5166ea3ebc8
-      size: 193
+      md5: 503bb0f2b3215ef4039117275c053fb7
+      size: 143
   train@logreg:
     cmd: uv run python -m src.models.train logreg
     deps:
@@ -379,8 +379,8 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
-      size: 2721
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
     - path: src/models/evaluate.py
       hash: md5
       md5: e72603b3c595e97ceab67bc81a874443
@@ -391,8 +391,8 @@ stages:
       size: 2444
     - path: src/models/train.py
       hash: md5
-      md5: 89cb9fd6313b23472dcb2218f04be879
-      size: 5333
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
     params:
       params.yaml:
         features:
@@ -411,21 +411,21 @@ stages:
     outs:
     - path: models/baselines/logreg.joblib
       hash: md5
-      md5: a65cf5a316877920b7e6aaa81d2028c5
-      size: 4797416
+      md5: a4c57a92a36bb32ae034d870efc0b4cd
+      size: 4797549
     - path: reports/eval/logreg
       hash: md5
-      md5: af107da5a0eb67be40fa214d6f2dd665.dir
-      size: 214814
+      md5: 5f1aaaa0835c8a34e0368898ad315c6f.dir
+      size: 182822
       nfiles: 4
     - path: reports/metrics/logreg.json
       hash: md5
-      md5: d663c50c70ba9a1a13054e072a9881b6
-      size: 525
+      md5: 0767f381a816e194b31000581145c3fe
+      size: 543
     - path: reports/runs/logreg.json
       hash: md5
-      md5: bf3ec301d20585cbb6731cb34224d348
-      size: 192
+      md5: cf738cc941a915383ee18feba1665960
+      size: 142
   train@random_forest:
     cmd: uv run python -m src.models.train random_forest
     deps:
@@ -447,8 +447,8 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
-      size: 2721
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
     - path: src/models/evaluate.py
       hash: md5
       md5: e72603b3c595e97ceab67bc81a874443
@@ -459,8 +459,8 @@ stages:
       size: 2444
     - path: src/models/train.py
       hash: md5
-      md5: 89cb9fd6313b23472dcb2218f04be879
-      size: 5333
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
     params:
       params.yaml:
         features:
@@ -482,21 +482,21 @@ stages:
     outs:
     - path: models/baselines/random_forest.joblib
       hash: md5
-      md5: f40eafed490e218998684cc8d311a0df
-      size: 111961258
+      md5: 7086212c3a4dd71183fd1e4d97101098
+      size: 111961224
     - path: reports/eval/random_forest
       hash: md5
-      md5: cb43047031d50d3a0293196b44aed576.dir
-      size: 224156
+      md5: d2fe9e4cec950adb2cc0e48833261f54.dir
+      size: 191594
       nfiles: 4
     - path: reports/metrics/random_forest.json
       hash: md5
-      md5: 06fc5e4e98f1d7368a8e4ea27531c944
-      size: 530
+      md5: 3b9bb5258acc00f80e799e0a5d0f423e
+      size: 550
     - path: reports/runs/random_forest.json
       hash: md5
-      md5: a16ea6d704854679b7aacb7c15603a1c
-      size: 199
+      md5: 041577ab4a4a88dab65c41b10cded793
+      size: 149
   train@lightgbm:
     cmd: uv run python -m src.models.train lightgbm
     deps:
@@ -518,8 +518,8 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: e61ddedf03e9ea7ecf3e2c75359ee8f7
-      size: 2721
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
     - path: src/models/evaluate.py
       hash: md5
       md5: e72603b3c595e97ceab67bc81a874443
@@ -530,8 +530,8 @@ stages:
       size: 2444
     - path: src/models/train.py
       hash: md5
-      md5: 89cb9fd6313b23472dcb2218f04be879
-      size: 5333
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
     params:
       params.yaml:
         features:
@@ -558,21 +558,21 @@ stages:
     outs:
     - path: models/baselines/lightgbm.joblib
       hash: md5
-      md5: 4cb00cc8bd9f458d45b8fe1041f73d8f
-      size: 8150360
+      md5: 04035d1b11cffe3efe70f9e93644862a
+      size: 8150515
     - path: reports/eval/lightgbm
       hash: md5
-      md5: fdee0637284257c907a1bdef16e0f359.dir
-      size: 215933
+      md5: 4f668fe8e4a8254f18a2b3834c602733.dir
+      size: 183924
       nfiles: 4
     - path: reports/metrics/lightgbm.json
       hash: md5
-      md5: e4388b846ef7d798e94c31622e67fcb6
-      size: 529
+      md5: 4b3c61aae2b5fa5760f75767b5950ece
+      size: 548
     - path: reports/runs/lightgbm.json
       hash: md5
-      md5: b118562994453668179bc715a4ab1894
-      size: 194
+      md5: 9d3760c8e00131aee996db822506e7b4
+      size: 144
   select:
     cmd: uv run python -m src.models.select
     deps:
@@ -630,3 +630,219 @@ stages:
       hash: md5
       md5: 67a4759b7daf8babb202bb58bd3c479a
       size: 524
+  train@mlp:
+    cmd: uv run python -m src.models.train mlp
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.mlp:
+          hidden_layer_sizes:
+          - 256
+          - 128
+          activation: relu
+          solver: adam
+          alpha: 0.0001
+          early_stopping: true
+          validation_fraction: 0.1
+          max_iter: 200
+          random_state: 42
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/mlp.joblib
+      hash: md5
+      md5: c522cbd75ad032cbe888aca926de41ce
+      size: 36668668
+    - path: reports/eval/mlp
+      hash: md5
+      md5: 84bf74061eb1ae9886b78c3fabe7b2ac.dir
+      size: 183835
+      nfiles: 4
+    - path: reports/metrics/mlp.json
+      hash: md5
+      md5: a74f2b7722057e825f9efb7ea0b581cc
+      size: 548
+    - path: reports/runs/mlp.json
+      hash: md5
+      md5: 8d05aff7d82282923a853a0e689dee21
+      size: 139
+  train@sgd:
+    cmd: uv run python -m src.models.train sgd
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.sgd:
+          loss: modified_huber
+          alpha: 0.0001
+          max_iter: 1000
+          tol: 0.001
+          random_state: 42
+          n_jobs: -1
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/sgd.joblib
+      hash: md5
+      md5: 1db3bd3c41fc2a1140eca89fca30bd7c
+      size: 2894506
+    - path: reports/eval/sgd
+      hash: md5
+      md5: b512c23b8862f8483afa92b0cda6d266.dir
+      size: 183148
+      nfiles: 4
+    - path: reports/metrics/sgd.json
+      hash: md5
+      md5: 70b997cbb028f3e3a08b56af20096fa2
+      size: 545
+    - path: reports/runs/sgd.json
+      hash: md5
+      md5: 1128f548041f41e321d873a633586f2c
+      size: 139
+  train@complement_nb:
+    cmd: uv run python -m src.models.train complement_nb
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: 93a39a66565edbe63ff54deb7ec885be
+      size: 2917
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: e72603b3c595e97ceab67bc81a874443
+      size: 6076
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 133f255be24ef03716b004328816e8c5
+      size: 2444
+    - path: src/models/train.py
+      hash: md5
+      md5: 48178a302e986292064f31ea981dd12b
+      size: 5570
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.complement_nb:
+          alpha: 1.0
+          norm: false
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/complement_nb.joblib
+      hash: md5
+      md5: 2218670e0ea4c2edd48011d74f8fa293
+      size: 1796809
+    - path: reports/eval/complement_nb
+      hash: md5
+      md5: a08e21834f4d81e49616b74354477d76.dir
+      size: 183856
+      nfiles: 4
+    - path: reports/metrics/complement_nb.json
+      hash: md5
+      md5: d6e19181a96061fcbc94af0836128a55
+      size: 546
+    - path: reports/runs/complement_nb.json
+      hash: md5
+      md5: 4b17f5997750d61f8a999dee165344c7
+      size: 149

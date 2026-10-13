@@ -1,6 +1,6 @@
 {
   "model": "logreg",
-  "run_id": "3eb74aa832b34ff08fba97f36ada36d4",
+  "run_id": "16ac482837ee4c9686273624f4680f15",
   "experiment": "career-role-baselines",
-  "tracking": "https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow"
+  "tracking": "local"
 }

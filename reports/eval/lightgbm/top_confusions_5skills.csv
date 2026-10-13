@@ -8,8 +8,8 @@ Relationship Manager (Banking),Sales Executive,56
 Java Developer,Software Engineer (general),53
 Frontend Developer,Software Engineer (general),50
 Marketing Executive,Sales Executive,47
-Sales Executive,Business Development Executive,42
 Inside Sales / Telesales,Sales Executive,42
+Sales Executive,Business Development Executive,42
 SAP Consultant,Software Engineer (general),39
 ML / AI Engineer,Software Engineer (general),38
 Data Analyst,Software Engineer (general),37
@@ -19,23 +19,23 @@ Manual Test Engineer,Software Engineer (general),35
 Software Engineer (general),Frontend Developer,33
 Finance Manager,Accountant,33
 Software Engineer (general),Data Engineer,32
-Automation Test Engineer,Manual Test Engineer,30
 Software Engineer (general),Java Developer,30
+Automation Test Engineer,Manual Test Engineer,30
 Data Engineer,Software Engineer (general),29
-Sales Executive,Inside Sales / Telesales,28
 Frontend Developer,Full Stack Developer,28
+Sales Executive,Inside Sales / Telesales,28
 Sales Executive,Relationship Manager (Banking),27
 DevOps Engineer,Software Engineer (general),27
-Data Scientist,ML / AI Engineer,26
 Branch Banking Officer,Sales Executive,26
+Data Scientist,ML / AI Engineer,26
 Sales Executive,Area / Territory Sales Manager,25
 Software Engineer (general),.NET Developer,24
 Admin Executive,Sales Executive,24
 Recruiter / Talent Acquisition,HR Executive / Generalist,24
 Management Consultant,Software Engineer (general),23
 Manual Test Engineer,Automation Test Engineer,23
+Production Engineer,Software Engineer (general),22
 Python Developer,Software Engineer (general),22
 Management Consultant,Data Analyst,22
 Architect (Building),Software Engineer (general),22
-Production Engineer,Software Engineer (general),22
-Software Engineer (general),SAP Consultant,21
+Software Engineer (general),Cloud Engineer,21

@@ -15,23 +15,30 @@ from src.utils import load_params
 
 PARAMS = load_params()
 
-# Three tiny "roles" with clearly different skills.
+# Three tiny "roles" with clearly different skills (5 rows each so MLPClassifier's
+# early_stopping validation split has ≥ 2 samples).
 TOY = pd.DataFrame(
     {
         "skills": [
             ["tally", "gst"],
             ["tally", "tds"],
             ["gst", "tds", "excel"],
+            ["tally", "excel"],
+            ["gst", "tally", "tds"],
             ["react.js", "css"],
             ["css", "html"],
             ["react.js", "html", "javascript"],
+            ["javascript", "css"],
+            ["html", "react.js", "css"],
             ["nursing", "gnm"],
             ["nursing", "icu"],
             ["gnm", "icu", "patient care"],
+            ["patient care", "nursing"],
+            ["icu", "gnm", "nursing"],
         ],
-        "exp_min": [1, 2, 3, 0, 1, 4, 2, 5, 3],
-        "role": ["Accountant"] * 3 + ["Frontend Developer"] * 3 + ["Staff Nurse"] * 3,
-        "family": ["Accounting & Finance"] * 3 + ["Software Development"] * 3 + ["Healthcare & Pharma"] * 3,
+        "exp_min": [1, 2, 3, 4, 2, 0, 1, 4, 3, 2, 2, 5, 3, 1, 4],
+        "role": ["Accountant"] * 5 + ["Frontend Developer"] * 5 + ["Staff Nurse"] * 5,
+        "family": ["Accounting & Finance"] * 5 + ["Software Development"] * 5 + ["Healthcare & Pharma"] * 5,
     }
 )
 

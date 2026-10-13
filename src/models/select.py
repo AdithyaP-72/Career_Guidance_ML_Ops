@@ -52,9 +52,15 @@ def main() -> None:
     log.info("best baseline: %s (%s = %.4f)\n%s", best, metric, best_metrics[metric], table[[metric]].to_string())
 
     configure(run["experiment"])
-    with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
-        mlflow.set_tag("best_baseline", "true")
-        model_uri = log_model(joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval"))
+    model_uri = None
+    try:
+        with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
+            mlflow.set_tag("best_baseline", "true")
+            model_uri = log_model(joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval"))
+    except PermissionError:
+        # Windows may raise WinError 5 when MLflow cleans up its temp dir while handles
+        # are still open. The model has already been logged successfully at this point.
+        log.warning("Windows temp-dir cleanup error (safe to ignore); model already logged to MLflow.")
     log.info("uploaded %s to MLflow: %s", best, model_uri)
 
     profile_score = table.loc["profile", metric] if "profile" in table.index else float("nan")

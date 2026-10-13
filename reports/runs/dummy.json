@@ -1,6 +1,6 @@
 {
   "model": "dummy",
-  "run_id": "148de21a0cd641edb462f46dc102f5a3",
+  "run_id": "1cda06d7b9bc4ef8b86090af91f30c79",
   "experiment": "career-role-baselines",
-  "tracking": "https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow"
+  "tracking": "local"
 }
