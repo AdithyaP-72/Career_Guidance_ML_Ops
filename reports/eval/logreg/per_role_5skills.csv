@@ -1,0 +1,107 @@
+role,precision,recall,f1-score,support
+.NET Developer,0.6299,0.6154,0.6226,130.0
+Accountant,0.595,0.7059,0.6457,306.0
+Accounts Payable / Receivable,0.6522,0.6122,0.6316,147.0
+Admin Executive,0.451,0.4389,0.4449,262.0
+Android Developer,0.6757,0.6579,0.6667,38.0
+Architect (Building),0.5309,0.3772,0.441,114.0
+Area / Territory Sales Manager,0.5734,0.4385,0.497,187.0
+Auditor,0.5614,0.4384,0.4923,73.0
+Automation Test Engineer,0.431,0.3333,0.3759,75.0
+BI Developer,0.5714,0.32,0.4103,50.0
+Branch Banking Officer,0.5179,0.3893,0.4444,149.0
+Brand / Product Marketing Manager,0.4118,0.2121,0.28,33.0
+Business Analyst,0.6786,0.4,0.5033,95.0
+Business Development Executive,0.5563,0.5015,0.5275,335.0
+Chartered Accountant,0.6333,0.3725,0.4691,51.0
+Chef / Cook,0.8039,0.6949,0.7455,59.0
+Clinical Research / Pharmacovigilance,0.6053,0.575,0.5897,40.0
+Cloud Engineer,0.3586,0.2955,0.324,176.0
+Collections Officer,0.6129,0.4419,0.5135,43.0
+Company Secretary / Compliance,0.4638,0.5714,0.512,56.0
+Content Writer,0.6712,0.6712,0.6712,73.0
+Corporate Trainer,0.6207,0.4932,0.5496,73.0
+Credit / Loan Officer,0.519,0.4409,0.4767,93.0
+Customer Service Executive,0.4431,0.4807,0.4612,389.0
+Customer Support (Non-voice),0.6667,0.4478,0.5357,67.0
+Customer Support (Voice),0.4987,0.5857,0.5387,321.0
+Cyber Security Analyst,0.6066,0.4933,0.5441,75.0
+Data Analyst,0.3596,0.4988,0.4179,421.0
+Data Engineer,0.6387,0.6909,0.6638,220.0
+Data Scientist,0.5833,0.3933,0.4698,89.0
+Database Administrator,0.5484,0.5,0.5231,34.0
+DevOps Engineer,0.6016,0.5347,0.5662,144.0
+Digital Marketing Executive,0.6742,0.5263,0.5911,114.0
+Doctor / Medical Officer,0.7182,0.7524,0.7349,105.0
+Electrical Engineer,0.5938,0.5,0.5429,76.0
+Embedded / Firmware Engineer,0.6271,0.5522,0.5873,67.0
+Executive Assistant,0.7857,0.7097,0.7458,62.0
+Fashion Designer,0.4762,0.4,0.4348,25.0
+Finance Manager,0.3388,0.2752,0.3037,149.0
+Financial Analyst,0.4062,0.2167,0.2826,60.0
+Frontend Developer,0.5422,0.4306,0.48,209.0
+Full Stack Developer,0.5754,0.431,0.4928,239.0
+Graphic Designer,0.7654,0.7294,0.747,85.0
+HR Business Partner,0.6667,0.381,0.4848,21.0
+HR Executive / Generalist,0.6565,0.6681,0.6623,226.0
+Hotel / Travel Staff,0.5667,0.5258,0.5455,97.0
+IT Support / Desktop Engineer,0.549,0.5283,0.5385,106.0
+Inside Sales / Telesales,0.5328,0.3892,0.4498,167.0
+Insurance Advisor,0.5116,0.3284,0.4,67.0
+Interior Designer,0.7353,0.6098,0.6667,41.0
+Java Developer,0.6777,0.6236,0.6495,263.0
+Journalist / Editor,0.7143,0.5357,0.6122,28.0
+Key Account Manager,0.5636,0.3605,0.4397,86.0
+Lawyer / Legal Associate,0.8077,0.5833,0.6774,36.0
+Logistics / Supply Chain Executive,0.5714,0.4889,0.5269,90.0
+MEP / HVAC Engineer,0.6154,0.32,0.4211,25.0
+ML / AI Engineer,0.5991,0.5359,0.5657,237.0
+Mainframe Developer,0.7391,0.6296,0.68,27.0
+Maintenance Engineer,0.6552,0.5352,0.5891,71.0
+Management Consultant,0.3923,0.3333,0.3604,246.0
+Manual Test Engineer,0.5468,0.571,0.5586,317.0
+Marketing Executive,0.4653,0.4372,0.4508,215.0
+Mechanical Design Engineer,0.5894,0.6489,0.6177,188.0
+Medical Coder,0.6486,0.6667,0.6575,36.0
+Microsoft Dynamics Consultant,0.5833,0.2917,0.3889,24.0
+Mobile App Developer,0.6,0.4545,0.5172,33.0
+Network Engineer,0.75,0.6667,0.7059,81.0
+Oracle Apps Consultant,0.6,0.5152,0.5543,99.0
+PHP Developer,0.7917,0.5758,0.6667,33.0
+Payroll Executive,0.5,0.3429,0.4068,35.0
+Pre-Sales Consultant,0.6154,0.2963,0.4,27.0
+Procurement / Purchase,0.7294,0.7126,0.7209,174.0
+Product Manager,0.62,0.5536,0.5849,56.0
+Production Engineer,0.663,0.603,0.6316,199.0
+Professor / Lecturer,0.6667,0.55,0.6027,40.0
+Project Manager,0.489,0.5427,0.5145,164.0
+Python Developer,0.5426,0.4513,0.4928,113.0
+Quality Engineer (Manufacturing),0.6066,0.4568,0.5211,81.0
+R&D / Process Engineer,0.4805,0.3978,0.4353,93.0
+Real Estate Sales,0.561,0.3433,0.4259,67.0
+Receptionist / Front Office,0.7121,0.662,0.6861,71.0
+Recruiter / Talent Acquisition,0.8217,0.7975,0.8094,237.0
+Relationship Manager (Banking),0.5512,0.4046,0.4667,173.0
+Retail Sales Associate,0.5246,0.3556,0.4238,90.0
+SAP Consultant,0.734,0.8157,0.7727,521.0
+SEO Specialist,0.6765,0.6765,0.6765,34.0
+Sales Executive,0.5124,0.7118,0.5958,1020.0
+Salesforce Developer,0.6667,0.4167,0.5128,72.0
+School Teacher,0.7925,0.84,0.8155,100.0
+Service Engineer / Technician,0.5385,0.4321,0.4795,81.0
+ServiceNow Developer,0.7377,0.7377,0.7377,61.0
+Site / Civil Engineer,0.686,0.6277,0.6556,94.0
+Social Media Executive,0.6087,0.6087,0.6087,46.0
+Software Engineer (general),0.5042,0.7164,0.5919,1167.0
+Staff Nurse,0.8056,0.7632,0.7838,38.0
+System Administrator,0.5556,0.3333,0.4167,30.0
+Tax / GST Executive,0.6667,0.5938,0.6281,64.0
+Technical Writer,0.8,0.3333,0.4706,24.0
+Trust & Safety / Content Moderator,0.9348,0.86,0.8958,50.0
+Tutor / Academic Counsellor,0.6522,0.5357,0.5882,56.0
+UI/UX Designer,0.7255,0.6607,0.6916,56.0
+Video Editor / Animator,0.6,0.625,0.6122,48.0
+Warehouse / Inventory,0.4194,0.3514,0.3824,37.0
+accuracy,0.5647,0.5647,0.5647,0.5647
+macro avg,0.6059,0.519,0.5527,13688.0
+weighted avg,0.5714,0.5647,0.5603,13688.0

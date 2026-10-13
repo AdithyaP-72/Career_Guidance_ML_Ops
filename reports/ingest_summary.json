@@ -10,8 +10,8 @@
   },
   "2019": {
     "rows_raw": 29425,
-    "rows": 29249,
-    "duplicates_removed": 176,
+    "rows": 29244,
+    "duplicates_removed": 181,
     "share_no_skills": 0.0357,
     "median_skills": 8.0,
     "unique_skills": 14462,

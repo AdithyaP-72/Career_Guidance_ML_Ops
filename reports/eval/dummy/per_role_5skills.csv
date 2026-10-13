@@ -1,0 +1,107 @@
+role,precision,recall,f1-score,support
+.NET Developer,0.0,0.0,0.0,130.0
+Accountant,0.0,0.0,0.0,306.0
+Accounts Payable / Receivable,0.0,0.0,0.0,147.0
+Admin Executive,0.0,0.0,0.0,262.0
+Android Developer,0.0,0.0,0.0,38.0
+Architect (Building),0.0,0.0,0.0,114.0
+Area / Territory Sales Manager,0.0,0.0,0.0,187.0
+Auditor,0.0,0.0,0.0,73.0
+Automation Test Engineer,0.0,0.0,0.0,75.0
+BI Developer,0.0,0.0,0.0,50.0
+Branch Banking Officer,0.0,0.0,0.0,149.0
+Brand / Product Marketing Manager,0.0,0.0,0.0,33.0
+Business Analyst,0.0,0.0,0.0,95.0
+Business Development Executive,0.0,0.0,0.0,335.0
+Chartered Accountant,0.0,0.0,0.0,51.0
+Chef / Cook,0.0,0.0,0.0,59.0
+Clinical Research / Pharmacovigilance,0.0,0.0,0.0,40.0
+Cloud Engineer,0.0,0.0,0.0,176.0
+Collections Officer,0.0,0.0,0.0,43.0
+Company Secretary / Compliance,0.0,0.0,0.0,56.0
+Content Writer,0.0,0.0,0.0,73.0
+Corporate Trainer,0.0,0.0,0.0,73.0
+Credit / Loan Officer,0.0,0.0,0.0,93.0
+Customer Service Executive,0.0,0.0,0.0,389.0
+Customer Support (Non-voice),0.0,0.0,0.0,67.0
+Customer Support (Voice),0.0,0.0,0.0,321.0
+Cyber Security Analyst,0.0,0.0,0.0,75.0
+Data Analyst,0.0,0.0,0.0,421.0
+Data Engineer,0.0,0.0,0.0,220.0
+Data Scientist,0.0,0.0,0.0,89.0
+Database Administrator,0.0,0.0,0.0,34.0
+DevOps Engineer,0.0,0.0,0.0,144.0
+Digital Marketing Executive,0.0,0.0,0.0,114.0
+Doctor / Medical Officer,0.0,0.0,0.0,105.0
+Electrical Engineer,0.0,0.0,0.0,76.0
+Embedded / Firmware Engineer,0.0,0.0,0.0,67.0
+Executive Assistant,0.0,0.0,0.0,62.0
+Fashion Designer,0.0,0.0,0.0,25.0
+Finance Manager,0.0,0.0,0.0,149.0
+Financial Analyst,0.0,0.0,0.0,60.0
+Frontend Developer,0.0,0.0,0.0,209.0
+Full Stack Developer,0.0,0.0,0.0,239.0
+Graphic Designer,0.0,0.0,0.0,85.0
+HR Business Partner,0.0,0.0,0.0,21.0
+HR Executive / Generalist,0.0,0.0,0.0,226.0
+Hotel / Travel Staff,0.0,0.0,0.0,97.0
+IT Support / Desktop Engineer,0.0,0.0,0.0,106.0
+Inside Sales / Telesales,0.0,0.0,0.0,167.0
+Insurance Advisor,0.0,0.0,0.0,67.0
+Interior Designer,0.0,0.0,0.0,41.0
+Java Developer,0.0,0.0,0.0,263.0
+Journalist / Editor,0.0,0.0,0.0,28.0
+Key Account Manager,0.0,0.0,0.0,86.0
+Lawyer / Legal Associate,0.0,0.0,0.0,36.0
+Logistics / Supply Chain Executive,0.0,0.0,0.0,90.0
+MEP / HVAC Engineer,0.0,0.0,0.0,25.0
+ML / AI Engineer,0.0,0.0,0.0,237.0
+Mainframe Developer,0.0,0.0,0.0,27.0
+Maintenance Engineer,0.0,0.0,0.0,71.0
+Management Consultant,0.0,0.0,0.0,246.0
+Manual Test Engineer,0.0,0.0,0.0,317.0
+Marketing Executive,0.0,0.0,0.0,215.0
+Mechanical Design Engineer,0.0,0.0,0.0,188.0
+Medical Coder,0.0,0.0,0.0,36.0
+Microsoft Dynamics Consultant,0.0,0.0,0.0,24.0
+Mobile App Developer,0.0,0.0,0.0,33.0
+Network Engineer,0.0,0.0,0.0,81.0
+Oracle Apps Consultant,0.0,0.0,0.0,99.0
+PHP Developer,0.0,0.0,0.0,33.0
+Payroll Executive,0.0,0.0,0.0,35.0
+Pre-Sales Consultant,0.0,0.0,0.0,27.0
+Procurement / Purchase,0.0,0.0,0.0,174.0
+Product Manager,0.0,0.0,0.0,56.0
+Production Engineer,0.0,0.0,0.0,199.0
+Professor / Lecturer,0.0,0.0,0.0,40.0
+Project Manager,0.0,0.0,0.0,164.0
+Python Developer,0.0,0.0,0.0,113.0
+Quality Engineer (Manufacturing),0.0,0.0,0.0,81.0
+R&D / Process Engineer,0.0,0.0,0.0,93.0
+Real Estate Sales,0.0,0.0,0.0,67.0
+Receptionist / Front Office,0.0,0.0,0.0,71.0
+Recruiter / Talent Acquisition,0.0,0.0,0.0,237.0
+Relationship Manager (Banking),0.0,0.0,0.0,173.0
+Retail Sales Associate,0.0,0.0,0.0,90.0
+SAP Consultant,0.0,0.0,0.0,521.0
+SEO Specialist,0.0,0.0,0.0,34.0
+Sales Executive,0.0,0.0,0.0,1020.0
+Salesforce Developer,0.0,0.0,0.0,72.0
+School Teacher,0.0,0.0,0.0,100.0
+Service Engineer / Technician,0.0,0.0,0.0,81.0
+ServiceNow Developer,0.0,0.0,0.0,61.0
+Site / Civil Engineer,0.0,0.0,0.0,94.0
+Social Media Executive,0.0,0.0,0.0,46.0
+Software Engineer (general),0.0853,1.0,0.1571,1167.0
+Staff Nurse,0.0,0.0,0.0,38.0
+System Administrator,0.0,0.0,0.0,30.0
+Tax / GST Executive,0.0,0.0,0.0,64.0
+Technical Writer,0.0,0.0,0.0,24.0
+Trust & Safety / Content Moderator,0.0,0.0,0.0,50.0
+Tutor / Academic Counsellor,0.0,0.0,0.0,56.0
+UI/UX Designer,0.0,0.0,0.0,56.0
+Video Editor / Animator,0.0,0.0,0.0,48.0
+Warehouse / Inventory,0.0,0.0,0.0,37.0
+accuracy,0.0853,0.0853,0.0853,0.0853
+macro avg,0.0008,0.0097,0.0015,13688.0
+weighted avg,0.0073,0.0853,0.0134,13688.0

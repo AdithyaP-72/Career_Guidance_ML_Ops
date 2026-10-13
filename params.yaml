@@ -16,10 +16,10 @@ split:
   seed: 42
 
 features:
-  top_k_skills: 1500       # vocabulary size = the skills the search box offers
+  top_k_skills: 6000       # vocabulary size = the skills the search box offers (6,000 beat 1,500 by ~5 pts top-3)
   exp_clip: 20             # years of experience above this are treated as 20
   eval_n_skills: 5         # test inputs are cut to this many skills (what users really enter)
-  dropout:                 # training-time augmentation, used from Step 5
+  dropout:                 # training-time augmentation: extra copies of each posting cut to min_k..max_k skills
     copies: 2
     min_k: 2
     max_k: 6
@@ -32,5 +32,39 @@ profiles:
   top_n_titles: 5
 
 profiling:
-  minimal: true            # ydata-profiling minimal mode: fast, skips correlations
+  minimal: true            # fg-data-profiling minimal mode: fast, skips correlations
   snapshots: [2017, 2019, 2022, 2025]
+
+train:                     # Step 5 baselines (src/models/train.py; one dvc stage per model)
+  models: [dummy, profile, logreg, random_forest, lightgbm]
+  skill_dropout: true      # train on postings + their cut-down copies (features.dropout)
+  experiment: career-role-baselines   # MLflow experiment name
+  # Each block below is passed straight to the model's constructor.
+  # No class weighting: "balanced" weights cost ~6 pts of top-3 accuracy (they favour rare roles).
+  dummy:
+    strategy: prior        # predict class frequencies -> top-3 = the three biggest roles
+  profile:
+    temperature: 0.05      # only shapes the confidence %, not the ranking
+  logreg:
+    C: 0.5
+    max_iter: 2000
+  random_forest:
+    n_estimators: 100
+    min_samples_leaf: 5    # bigger leaves keep the saved model small (200 trees / leaf 2 was 761 MB)
+    max_features: sqrt
+    n_jobs: -1
+    random_state: 42
+  lightgbm:                # 103 classes = 103 trees per round, so few, small, regularised rounds;
+    n_estimators: 120      # library defaults diverge on this many classes
+    learning_rate: 0.08
+    num_leaves: 15
+    min_child_samples: 10
+    colsample_bytree: 0.2
+    reg_lambda: 1.0
+    force_col_wise: true
+    n_jobs: -1
+    random_state: 42
+    verbose: -1
+
+select:                    # src/models/select.py
+  metric: top3_5skills     # best baseline = highest top-3 accuracy on 5-skill test inputs
