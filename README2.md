@@ -611,3 +611,109 @@ The infrastructure person shouldn't do everyone's setup. The seniors said to set
 - Try quantization.
 - Don't use Evidently AI.
 - Prometheus and Grafana: use Docker images for everything instead of .exe installers.
+
+
+---
+
+## 5. Layman Explanations: Labelling, Features & The 2019 Drift Set
+
+### 5.1 Why did we need Regex Rules if you thought "role" was already in the 2025 dataset?
+
+#### 1. Look at the actual columns in Naukri 2025:
+The 2025 dataset has:
+`['title', 'tagsAndSkills', 'experience', 'companyName', 'salary', 'location', ...]`
+
+Notice: **There is NO column called `role` in the 2025 dataset!** (The older 2019 dataset had one, but 2025 only has `title`).
+
+#### 2. Why couldn't we just use `title` as our role?
+Because `title` is written by thousands of different HR recruiters in free-form text. Out of ~98,000 job postings, there are **over 55,000 unique titles!**
+
+Real examples of raw titles from the data:
+* *"Urgent Hiring for React JS Developer (Immediate Joiner) - 3+ yrs"*
+* *"Frontend React.js Engineer - Bangalore / Remote"*
+* *"Lead UI Developer (React/Redux/TypeScript) - MNC"*
+* *"Walk-in interview tomorrow: Accounts / Tally / GST Executive"*
+
+If you treated those raw titles as your classes, a machine learning model would have to pick between 55,000 categories, almost all of which only have 1 or 2 jobs. That's completely impossible to train.
+
+#### 3. What the Regex Rules (`configs/role_rules.yaml`) do:
+Think of regex rules as a **smart filing cabinet**:
+* If a title contains `react` or `frontend` or `angular` $\to$ File it under the clean label: **"Frontend Developer"**
+* If a title contains `gst` or `tally` or `tax` $\to$ File it under: **"Tax / GST Executive"**
+* If a title contains `nurse` or `nursing` $\to$ File it under: **"Staff Nurse"**
+
+We created **113 clean role labels** using these keyword patterns. That took 55,000 messy job titles and grouped them into clean, well-defined career targets.
+
+---
+
+### 5.2 Feature Engineering Explained in Layman Terms
+
+Machine learning models cannot read English words like `"Python, SQL, AWS"` or `"3 years"`. They only understand numbers and tables of $0$s and $1$s. Feature engineering is simply translating human resume data into numbers the model can do math on.
+
+Here is what each step in that pipeline does:
+
+#### 1. Skill Vocabulary Vectorization (`CountVectorizer(binary=True, max_features=6000)`)
+Imagine a giant attendance sheet or checklist with **6,000 columns**, where each column is one specific skill:
+
+| Job Posting | python | react | sql | tally | gst | docker | ... (6,000 skills total) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Job A** (Data Analyst) | **1** | 0 | **1** | 0 | 0 | 0 | ... |
+| **Job B** (Frontend Dev) | 0 | **1** | 0 | 0 | 0 | 0 | ... |
+| **Job C** (Accountant) | 0 | 0 | 0 | **1** | **1** | 0 | ... |
+
+* `binary=True`: It puts a **1** if the job asks for that skill, and a **0** if it doesn't.
+* `max_features=6000`: Out of 44,000 rare and typo-filled skills in the wild, we kept the top **6,000 most common skills**.
+* **Why 6,000 instead of 1,500?** When we tried only 1,500 skills, rare but crucial skills got cut out. For example, a hospital job asks for `gnm` (General Nursing and Midwifery), or an accountant asks for `tds`. If those words aren't in your 6,000 columns, the model is blind to them. Keeping 6,000 gave our model an extra **+4.8% boost in accuracy**.
+
+#### 2. Experience Normalization
+* Jobs list experience like `"3 - 6 Yrs"`. We take the minimum number: `3.0`.
+* **Clipped to [0, 20]:** If someone has 35 years of experience, we cap it at 20. Why? Because the difference between 2 years and 5 years is huge, but the difference between 22 years and 35 years for job roles is basically identical. Capping it stops extreme outliers from throwing off the math.
+* **Scaled to [0, 1.0]:** 0 years becomes `0.0`, 10 years becomes `0.5`, 20 years becomes `1.0`. This puts experience on the exact same scale as our $0$ and $1$ skill checkboxes so one feature doesn't dominate the other.
+
+#### 3. Skill Dropout Augmentation (Training Only)
+This fixes a real-world mismatch:
+* **In the training data:** Companies write comprehensive job descriptions listing **~8 to 12 skills**.
+* **In the real world:** A real user using our app will casually type only **3 to 5 skills**.
+
+If the model *only* learns from rich job postings with 10 skills, it panics and gets confused when a user enters only 3 skills.
+
+**How we fixed it ("Skill Dropout"):**
+For every job in our training data, we made 2 extra duplicate copies, but we randomly erased some of the skills so the copy only has **2 to 6 skills**.
+* *Original:* `[python, sql, aws, docker, kubernetes, airflow, spark, linux]` (8 skills)
+* *Copy 1:* `[python, sql, spark]` (3 skills)
+* *Copy 2:* `[aws, docker, kubernetes, linux]` (4 skills)
+
+This tripled our training data from **54,752 to 164,256 examples**. It trained the model to recognize a job role even when given a very short, incomplete list of skills.
+
+#### 4. Headline Test Downsampling
+When evaluating our models to decide who wins, we wanted an honest, realistic test:
+* We took our 13,688 test postings and **artificially cut each of them down to exactly 5 random skills**.
+* Then we asked the models: *"Given ONLY these 5 skills, can you guess the job role in your top 3 picks?"*
+
+This simulated thousands of real users using the app. Under this realistic test, **Logistic Regression achieved 79.39% accuracy**, proving it can reliably suggest the right job even from short human inputs.
+
+---
+
+### 5.3 The 2019 Drift Evaluation Set: Did we test on the whole 2019 dataset?
+
+**No, not the entire raw 2019 dataset — it tests on 20,183 filtered postings (about 70% of 2019).**
+
+Here is the exact funnel of how 2019 gets filtered down for testing:
+
+```
+29,244 unique 2019 postings in raw data
+   │
+   ├── Filtered out: postings with < 3 skills (about 3.6% had 0–2 skills)
+   │
+   ├── Filtered out: unlabelled titles (postings whose job title matched no rule)
+   │
+   └── Filtered out: 3 "emerging" roles (ServiceNow Dev, Trust & Safety, MEP Engineer)
+       that only existed in 2025 and were too rare in 2019 (< 20 postings)
+   │
+   ▼
+20,183 valid postings evaluated across the 100 stable roles
+```
+
+#### Why filter it?
+1. **Fair Comparison:** We can't ask a model to predict roles on job postings that have zero skills listed, or evaluate roles that didn't exist in 2019.
+2. **Apple-to-Apple Drift Test:** By testing on the **100 stable roles** that have solid representation in *both* 2019 and 2025, any drop in accuracy (from 79.4% down to 66.8%) is pure **market skill drift**, not noise from missing labels or non-existent classes.
