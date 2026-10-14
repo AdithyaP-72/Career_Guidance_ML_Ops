@@ -16,7 +16,7 @@ An end-to-end MLOps pipeline for Indian career path guidance. Given a user's ski
 
 | # | Objective | Measurement | Target / Baseline |
 |---|---|---|---|
-| **O1** | Specific role recommendation | Top-3 accuracy on 5-skill inputs (simulating real user interaction) | Baseline Logistic Regression: **79.4% top-3** (Target: $\ge 75\%$) |
+| **O1** | Specific role recommendation | Top-3 accuracy on 5-skill inputs (simulating real user interaction) | Champion Complement Naive Bayes: **80.03% top-3** (Target: $\ge 75\%$) |
 | **O2** | Skill gap & readiness | Weighted core skill overlap per role (from 2025 Naukri data) | Deterministic pandas calculations versioned by DVC |
 | **O3** | Ordered learning path | Co-occurrence rank $\times$ market growth ($2019 \to 2025$) mapped to course catalog | NPTEL/SWAYAM matches for top skills |
 | **O4** | Education prior | Separate education-to-role prior table (PLFS & Naukri historical data) | Independent lookup table (not direct NLP on degrees) |
@@ -84,33 +84,33 @@ uv run dvc metrics show
 
 ## 3. Phase 1 Model Results & Tracking
 
-Five baseline models were trained across 164,256 augmented postings (54,752 unique train postings with skill dropout) and evaluated against a held-out test set of 13,688 postings cut to 5 skills.
+Eight candidate models were trained across 164,256 augmented postings (54,752 unique train postings with skill dropout) and evaluated against a held-out test set of 13,688 postings cut to 5 skills.
 
 ### Baseline Comparison (`reports/model_comparison.csv`)
 
-| Model | Top-3 (5 skills) | Top-1 (5 skills) | Top-5 (5 skills) | Macro-F1 | Right Family | Top-3 (Full) | Fit Time | Predict 1k | Model Size |
-|---|---|---|---|---|---|---|---|---|---|
-| **Logistic Regression** (Champion) | **79.39%** | 56.47% | **85.84%** | 0.5527 | **72.09%** | 84.58% | 200 s | **27 ms** | 4.8 MB |
-| **LightGBM** | 78.19% | **56.75%** | 84.53% | **0.5595** | 72.00% | **84.81%** | 843 s | 1026 ms | 8.1 MB |
-| **Random Forest** | 73.75% | 49.26% | 80.65% | 0.4401 | 66.79% | 79.28% | 45 s | 144 ms | 112 MB |
-| **Profile Matching** (Cosine) | 66.33% | 43.51% | 75.47% | 0.4549 | 62.89% | 73.86% | 2 s | 14 ms | 0.3 MB |
-| **Dummy** (Prior baseline) | 19.78% | 8.53% | 25.70% | 0.0015 | 17.47% | 19.78% | 1 s | 11 ms | 0.07 MB |
+| Model | Top-3 (5 skills) | Top-1 (5 skills) | Top-5 (5 skills) | Macro-F1 | Right Family | Top-3 (Full) | Top-3 (2019, 5 skills) | Fit Time | Predict 1k | Model Size |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Complement Naive Bayes** (Champion) | 80.03% | 55.97% | 86.61% | 0.5194 | 72.03% | 83.59% | 69.92% | 1.4 s | 11.54 ms | 1.8 MB |
+| Logistic Regression | 79.39% | 56.47% | 85.84% | 0.5527 | 72.09% | 84.58% | 66.75% | 73.1 s | 8.46 ms | 4.8 MB |
+| LightGBM | 78.19% | 56.75% | 84.53% | 0.5595 | 72.00% | 84.81% | 67.09% | 321.7 s | 379.64 ms | 8.15 MB |
+| MLP (Neural Network) | 76.40% | 53.84% | 83.30% | 0.5238 | 70.54% | 81.30% | 61.27% | 3002.9 s | 20.66 ms | 36.67 MB |
+| SGD (Modified Huber) | 76.22% | 56.75% | 81.12% | 0.5492 | 71.83% | 83.16% | 62.05% | 4.7 s | 9.31 ms | 2.89 MB |
+| Random Forest | 73.75% | 49.26% | 80.65% | 0.4401 | 66.79% | 79.28% | 62.08% | 19.9 s | 82.33 ms | 111.96 MB |
+| Profile Matching (Cosine) | 66.33% | 43.51% | 75.47% | 0.4549 | 62.89% | 73.86% | 55.97% | 0.8 s | 11.76 ms | 0.31 MB |
+| Dummy (Prior baseline) | 19.78% | 8.53% | 25.70% | 0.0015 | 17.47% | 19.78% | 17.55% | 0.9 s | 5.71 ms | 0.07 MB |
+
+
+**Complement Naive Bayes is the current champion**, selected by the highest top-3 accuracy on five-skill test inputs (`select.metric: top3_5skills`). Its 80.03% score exceeds Logistic Regression by 0.64 percentage points and Profile Matching by 13.70 percentage points, meeting the 75% target. The selected artifact is `models/model.joblib`, with metrics recorded in `reports/metrics.json`.
+
+The newly added challengers are **MLP** (76.40% top-3), **SGD with modified Huber loss** (76.22%), and **Complement Naive Bayes** (80.03%). MLP uses two hidden layers (256 and 128 units); SGD provides a fast linear classifier for sparse skill features.
+
+Top-3 accuracy means the correct role appears among the model's three highest-ranked recommendations. Macro-F1 measures top-1 performance across roles, while Right Family measures whether the top-ranked role belongs to the correct family. The 2019 column evaluates the historical reference set of 20,183 postings; the champion scores 69.92%, compared with 80.03% on the held-out 2025 test set. This difference provides a historical distribution-shift benchmark. Training and inference timings reflect the recorded run environment and can vary by hardware.
 
 * Detailed evaluation findings and confusion patterns are documented in **[journey.md](journey.md)**.
 * **Hosted MLflow Experiment Tracker:** View parameter curves, confusion plots, and model artifacts at:
   👉 [https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow](https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow)
 
 ---
-
-logistic regression-     Construction worker
-1.Engineer
-2.Teacher
-3.Janitor
-4.Police
-5.Constructor worker
-6.
-7.
-8.
 
 ## 4. Repository Structure
 
@@ -126,7 +126,7 @@ logistic regression-     Construction worker
 │   └── processed/               # classes.json, train/test/reference_2019 parquets
 ├── models/                      # DVC-managed model checkpoints & skill profiles
 │   ├── baselines/               # Trained candidate models (.joblib)
-│   ├── model.joblib             # Selected champion model (Logistic Regression)
+│   ├── model.joblib             # Selected champion model (Complement Naive Bayes)
 │   └── skill_profiles.json      # Precomputed role skill profiles & co-occurrence matrix
 ├── notebooks/
 │   └── 01_eda.ipynb             # Exploratory Data Analysis notebook
