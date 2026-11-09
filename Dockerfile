@@ -42,7 +42,10 @@ COPY src/ src/
 COPY configs/skill_aliases.yaml configs/skill_aliases.yaml
 COPY bundle/ bundle/
 
+# Which commit this image was built from; /health reports it so CD can confirm what is live.
+ARG GIT_SHA=dev
 ENV PATH="/app/.venv/bin:$PATH" \
+    GIT_SHA=${GIT_SHA} \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     BUNDLE_DIR=/app/bundle \

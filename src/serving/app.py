@@ -94,6 +94,7 @@ def health(request: Request):
         "model": m["model_name"],
         "version": str(m["version"]),
         "algorithm": m.get("algorithm"),
+        "revision": os.environ.get("GIT_SHA", "dev"),  # git commit the image was built from
         "features": {"resume_upload": request.app.state.resume_ready},
     }
 
