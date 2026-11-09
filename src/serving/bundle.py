@@ -8,6 +8,8 @@ bundle/
     trusted_types.json     the non-sklearn types that file needs; checked against src/models/train.py
     skill_profiles.json    per-role core skills + growth  (readiness, skill gap, learning path)
     skill_cooccurrence.npz + skill_vocab.json              (learning path order)
+    skill_courses.json     skill → free / online courses     (learning path links; DVC stage `courses`)
+    skill_keyness.json     how skill-like each word is       (resume upload; DVC stage `resume_keyness`)
     meta.json              which model/version/run this is, for /model and the logs
 
 --from-registry downloads `models:/<name>@<alias>` plus the `serving/` files that register.py stored
@@ -32,7 +34,14 @@ from src.utils import MODELS, REPORTS, ROOT, get_logger, load_params, read_json,
 
 log = get_logger("bundle")
 
-LOOKUPS = ["skill_profiles.json", "skill_cooccurrence.npz", "skill_vocab.json"]
+# Lookup files the API reads next to the model. register.py stores exactly these in the model's MLflow run.
+LOOKUPS = [
+    "skill_profiles.json",
+    "skill_cooccurrence.npz",
+    "skill_vocab.json",
+    "skill_courses.json",
+    "skill_keyness.json",
+]
 
 
 def finalise(out: Path, meta: dict) -> dict:

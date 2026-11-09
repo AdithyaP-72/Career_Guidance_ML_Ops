@@ -40,6 +40,12 @@ def toy_postings(seed: int = 0) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+TOY_COURSES = {
+    "gst": [{"title": "GST Basics", "provider": "NPTEL", "url": "https://onlinecourses.nptel.ac.in/gst"}],
+    "html": [],
+}
+
+
 def make_toy_bundle(out: Path) -> Path:
     df = toy_postings()
     pipe = build_pipeline("logreg", load_params()).fit(df[["skills", "exp_min"]], df["role"])
@@ -63,6 +69,8 @@ def make_toy_bundle(out: Path) -> Path:
         write_json({"roles": roles, "skill_growth": growth, "params": {}}, lookups / "skill_profiles.json")
         sp.save_npz(lookups / "skill_cooccurrence.npz", (X.T @ X).tocsr())
         write_json(vec.get_feature_names_out().tolist(), lookups / "skill_vocab.json")
+        write_json(TOY_COURSES, lookups / "skill_courses.json")
+        write_json({"tally": 0.6, "gst": 0.5, "nursing": 0.5}, lookups / "skill_keyness.json")
         meta = {"source": "toy", "model_name": "career-role-classifier", "version": "toy", "algorithm": "logreg"}
         write_local(out, pipe, lookups, meta)
     return out

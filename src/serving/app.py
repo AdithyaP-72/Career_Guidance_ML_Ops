@@ -13,8 +13,7 @@ Endpoints:
     GET  /skills?q=    autocomplete for the skill search box
     GET  /roles        every role the model can recommend, with its family
     POST /predict      skills + experience → top-k roles, readiness, skill gap, learning path
-    POST /extract-skills   resume file (PDF/DOCX/TXT, ≤ 2 MB) → skills in the model's spelling
-                           (501 until src/serving/resume.py is implemented)
+    POST /extract-skills   resume file (PDF/DOCX, ≤ 5 MB) → skills in the model's spelling (src/serving/resume.py)
 """
 
 from __future__ import annotations
@@ -33,33 +32,27 @@ from starlette.concurrency import run_in_threadpool
 
 from src.serving import resume
 from src.serving.recommender import Recommender
-from src.serving.schemas import ModelInfo, PredictRequest, PredictResponse, SkillSearch
+from src.serving.schemas import ModelInfo, PredictRequest, PredictResponse, ResumeSkills, SkillSearch
 from src.utils import ROOT, get_logger
 
 log = get_logger("api")
 
 MIN_SKILLS = int(os.environ.get("MIN_SKILLS", "5"))
 LOW_CONFIDENCE = float(os.environ.get("LOW_CONFIDENCE", "0.2"))
-MAX_RESUME_BYTES = 2 * 1024 * 1024
-RESUME_TYPES = {".pdf", ".docx", ".txt"}
-
-
-def resume_upload_ready() -> bool:
-    """False while src/serving/resume.py is still the NotImplementedError placeholder."""
-    try:
-        resume.resume_to_skills(b"", "probe.txt", set(), {})
-    except NotImplementedError:
-        return False
-    except Exception:  # an implemented extractor may reject an empty file; that still means "ready"
-        return True
-    return True
+MAX_RESUME_BYTES = resume.MAX_BYTES
+RESUME_TYPES = {".pdf", ".docx"}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.rec = Recommender(Path(os.environ.get("BUNDLE_DIR", ROOT / "bundle")))
-    app.state.resume_ready = resume_upload_ready()
-    log.info("loaded %s (resume upload: %s)", json.dumps(app.state.rec.meta), app.state.resume_ready)
+    bundle = Path(os.environ.get("BUNDLE_DIR", ROOT / "bundle"))
+    app.state.rec = Recommender(bundle)
+    # The resume extractor's index is built once here, from the bundle's own vocabulary + keyness lookup,
+    # so it always matches the model being served.
+    app.state.extractor = resume.get_extractor(
+        vocab_path=str(bundle / "skill_vocab.json"), keyness_path=str(bundle / "skill_keyness.json")
+    )
+    log.info("loaded %s", json.dumps(app.state.rec.meta))
     yield
 
 
@@ -95,7 +88,7 @@ def health(request: Request):
         "version": str(m["version"]),
         "algorithm": m.get("algorithm"),
         "revision": os.environ.get("GIT_SHA", "dev"),  # git commit the image was built from
-        "features": {"resume_upload": request.app.state.resume_ready},
+        "features": {"resume_upload": True, "course_links": bool(rec(request).courses)},
     }
 
 
@@ -156,24 +149,26 @@ def predict(body: PredictRequest, request: Request):
     return response
 
 
-@app.post("/extract-skills")
+@app.post("/extract-skills", response_model=ResumeSkills)
 async def extract_skills(request: Request, file: Annotated[UploadFile, File()]):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in RESUME_TYPES:
-        raise HTTPException(415, f"upload a {', '.join(sorted(RESUME_TYPES))} file")
-    data = await file.read(MAX_RESUME_BYTES + 1)
+        raise HTTPException(415, "Please upload a PDF or a .docx file.")
+    data = await file.read(MAX_RESUME_BYTES + 1)  # never read more than the limit into memory
     if len(data) > MAX_RESUME_BYTES:
-        raise HTTPException(413, "file is larger than 2 MB")
-    r = rec(request)
-    vocab = set(r.vocab)
+        raise HTTPException(413, f"The file is too large (limit {MAX_RESUME_BYTES // 1_000_000} MB).")
     try:
         # Parsing is CPU work: run it in a worker thread so the server keeps answering other requests.
-        found = await run_in_threadpool(resume.resume_to_skills, data, file.filename, vocab, r.aliases)
-    except NotImplementedError:
-        raise HTTPException(501, "resume upload is coming soon; add your skills by hand for now") from None
-    except resume.ResumeError as e:
+        result = await run_in_threadpool(resume.extract_skills, data, file.filename, 30, request.app.state.extractor)
+    except resume.ResumeError as e:  # corrupt, encrypted, wrong content: the message is safe to show
         raise HTTPException(422, str(e)) from None
-    skills = list(dict.fromkeys(s for s in found if s in vocab))
+    vocab = rec(request).vocab
+    skills = [s for s in result.names if s in vocab]
+    message = result.message
+    if not skills and not message:
+        message = "We could not find skills from our list in this resume. You can add them manually."
     # Never log resume content (personal data): counts only.
-    log.info("resume %s", json.dumps({"type": suffix, "bytes": len(data), "skills_found": len(skills)}))
-    return {"skills": skills, "ignored": len(found) - len(skills)}  # unknown to the model, or repeated
+    log.info("resume %s", json.dumps({"type": suffix, "bytes": len(data), "code": result.code, "skills": len(skills)}))
+    return ResumeSkills(
+        skills=skills, ignored=len(result.names) - len(skills), message=message, warnings=result.warnings
+    )

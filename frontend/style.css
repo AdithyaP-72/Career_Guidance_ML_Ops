@@ -121,5 +121,9 @@ button.primary:disabled { opacity: 0.45; cursor: not-allowed; }
 .path { margin: 6px 0 0; padding-left: 22px; }
 .path li { margin-bottom: 4px; }
 .path .why { color: var(--muted); font-size: 0.85rem; }
+.courses { list-style: none; margin: 2px 0 6px; padding: 0; font-size: 0.85rem; }
+.courses li { margin: 2px 0; overflow-wrap: anywhere; }
+.courses a { color: var(--accent); }
+.courses .provider { color: var(--muted); }
 .footer { padding: 8px 16px 32px; font-size: 0.85rem; }
 .footer p { margin: 4px 0; }

@@ -136,45 +136,54 @@ def test_bundle_refuses_a_model_with_untrusted_types(tmp_path, bundle):
         write_local(tmp_path / "b", pipe, bundle, {"model_name": "x", "version": "x", "algorithm": "x"})
 
 
-# ── resume upload (the extractor itself is a teammate's module; here we test the endpoint around it) ──
+# ── resume upload (the extractor itself is tested in tests/test_resume.py; here: the endpoint around it) ──
+
+ACCOUNTANT_CV = ["Made-up Person", "", "SKILLS", "Tally, GST, TDS, Accounting, MS Excel, Underwater Basket Weaving"]
 
 
-def test_resume_upload_is_off_until_the_extractor_exists(client):
-    assert client.get("/health").json()["features"] == {"resume_upload": False}
-    r = client.post("/extract-skills", files={"file": ("cv.pdf", b"%PDF-1.4 fake", "application/pdf")})
-    assert r.status_code == 501
+def test_health_lists_the_features(client):
+    assert client.get("/health").json()["features"] == {"resume_upload": True, "course_links": True}
+
+
+def test_resume_pdf_and_docx_prefill_skills_in_the_models_spelling(client):
+    from tests.resume_samples import make_docx, make_pdf
+
+    for name, data in [("cv.pdf", make_pdf([ACCOUNTANT_CV])), ("cv.docx", make_docx(ACCOUNTANT_CV))]:
+        r = client.post("/extract-skills", files={"file": (name, data, "application/octet-stream")})
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert {"tally", "gst", "tds", "accounting", "excel"} <= set(body["skills"]), (name, body)
+        assert body["message"] is None
+        # ...and those skills go straight into /predict
+        assert client.post("/predict", json={"skills": body["skills"]}).json()["recommendations"][0]["role"] == (
+            "Accountant"
+        )
 
 
 def test_resume_upload_rejects_wrong_type_and_big_files(client):
-    assert (
-        client.post("/extract-skills", files={"file": ("cv.exe", b"MZ", "application/octet-stream")}).status_code == 415
-    )
-    big = b"x" * (2 * 1024 * 1024 + 1)
-    assert client.post("/extract-skills", files={"file": ("cv.txt", big, "text/plain")}).status_code == 413
+    from src.serving.app import MAX_RESUME_BYTES
+
+    r = client.post("/extract-skills", files={"file": ("cv.exe", b"MZ", "application/octet-stream")})
+    assert r.status_code == 415
+    assert client.post("/extract-skills", files={"file": ("cv.txt", b"python", "text/plain")}).status_code == 415
+    big = b"%PDF-" + b"x" * MAX_RESUME_BYTES
+    assert client.post("/extract-skills", files={"file": ("cv.pdf", big, "application/pdf")}).status_code == 413
 
 
-def test_resume_skills_are_filtered_to_the_model_vocabulary(client, monkeypatch):
-    from src.serving import resume
+def test_broken_or_scanned_resumes_get_a_message_the_user_can_read(client):
+    from tests.resume_samples import make_pdf
 
-    seen = {}
-
-    def fake(data, filename, vocab, aliases):
-        seen.update(data=data, filename=filename, vocab_size=len(vocab))
-        return ["tally", "gst", "underwater basket weaving", "tally"]
-
-    monkeypatch.setattr(resume, "resume_to_skills", fake)
-    r = client.post("/extract-skills", files={"file": ("cv.txt", b"I know Tally and GST", "text/plain")})
+    r = client.post("/extract-skills", files={"file": ("cv.pdf", b"%PDF-1.4 garbage", "application/pdf")})
+    assert r.status_code == 422 and "could not be read" in r.json()["detail"]
+    r = client.post("/extract-skills", files={"file": ("scan.pdf", make_pdf([[]]), "application/pdf")})
     assert r.status_code == 200
-    assert r.json() == {"skills": ["tally", "gst"], "ignored": 2}
-    assert seen["data"] == b"I know Tally and GST" and seen["filename"] == "cv.txt" and seen["vocab_size"] > 0
+    assert r.json()["skills"] == [] and "scanned" in r.json()["message"]
 
 
-def test_unreadable_resume_gives_the_extractor_message(client, monkeypatch):
-    from src.serving import resume
-
-    def scanned(*_):
-        raise resume.ResumeError("this PDF is a scanned image; no text to read")
-
-    monkeypatch.setattr(resume, "resume_to_skills", scanned)
-    r = client.post("/extract-skills", files={"file": ("cv.pdf", b"%PDF", "application/pdf")})
-    assert r.status_code == 422 and "scanned" in r.json()["detail"]
+def test_learning_path_links_courses(client):
+    top = client.post("/predict", json={"skills": ["accounting", "tally", "tds", "excel", "html"]}).json()
+    steps = {s["skill"]: s["courses"] for r in top["recommendations"] for s in r["learning_path"]}
+    assert steps["gst"] == [
+        {"title": "GST Basics", "provider": "NPTEL", "url": "https://onlinecourses.nptel.ac.in/gst"}
+    ]
+    assert all(isinstance(c, list) for c in steps.values())  # skills without a course: an empty list, not missing

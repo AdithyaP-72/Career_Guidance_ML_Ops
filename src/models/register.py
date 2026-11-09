@@ -7,7 +7,8 @@ What it does:
     1. reads reports/metrics.json (which model select picked, its MLflow run + logged model)
        and reports/validation.json (did it pass the quality gate)
     2. attaches what the API needs next to the model in that MLflow run:
-           serving/   skill_profiles.json, skill_cooccurrence.npz, skill_vocab.json
+           serving/   the lookup files in src/serving/bundle.py → LOOKUPS (profiles, co-occurrence, vocab,
+                      courses, keyness): stored with the model so a deployed version always gets its own copy
            validation/  validation.json, model_card.md
     3. registers the logged model as a new version of params.yaml → register.model_name
        (or reuses the existing version if this exact model file was registered before; see model_md5)
@@ -29,12 +30,13 @@ from mlflow import MlflowClient
 from mlflow.exceptions import MlflowException
 
 from src.models.tracking import configure, md5
+from src.serving.bundle import LOOKUPS
 from src.utils import MODELS, REPORTS, get_logger, load_params, read_json
 
 log = get_logger("register")
 
 CHAMPION, PREVIOUS, CHALLENGER = "champion", "previous-champion", "challenger"
-SERVING_FILES = ["skill_profiles.json", "skill_cooccurrence.npz", "skill_vocab.json"]
+SERVING_FILES = LOOKUPS  # what bundle.py downloads again from serving/
 
 
 def decide(passed: bool, candidate: float, champion: float | None, min_improvement: float) -> str:

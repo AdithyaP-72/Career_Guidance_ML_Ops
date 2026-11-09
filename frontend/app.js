@@ -52,7 +52,7 @@ async function connect() {
         state.resumeReady = Boolean(body.features?.resume_upload);
         if (!state.resumeReady) {
           $("resume").disabled = true;
-          $("resume-status").textContent = "Resume upload: coming soon";
+          $("resume-status").textContent = "Resume upload is not available on this server.";
         }
         setStatus("");
         return;
@@ -171,12 +171,14 @@ $("resume").addEventListener("change", async (e) => {
   try {
     const { ok, status, body } = await api("/extract-skills", { method: "POST", body: form }, 60000);
     if (ok) {
-      body.skills.forEach(addSkill);
+      body.skills.slice(0, 15).forEach(addSkill); // best first; 15 is plenty to start from
+      const note = body.warnings?.length ? ` ${body.warnings.join(" ")}` : "";
       $("resume-status").textContent = body.skills.length
-        ? `Found ${body.skills.length} skills. Check them below and remove any that are wrong.`
-        : "No skills found in this file. Add them by hand below.";
+        ? `Found ${body.skills.length} skills. Check them below and remove any that are wrong.${note}`
+        : (body.message ?? "No skills found in this file. Add them by hand below.");
     } else {
-      $("resume-status").textContent = status === 501 ? "Resume upload: coming soon" : (body.detail ?? "Couldn't read that file.");
+      $("resume-status").textContent =
+        typeof body.detail === "string" ? body.detail : `Couldn't read that file (error ${status}).`;
     }
   } catch {
     $("resume-status").textContent = "Upload failed. Please try again.";
@@ -224,6 +226,16 @@ function trend(growth) {
   return "steady demand";
 }
 
+// Course links come from the API's data; only http(s) URLs become links.
+function courseLinks(courses = []) {
+  const safe = courses.filter((c) => /^https?:\/\//i.test(c.url));
+  if (!safe.length) return "";
+  return el("ul", { class: "courses" }, safe.map((c) =>
+    el("li", {},
+      el("a", { href: c.url, target: "_blank", rel: "noopener noreferrer" }, c.title),
+      el("span", { class: "provider" }, ` · ${c.provider}`))));
+}
+
 function roleCard(r) {
   const exp = r.typical_experience_years;
   return el("article", { class: "card" },
@@ -239,7 +251,8 @@ function roleCard(r) {
     r.learning_path.length ? [el("p", { class: "subhead" }, "Learn next, in this order"),
       el("ol", { class: "path" }, r.learning_path.slice(0, 5).map((step) =>
         el("li", {}, el("strong", {}, step.skill), " ",
-          el("span", { class: "why" }, `asked in ${pct(step.share_of_role_postings)} of these jobs · ${trend(step.market_growth)}`))))] : "",
+          el("span", { class: "why" }, `asked in ${pct(step.share_of_role_postings)} of these jobs · ${trend(step.market_growth)}`),
+          courseLinks(step.courses))))] : "",
   );
 }
 

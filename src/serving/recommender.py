@@ -13,6 +13,7 @@ Learning path (O3): the role's missing core skills, ordered by
              × (1 + affinity: how often it appears together with the skills you already have)
              × growth: its 2025 share of postings vs 2019 (clipped to 0.5..2, unknown = 1)
 i.e. learn first what the role needs most, that builds on what you know, and that is growing.
+Each step lists up to 3 courses from skill_courses.json (free NPTEL / SWAYAM first, then Coursera).
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ from src.features.build import EXPERIENCE, SKILLS
 from src.utils import load_aliases, normalise_skill, read_json
 
 GROWTH_CLIP = (0.5, 2.0)
+COURSES_PER_SKILL = 3
 
 
 @dataclass
@@ -47,6 +49,7 @@ class Recommender:
         self.growth = {s: _growth(v) for s, v in profiles.get("skill_growth", {}).items()}
         self.co = sp.load_npz(d / "skill_cooccurrence.npz").tocsr()
         self.co_index = {s: i for i, s in enumerate(read_json(d / "skill_vocab.json"))}
+        self.courses: dict[str, list[dict]] = read_json(d / "skill_courses.json")  # skill → [{title, provider, url}]
         self.aliases = load_aliases() if aliases is None else aliases
         self.vocab = self.model.named_steps["features"].named_transformers_["skills"].vocabulary_
         freq = self.co.diagonal()
@@ -102,6 +105,7 @@ class Recommender:
                     "affinity_with_your_skills": round(aff, 4),
                     "market_growth": round(growth, 3),
                     "priority": round(core[s] * (1 + aff) * growth, 4),
+                    "courses": self.courses.get(s, [])[:COURSES_PER_SKILL],
                 }
             )
         return sorted(steps, key=lambda x: -x["priority"])
