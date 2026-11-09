@@ -169,14 +169,16 @@ A scikit-learn `ColumnTransformer` combines:
 
 ### 5.4 MLOps Architecture & Roadmap
 
+Phase 2 (productionization & deployment) is documented step by step in [docs/PHASE2.md](docs/PHASE2.md).
+
 | Stage | Focus | Tools Used / Planned | Status |
 |---|---|---|---|
 | **1–2** | Ingestion & Features | pandas, pyarrow, scikit-learn, fg-data-profiling | ✅ Done |
 | **3** | Versioning & Storage | Git, DVC, DagsHub Remote Storage (S3 API) | ✅ Done |
 | **4a** | Baselines & Tracking | scikit-learn, LightGBM, MLflow (DagsHub hosted) | ✅ Done |
 | **4b** | Hyperparameter Tuning | Optuna Bayesian optimization | ⏳ Next |
-| **5** | Validation & Testing | pytest (43 tests), skops safe loading, SHAP analysis | 🟡 In progress |
-| **6** | Packaging | Docker / Podman, ONNX model quantization | ⏳ Planned |
-| **7** | Serving & API | FastAPI, Render / Hugging Face Spaces | ⏳ Planned |
+| **5** | Validation & Testing | pytest (87 tests), quality gate (`validate` stage: calibration, slices, behavioural cases), skops safe loading, MLflow Model Registry (`@champion` / `@challenger`) | ✅ Done (Phase 2) |
+| **6** | Packaging & CI/CD | Podman (OCI image), GHCR, GitHub Actions (CI + CD) | ✅ Done (Phase 2) |
+| **7** | Serving & API | FastAPI, static frontend, Render (Blueprint) | ✅ Done (Phase 2) |
 | **8** | Monitoring | Prometheus, Grafana, NannyML / custom JS divergence | ⏳ Planned |
 | **9** | Continuous Retraining | GitHub Actions automated `dvc repro` workflow | ⏳ Planned |
