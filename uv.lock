@@ -448,55 +448,72 @@ wheels = [
 
 [[package]]
 name = "career-guidance"
-version = "0.1.0"
+version = "0.2.0"
 source = { virtual = "." }
+default-groups = ["dev", "pipeline", "serve"]
 dependencies = [
-    { name = "dvc", extra = ["s3"] },
-    { name = "fg-data-profiling" },
     { name = "lightgbm" },
-    { name = "matplotlib" },
-    { name = "mlflow" },
-    { name = "openpyxl" },
     { name = "pandas" },
-    { name = "pyarrow" },
-    { name = "python-dotenv" },
     { name = "pyyaml" },
     { name = "scikit-learn" },
+    { name = "skops" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "ipykernel" },
     { name = "jupyter" },
-    { name = "matplotlib" },
     { name = "pytest" },
     { name = "python-pptx" },
     { name = "ruff" },
 ]
+pipeline = [
+    { name = "dvc", extra = ["s3"] },
+    { name = "fg-data-profiling" },
+    { name = "matplotlib" },
+    { name = "mlflow" },
+    { name = "openpyxl" },
+    { name = "pyarrow" },
+    { name = "python-dotenv" },
+]
+serve = [
+    { name = "fastapi" },
+    { name = "python-multipart" },
+    { name = "uvicorn" },
+]
 
 [package.metadata]
 requires-dist = [
-    { name = "dvc", extras = ["s3"], specifier = ">=3.67.1" },
-    { name = "fg-data-profiling", specifier = ">=4.20.0" },
     { name = "lightgbm", specifier = ">=4.7.0" },
-    { name = "matplotlib", specifier = ">=3.11.2" },
-    { name = "mlflow", specifier = ">=3.17.1" },
-    { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = ">=2.3.3" },
-    { name = "pyarrow", specifier = ">=25.0.1" },
-    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "scikit-learn", specifier = ">=1.9.1" },
+    { name = "skops", specifier = ">=0.16.0" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "httpx", specifier = ">=0.28.0" },
     { name = "ipykernel", specifier = ">=7.4.0" },
     { name = "jupyter", specifier = ">=1.1.1" },
-    { name = "matplotlib", specifier = ">=3.11.2" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "python-pptx", specifier = ">=1.0.2" },
     { name = "ruff", specifier = ">=0.16.10" },
+]
+pipeline = [
+    { name = "dvc", extras = ["s3"], specifier = ">=3.67.1" },
+    { name = "fg-data-profiling", specifier = ">=4.20.0" },
+    { name = "matplotlib", specifier = ">=3.11.2" },
+    { name = "mlflow", specifier = ">=3.17.1" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pyarrow", specifier = ">=25.0.1" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
+]
+serve = [
+    { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "uvicorn", specifier = ">=0.32.0" },
 ]
 
 [[package]]
@@ -4171,6 +4188,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/21/25/5473e46b179f8e8b4ad3aeeb36773d1701b7770eaf5e5bc2025c7303b598/python_json_logger-4.2.0.tar.gz", hash = "sha256:e371ebe22ec01e289850102091a2b1f6fc9e655c7f1f5f29073936756c290afa", size = 18211, upload-time = "2026-08-15T11:36:38.232Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/dc/55/6467fde553886cb293e41538f3a8b4e4fd4688c6df242cf982162d8367fb/python_json_logger-4.2.0-py3-none-any.whl", hash = "sha256:158a52126fcd6869e09574d2b66272666f3dc8f468c62637ef9a1fa883719cb9", size = 14988, upload-time = "2026-08-15T11:36:36.821Z" },
+]
+
+[[package]]
+name = "python-multipart"
+version = "0.0.33"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/b7/15b905f6142a9a8a68f66900788da1a32e4d4254452783b37ad1eccb0506/python_multipart-0.0.33.tar.gz", hash = "sha256:b8112424a6abd162ec08d390565dd113ad699f2fe6fef3c987b8bbcbfe9e390d", size = 50499, upload-time = "2026-10-31T14:23:47.461Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/1b/6b1b4164ec734cac911460ab599bfbe46afedd42c5c9627fe4235942c314/python_multipart-0.0.33-py3-none-any.whl", hash = "sha256:8f16c07b36add9da6b2ee87d3efcaf0a45a6de9c3d0a5dd94e9ccf7675a7bc45", size = 32253, upload-time = "2026-10-31T14:23:46.33Z" },
 ]
 
 [[package]]
