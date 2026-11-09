@@ -1,0 +1,10 @@
+# Allow-list: the image gets only what the API needs. Everything else (data/, models/, .venv/,
+# .env with secrets, reports/, notebooks/...) never reaches the Docker build context.
+*
+!pyproject.toml
+!uv.lock
+!src/
+!configs/skill_aliases.yaml
+!bundle/
+**/__pycache__
+**/*.pyc
