@@ -1,0 +1,107 @@
+// CI/CD flow of the GitHub Actions workflows (.github/workflows/ci.yml, cd.yml, keepwarm.yml).
+// Re-render after editing:  dot -Tpng -Gdpi=170 docs/images/cicd-flow.dot -o docs/images/cicd-flow.png
+digraph cicd {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=15, nodesep=0.45, ranksep=0.42, pad=0.35,
+         bgcolor="white", newrank=true,
+         label=<<b>Career Guidance: CI/CD with GitHub Actions</b><br/><font point-size="11" color="#5d6676">solid = workflow steps and triggers    dashed = data / network    red = failure path</font><br/> >,
+         labelloc=t, labeljust=l];
+  node  [fontname="DejaVu Sans", fontsize=11, shape=box, style="rounded,filled", fillcolor="#ffffff",
+         color="#9aa3b2", penwidth=1.3, margin="0.18,0.08", width=2.3];
+  edge  [fontname="DejaVu Sans", fontsize=9, color="#4a5568", arrowsize=0.7, penwidth=1.1];
+
+  // ── triggers (top row) ──────────────────────────────────────────────────────
+  subgraph cluster_triggers {
+    label=<<b>Triggers</b>>; style="rounded,filled"; fillcolor="#f4f5f7"; color="#d5d9e0"; fontsize=12;
+    pr     [label=<<b>Pull request</b><br/><font point-size="9">teammate or you</font>>];
+    push   [label=<<b>Merge / push to main</b>>];
+    laptop [label=<<b>Laptop</b><br/><font point-size="9">dvc repro → validate → register<br/>new @champion → then a manual run</font>>];
+    manual [label=<<b>Manual run</b><br/><font point-size="9">gh workflow run cd.yml<br/>-f alias=previous-champion = rollback</font>>];
+    { rank=same; pr; push; laptop; manual; }
+  }
+
+  // ── CI column ───────────────────────────────────────────────────────────────
+  subgraph cluster_ci {
+    label=<<b>CI</b>  <font point-size="10">ci.yml: is this change safe to merge?</font>>;
+    style="rounded,filled"; fillcolor="#eaf1fd"; color="#9db8ec"; fontsize=13;
+    ci_test [label=<<b>test</b><br/><font point-size="9">uv sync --frozen<br/>ruff check + format<br/>pytest (88 tests)</font>>, color="#2459d6"];
+    ci_cont [label=<<b>container</b><br/><font point-size="9">toy model bundle<br/>podman build --format docker<br/>smoke_test.sh</font>>, color="#2459d6", width=2.1];
+    ci_gate [label=<<b>model-gate</b><br/><font point-size="9">dvc pull model + test split<br/>validate --strict<br/>model card → run summary</font>>, color="#2459d6", width=2.1];
+    ci_ok   [label=<<b>All jobs passed<br/>on main?</b>>, shape=diamond, style="filled", fillcolor="#eaf1fd", color="#2459d6", fontsize=10, width=2.0];
+    blocked [label=<<b>✗ PR blocked</b><br/><font point-size="9">fix and push again<br/>(nothing deployed)</font>>, color="#c0392b", fontcolor="#c0392b"];
+  }
+
+  // ── CD column ───────────────────────────────────────────────────────────────
+  subgraph cluster_cd {
+    label=<<b>CD</b>  <font point-size="10">cd.yml: ship the champion</font>>;
+    style="rounded,filled"; fillcolor="#e9f6ee"; color="#9fd3b2"; fontsize=13;
+    cd_fetch  [label=<<b>1  Fetch @champion</b><br/><font point-size="9">(or chosen alias) from the<br/>MLflow registry → bundle/</font>>, color="#1f7a4a"];
+    cd_decide [label=<<b>2  Live differs?</b><br/><font point-size="9">model version or serving code<br/>vs /health · manual = always</font>>, shape=diamond, style="filled", fillcolor="#e9f6ee", color="#1f7a4a", fontsize=10, width=2.9];
+    cd_skip   [label=<<b>Skip</b><br/><font point-size="9">already live</font>>, color="#7a8494", width=1.3];
+    cd_build  [label=<<b>3  podman build</b><br/><font point-size="9">tag model-v&lt;N&gt;-&lt;sha&gt;</font>>, color="#1f7a4a"];
+    cd_smoke  [label=<<b>4  Smoke test</b><br/><font point-size="9">the exact image, real model</font>>, color="#1f7a4a"];
+    cd_fail   [label=<<b>✗ Deploy fails</b><br/><font point-size="9">nothing pushed;<br/>live version untouched</font>>, color="#c0392b", fontcolor="#c0392b", width=1.6];
+    cd_push   [label=<<b>5  Push to GHCR</b><br/><font point-size="9">built-in GITHUB_TOKEN</font>>, color="#1f7a4a"];
+    cd_ready  [label=<<b>Render<br/>configured?</b>>, shape=diamond, style="filled", fillcolor="#e9f6ee", color="#1f7a4a", fontsize=10, width=1.8];
+    cd_stop   [label=<<b>Stop</b><br/><font point-size="9">first run: image<br/>pushed only</font>>, color="#7a8494", width=1.3];
+    cd_hook   [label=<<b>6  Render deploy hook</b><br/><font point-size="9">&amp;imgURL=&lt;exact tag&gt;</font>>, color="#1f7a4a"];
+    cd_wait   [label=<<b>7  Wait until live</b><br/><font point-size="9">/health shows new<br/>version + revision</font>>, color="#1f7a4a"];
+    { rank=same; cd_build; cd_skip; }
+    { rank=same; cd_smoke; cd_fail; }
+    { rank=same; cd_hook; cd_stop; }
+  }
+
+  // ── services column ─────────────────────────────────────────────────────────
+  subgraph cluster_ext {
+    label=<<b>Services</b>>; style="rounded,filled"; fillcolor="#fdf6e7"; color="#e8cf95"; fontsize=13;
+    dagshub [label=<<b>DagsHub</b><br/><font point-size="9">DVC storage · MLflow<br/>tracking + Model Registry</font>>, shape=cylinder, color="#b7791f"];
+    ghcr    [label=<<b>GHCR</b><br/><font point-size="9">career-guidance-api images</font>>, shape=cylinder, color="#b7791f"];
+    api     [label=<<b>Render: API</b><br/><font point-size="9">FastAPI container (free tier)</font>>, color="#b7791f"];
+    web     [label=<<b>Render: frontend</b><br/><font point-size="9">static site; Render rebuilds it<br/>when frontend/** changes on main</font>>, color="#b7791f"];
+    user    [label=<<b>User's browser</b>>, shape=oval, color="#b7791f", width=1.8];
+    kw      [label=<<b>keepwarm.yml</b>  <font point-size="9">(cron)</font><br/><font point-size="9">ping /health every 10 min<br/>(free tier sleeps after 15)</font>>, color="#7a8494"];
+    dagshub -> ghcr -> api -> web -> user [style=invis];
+  }
+
+  { rank=same; cd_fetch; dagshub; }
+
+  // line services up with the steps that use them
+  { rank=same; cd_push; ghcr; }
+  { rank=same; cd_wait; api; }
+
+  // ── flow ────────────────────────────────────────────────────────────────────
+  pr   -> ci_test;
+  push -> ci_test;
+  ci_test -> ci_cont;
+  ci_test -> ci_gate;
+  ci_cont -> ci_ok;
+  ci_gate -> ci_ok;
+  ci_gate -> blocked [color="#c0392b", fontcolor="#c0392b", style=dashed, xlabel="gate fails "];
+  ci_ok -> blocked [color="#c0392b", fontcolor="#c0392b", style=dashed, label=" no (any job failed)"];
+
+  manual -> cd_fetch [label=" workflow_dispatch"];
+  ci_ok -> cd_fetch [label=<<b>yes</b> (workflow_run)>, constraint=false, color="#1f7a4a", penwidth=1.6];
+
+  cd_fetch -> cd_decide;
+  cd_decide -> cd_build [label=" yes"];
+  cd_decide -> cd_skip [label=" no"];
+  cd_build -> cd_smoke;
+  cd_smoke -> cd_push [label=" pass"];
+  cd_smoke -> cd_fail [color="#c0392b", fontcolor="#c0392b", style=dashed, label=" fail"];
+  cd_push -> cd_ready;
+  cd_ready -> cd_hook [label=" yes"];
+  cd_ready -> cd_stop [label=" no"];
+  cd_hook -> cd_wait;
+
+
+  // data / network (dashed)
+  laptop   -> dagshub [style=dashed, color="#b7791f", fontcolor="#8a5a12", label="dvc push · register", constraint=false];
+  ci_gate  -> dagshub [style=dashed, color="#b7791f", fontcolor="#8a5a12", label="dvc pull", constraint=false];
+  dagshub  -> cd_fetch [style=dashed, color="#b7791f", fontcolor="#8a5a12", label="model + lookups"];
+  cd_push  -> ghcr [style=dashed, color="#b7791f"];
+  ghcr     -> api [style=dashed, color="#b7791f", fontcolor="#8a5a12", label=" pulls image", constraint=false];
+  cd_hook  -> api [style=dashed, color="#b7791f", constraint=false];
+  cd_wait  -> api [style=dashed, color="#b7791f", fontcolor="#8a5a12", label="/health"];
+  kw       -> api [style=dashed, color="#b7791f", constraint=false];
+  web      -> user [style=dashed, color="#b7791f", dir=back, constraint=false];
+  web      -> api [style=dashed, color="#b7791f", fontcolor="#8a5a12", label=" /skills · /predict", dir=forward, constraint=false];
+}

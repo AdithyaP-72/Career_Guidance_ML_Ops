@@ -190,6 +190,10 @@ image's own HEALTHCHECK, makes one real prediction and checks the top role. CI a
 
 ### 1.8 CI: `.github/workflows/ci.yml` ("is this change safe to merge?")
 
+The whole CI/CD flow in one picture (source: `images/cicd-flow.dot`, re-render with the command at its top):
+
+![CI/CD flow](images/cicd-flow.png)
+
 Triggers: every **pull request**, every **push to main**, and manually.
 
 ```
