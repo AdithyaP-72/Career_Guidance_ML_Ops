@@ -6,12 +6,12 @@ Upload a PDF or DOCX, get back the person's skills **in the role model's own spe
 ```python
 from src.serving.resume import extract_skills, ResumeError
 
-result = extract_skills(file_bytes, filename, top_n=30)    # -> ResumeResult
-result.names      # ['python', 'react.js', 'machine learning', ...]  best first
-result.skills     # same, as ExtractedSkill(skill, score, count, in_skills_section, fuzzy)
-result.message    # None, or a plain-words reason when nothing usable was found (safe to show the user)
-result.code       # 'ok' | 'no_text' (scanned PDF) | 'no_skills'
-result.warnings   # e.g. 'Only the first 8 pages were read.'
+result = extract_skills(file_bytes, filename, top_n=30)  # -> ResumeResult
+result.names  # ['python', 'react.js', 'machine learning', ...]  best first
+result.skills  # same, as ExtractedSkill(skill, score, count, in_skills_section, fuzzy)
+result.message  # None, or a plain-words reason when nothing usable was found (safe to show the user)
+result.code  # 'ok' | 'no_text' (scanned PDF) | 'no_skills'
+result.warnings  # e.g. 'Only the first 8 pages were read.'
 # raises ResumeError (message is safe to show) for: wrong type / .doc, empty, >5 MB, corrupt, password-protected
 ```
 Suggested API mapping: `ResumeError` -> HTTP 422 (413 for "too large"); `result.code == "no_text"` -> 200 with an empty

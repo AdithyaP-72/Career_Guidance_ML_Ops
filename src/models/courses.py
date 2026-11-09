@@ -15,11 +15,9 @@ Outputs:
 
 from __future__ import annotations
 
-import json
 import random
 import re
 from collections import defaultdict
-from pathlib import Path
 
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -69,6 +67,7 @@ def deduplicate_nptel(df: pd.DataFrame) -> pd.DataFrame:
     Normalises canonical title by stripping 'NOC:' prefixes and punctuation.
     Keeps the run with the longest summary and non-empty URL.
     """
+
     def canonical_title(t: str) -> str:
         t = re.sub(r"^(?:noc\s*:\s*)+", "", str(t).strip(), flags=re.IGNORECASE)
         t = re.sub(r"[^a-zA-Z0-9\s]", " ", t)
@@ -97,11 +96,13 @@ def parse_coursera_courses(df: pd.DataFrame, aliases: dict[str, str]) -> dict[st
             norm = normalise_skill(t, aliases)
             if norm and norm not in seen_skills:
                 seen_skills.add(norm)
-                lookup[norm].append({
-                    "title": str(row["name"]).strip(),
-                    "provider": "Coursera",
-                    "url": str(row["url"]).strip(),
-                })
+                lookup[norm].append(
+                    {
+                        "title": str(row["name"]).strip(),
+                        "provider": "Coursera",
+                        "url": str(row["url"]).strip(),
+                    }
+                )
     return lookup
 
 
@@ -125,10 +126,13 @@ def is_course_relevant_for_skill(skill: str, title: str) -> bool:
 def build_nptel_search_index(df_nptel: pd.DataFrame) -> tuple[TfidfVectorizer, any]:
     """Build TF-IDF matrix for NPTEL/SWAYAM search documents (title weighted 3x + summary)."""
     docs = (
-        df_nptel["clean_title"] + " . " +
-        df_nptel["clean_title"] + " . " +
-        df_nptel["clean_title"] + " . " +
-        df_nptel["clean_summary"]
+        df_nptel["clean_title"]
+        + " . "
+        + df_nptel["clean_title"]
+        + " . "
+        + df_nptel["clean_title"]
+        + " . "
+        + df_nptel["clean_summary"]
     )
     tfidf = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), min_df=2)
     matrix = tfidf.fit_transform(docs)
@@ -187,11 +191,13 @@ def map_skills_to_courses(
                     if title not in seen_titles:
                         seen_titles.add(title)
                         r = nptel_records[idx]
-                        matched.append({
-                            "title": r["clean_title"],
-                            "provider": r["provider"],
-                            "url": r["url"],
-                        })
+                        matched.append(
+                            {
+                                "title": r["clean_title"],
+                                "provider": r["provider"],
+                                "url": r["url"],
+                            }
+                        )
                         break
             if len(matched) >= max_courses:
                 break
@@ -215,11 +221,13 @@ def map_skills_to_courses(
                     if not is_course_relevant_for_skill(skill, r["clean_title"]):
                         continue
                     seen_titles.add(r["clean_title"])
-                    matched.append({
-                        "title": r["clean_title"],
-                        "provider": r["provider"],
-                        "url": r["url"],
-                    })
+                    matched.append(
+                        {
+                            "title": r["clean_title"],
+                            "provider": r["provider"],
+                            "url": r["url"],
+                        }
+                    )
                     if len(matched) >= max_courses:
                         break
 
@@ -234,11 +242,13 @@ def map_skills_to_courses(
             for c in coursera_cands:
                 if c["title"] not in seen_titles and is_course_relevant_for_skill(skill, c["title"]):
                     seen_titles.add(c["title"])
-                    matched.append({
-                        "title": c["title"],
-                        "provider": "Coursera",
-                        "url": c["url"],
-                    })
+                    matched.append(
+                        {
+                            "title": c["title"],
+                            "provider": "Coursera",
+                            "url": c["url"],
+                        }
+                    )
                     if len(matched) >= max_courses:
                         break
 
@@ -250,11 +260,13 @@ def map_skills_to_courses(
                     if pat.search(c_title) and is_course_relevant_for_skill(skill, c_title):
                         if c_title not in seen_titles:
                             seen_titles.add(c_title)
-                            matched.append({
-                                "title": c_title,
-                                "provider": "Coursera",
-                                "url": r["url"],
-                            })
+                            matched.append(
+                                {
+                                    "title": c_title,
+                                    "provider": "Coursera",
+                                    "url": r["url"],
+                                }
+                            )
                             break
                 if len(matched) >= max_courses:
                     break
@@ -302,14 +314,16 @@ def evaluate_sample_relevance(
         if is_relevant:
             relevant_count += 1
 
-        sample_report.append({
-            "index": idx,
-            "skill": skill,
-            "course_title": title,
-            "provider": provider,
-            "url": url,
-            "is_relevant": is_relevant,
-        })
+        sample_report.append(
+            {
+                "index": idx,
+                "skill": skill,
+                "course_title": title,
+                "provider": provider,
+                "url": url,
+                "is_relevant": is_relevant,
+            }
+        )
 
     relevance_pct = round(relevant_count / len(sampled), 4)
     return relevance_pct, sample_report
@@ -326,21 +340,29 @@ def main() -> None:
     for role_info in profiles_data.get("roles", {}).values():
         core_skills_set.update(role_info.get("core_skills", {}).keys())
     core_skills = sorted(list(core_skills_set))
-    log.info("Found %d unique core learning-path skills across %d roles.", len(core_skills), len(profiles_data.get("roles", {})))
+    log.info(
+        "Found %d unique core learning-path skills across %d roles.",
+        len(core_skills),
+        len(profiles_data.get("roles", {})),
+    )
 
     # Load Coursera raw data
     coursera_path = RAW / "courses" / "coursera_courses_2025.csv"
     log.info("Loading Coursera courses from %s...", coursera_path)
     df_coursera = pd.read_csv(coursera_path)
     coursera_by_skill = parse_coursera_courses(df_coursera, aliases)
-    log.info("Indexed %d Coursera courses across %d distinct normalized tags.", len(df_coursera), len(coursera_by_skill))
+    log.info(
+        "Indexed %d Coursera courses across %d distinct normalized tags.", len(df_coursera), len(coursera_by_skill)
+    )
 
     # Load NPTEL / SWAYAM raw data
     nptel_path = RAW / "courses" / "nptel_swayam_courses.csv"
     log.info("Loading NPTEL/SWAYAM courses from %s...", nptel_path)
     df_nptel_raw = pd.read_csv(nptel_path)
     df_nptel = deduplicate_nptel(df_nptel_raw)
-    log.info("Deduplicated NPTEL/SWAYAM courses: %d raw -> %d unique canonical courses.", len(df_nptel_raw), len(df_nptel))
+    log.info(
+        "Deduplicated NPTEL/SWAYAM courses: %d raw -> %d unique canonical courses.", len(df_nptel_raw), len(df_nptel)
+    )
 
     # Map skills to courses
     skill_courses = map_skills_to_courses(core_skills, df_nptel, coursera_by_skill, df_coursera, aliases, params)
@@ -348,7 +370,9 @@ def main() -> None:
     # Calculate coverage metrics
     total_skills = len(core_skills)
     covered_skills = sum(1 for courses in skill_courses.values() if len(courses) > 0)
-    nptel_covered = sum(1 for courses in skill_courses.values() if any(c["provider"] in ("NPTEL", "SWAYAM") for c in courses))
+    nptel_covered = sum(
+        1 for courses in skill_courses.values() if any(c["provider"] in ("NPTEL", "SWAYAM") for c in courses)
+    )
     coursera_covered = sum(1 for courses in skill_courses.values() if any(c["provider"] == "Coursera" for c in courses))
 
     coverage_pct = round(covered_skills / total_skills, 4) if total_skills else 0.0
@@ -363,7 +387,12 @@ def main() -> None:
     # Save output artifacts
     out_courses_path = MODELS / "skill_courses.json"
     write_json(skill_courses, out_courses_path)
-    log.info("Saved course lookup to %s (%d skills, %.2f KB)", out_courses_path, len(skill_courses), out_courses_path.stat().st_size / 1024)
+    log.info(
+        "Saved course lookup to %s (%d skills, %.2f KB)",
+        out_courses_path,
+        len(skill_courses),
+        out_courses_path.stat().st_size / 1024,
+    )
 
     # Save metrics report
     metrics = {
@@ -390,7 +419,9 @@ def main() -> None:
         log.info("Saved relevance verification sample to %s", sample_csv_path)
 
     log.info("=== Courses Stage Summary ===")
-    log.info("Coverage: %d/%d (%.1f%%) learning-path skills have courses.", covered_skills, total_skills, coverage_pct * 100)
+    log.info(
+        "Coverage: %d/%d (%.1f%%) learning-path skills have courses.", covered_skills, total_skills, coverage_pct * 100
+    )
     log.info("NPTEL/SWAYAM (free Indian): %d/%d (%.1f%%)", nptel_covered, total_skills, nptel_coverage_pct * 100)
     log.info("Coursera fallback: %d/%d (%.1f%%)", coursera_covered, total_skills, coursera_coverage_pct * 100)
     log.info("Sample Relevance: %.1f%% across %d hand-checked pairs.", relevance_pct * 100, len(sample_report))
