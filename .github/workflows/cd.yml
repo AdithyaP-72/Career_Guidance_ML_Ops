@@ -1,0 +1,158 @@
+# CD: "ship the champion".  registry → image → test → GHCR → Render → verify.
+#
+# When it runs:
+#   - automatically, after CI succeeds on main (a merged PR or a push)
+#   - by hand (Actions tab → CD → Run workflow, or `gh workflow run cd.yml`), e.g. right after
+#     `register` promoted a new @champion, or with alias=previous-champion to roll back
+#
+# It compares what SHOULD be live (code at this commit + the registry's model) with what IS live
+# (/health reports revision + model version) and only deploys when they differ, so a README-only
+# commit doesn't restart the server. A manual run always deploys.
+
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      alias:
+        description: "Registry alias to deploy (previous-champion = roll back)"
+        type: choice
+        options: [champion, previous-champion, challenger]
+        default: champion
+
+permissions:
+  contents: read
+  packages: write        # push to GHCR with the built-in GITHUB_TOKEN
+
+# Never run two deploys at once; queue them instead.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+
+jobs:
+  deploy:
+    name: Build, test, push, deploy
+    # Automatic runs only when CI passed. (workflow_run also fires when CI fails.)
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production   # shows up under the repo's "Deployments", with the live URL
+      url: ${{ vars.RENDER_API_URL }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # workflow_run: deploy exactly the commit CI tested, not whatever main is now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0   # full history, to diff against the live revision
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.23"
+          enable-cache: true
+
+      - name: Install the pipeline tools (MLflow client)
+        run: uv sync --frozen --no-default-groups --group pipeline
+
+      - name: Fetch the model from the MLflow registry
+        env:
+          MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+        run: uv run python -m src.serving.bundle --from-registry --alias "${{ inputs.alias || 'champion' }}"
+
+      - name: Decide whether to deploy
+        id: plan
+        env:
+          API_URL: ${{ vars.RENDER_API_URL }}
+          MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          SHA=$(git rev-parse --short=7 HEAD)
+          VERSION=$(python3 -c 'import json; print(json.load(open("bundle/meta.json"))["version"])')
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/career-guidance-api"   # GHCR needs lowercase
+          TAG="$IMAGE:model-v$VERSION-$SHA"
+          {
+            echo "sha=$SHA"
+            echo "version=$VERSION"
+            echo "image=$IMAGE"
+            echo "tag=$TAG"
+          } >> "$GITHUB_OUTPUT"
+
+          # What is live right now? (May be asleep or not deployed yet: then just deploy.)
+          LIVE=$(curl -fsS --max-time 60 "$API_URL/health" || echo '{}')
+          LIVE_SHA=$(echo "$LIVE" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("revision",""))')
+          LIVE_VERSION=$(echo "$LIVE" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))')
+          echo "live: revision=$LIVE_SHA model=v$LIVE_VERSION | wanted: revision=$SHA model=v$VERSION"
+
+          SERVING_PATHS=(src/ configs/skill_aliases.yaml Dockerfile pyproject.toml uv.lock)   # what goes into the image
+          if [ "$MANUAL" = "true" ]; then
+            DEPLOY=true; WHY="manual run"
+          elif [ -z "$LIVE_SHA" ] || ! git cat-file -e "$LIVE_SHA^{commit}" 2>/dev/null; then
+            DEPLOY=true; WHY="live revision unknown"
+          elif [ "$LIVE_VERSION" != "$VERSION" ]; then
+            DEPLOY=true; WHY="model changed (v$LIVE_VERSION → v$VERSION)"
+          elif ! git diff --quiet "$LIVE_SHA" HEAD -- "${SERVING_PATHS[@]}"; then
+            DEPLOY=true; WHY="serving code changed since $LIVE_SHA"
+          else
+            DEPLOY=false; WHY="live already runs this code and model"
+          fi
+          echo "deploy=$DEPLOY" >> "$GITHUB_OUTPUT"
+          echo "### Deploy: $DEPLOY ($WHY)" >> "$GITHUB_STEP_SUMMARY"
+          echo "deploy=$DEPLOY because: $WHY"
+
+      - name: Build image (Podman)
+        if: steps.plan.outputs.deploy == 'true'
+        run: |
+          podman build --format docker \
+            --build-arg GIT_SHA=${{ steps.plan.outputs.sha }} \
+            --label org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }} \
+            --label org.opencontainers.image.revision=${{ steps.plan.outputs.sha }} \
+            --label org.opencontainers.image.version=model-v${{ steps.plan.outputs.version }} \
+            -t ${{ steps.plan.outputs.tag }} -t ${{ steps.plan.outputs.image }}:latest .
+
+      - name: Smoke test the exact image we are about to ship
+        if: steps.plan.outputs.deploy == 'true'
+        run: scripts/smoke_test.sh ${{ steps.plan.outputs.tag }} Accountant
+
+      - name: Push to GHCR
+        if: steps.plan.outputs.deploy == 'true'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          podman push ${{ steps.plan.outputs.tag }}
+          podman push ${{ steps.plan.outputs.image }}:latest
+
+      - name: Tell Render to deploy this exact image
+        if: steps.plan.outputs.deploy == 'true'
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          ENCODED=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$TAG")
+          curl -fsS -X POST "$HOOK&imgURL=$ENCODED" -o /dev/null
+          echo "deploy requested for $TAG"
+
+      - name: Wait until Render serves the new version
+        if: steps.plan.outputs.deploy == 'true'
+        env:
+          API_URL: ${{ vars.RENDER_API_URL }}
+          WANT_SHA: ${{ steps.plan.outputs.sha }}
+          WANT_VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          # Render pulls ~700 MB and the app needs ~3 min to start on 0.1 CPU, so be patient.
+          for i in $(seq 1 60); do
+            LIVE=$(curl -fsS --max-time 30 "$API_URL/health" || echo '{}')
+            if echo "$LIVE" | python3 -c "import json,sys,os; h=json.load(sys.stdin); sys.exit(0 if h.get('revision')==os.environ['WANT_SHA'] and str(h.get('version'))==os.environ['WANT_VERSION'] else 1)"; then
+              echo "live: $LIVE"
+              echo "✅ live at $API_URL: model v$WANT_VERSION, revision $WANT_SHA" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "waiting ($i/60)… live says: $LIVE"
+            sleep 20
+          done
+          echo "Render did not switch to the new version within 20 minutes" && exit 1

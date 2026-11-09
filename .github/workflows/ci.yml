@@ -1,0 +1,109 @@
+# CI: "is this change safe to merge?"  Runs on every pull request and every push to main.
+#
+#   test        lint + format check + all unit tests (toy data; no secrets needed)
+#   container   build the API image with Podman and smoke-test it (toy model)
+#   model-gate  pull the model committed in dvc.lock from DagsHub and run the quality gate on it
+#               (needs secrets, so it is skipped for pull requests from forks)
+#
+# CD (cd.yml) only runs after this whole workflow succeeds on main.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push to the same branch/PR cancels the older, now-pointless run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+
+jobs:
+  test:
+    name: Lint + unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.23"     # same uv as the Dockerfile and our laptops
+          enable-cache: true     # reuse downloaded packages between runs
+
+      - name: Install dependencies (exact versions from uv.lock)
+        run: uv sync --frozen    # --frozen: fail instead of silently changing the lockfile
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Formatting
+        run: uv run ruff format --check .
+
+      - name: Unit tests
+        run: uv run pytest -q
+
+  container:
+    name: Build + smoke-test image (Podman)
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.23"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Toy model bundle (the real model is only used by CD)
+        run: uv run python -m tests.toy_bundle bundle
+
+      - name: Build image
+        run: podman --version && podman build --format docker --build-arg "GIT_SHA=${GITHUB_SHA::7}" -t career-api:ci .
+
+      - name: Smoke test
+        run: scripts/smoke_test.sh career-api:ci Accountant
+
+  model-gate:
+    name: Quality gate on the committed model
+    needs: test
+    runs-on: ubuntu-24.04
+    # Secrets are not available to pull requests from forks, so skip there.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.23"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: DagsHub credentials for DVC (written to .dvc/config.local, never committed)
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          uv run dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
+          uv run dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
+
+      - name: Pull only what the gate needs (the model and the test split, ~6 MB)
+        run: uv run dvc pull models/model.joblib data/processed/test.parquet
+
+      - name: Quality gate (fails the job if the model fails a check)
+        run: uv run python -m src.models.validate --strict
+
+      - name: Model card in the run summary
+        if: always()
+        run: test -f reports/model_card.md && cat reports/model_card.md >> "$GITHUB_STEP_SUMMARY" || true

@@ -1,0 +1,34 @@
+# Render Blueprint: our hosting, written as code. Render reads this file from the repo and creates
+# (or updates) both services to match. Dashboard → New → Blueprint → pick this repo.
+#
+#   career-guidance-api   the FastAPI container. Render does NOT build it: it runs the image our CD
+#                         workflow built, tested and pushed to GHCR. CD triggers each deploy through a
+#                         deploy hook with the exact image tag, so what runs here is what CI tested.
+#   career-guidance-web   the static frontend (frontend/). Free static sites never sleep and use no
+#                         instance hours; Render rebuilds it itself when frontend/ changes on main.
+
+services:
+  - type: web
+    name: career-guidance-api
+    runtime: image
+    image:
+      url: ghcr.io/adithyap-72/career-guidance-api:latest   # GHCR names must be lowercase
+    plan: free              # 512 MB RAM, 0.1 CPU, sleeps after 15 min idle (keepwarm.yml pings it)
+    region: singapore       # closest Render region to India
+    healthCheckPath: /health
+    envVars:
+      - key: CORS_ORIGINS   # who may call the API from a browser. "*" is fine for a demo;
+        value: "*"          # for real use, set it to the frontend's URL only.
+
+  - type: web
+    name: career-guidance-web
+    runtime: static
+    # The only "build": write the API's address into config.js (see frontend/index.html).
+    buildCommand: echo "window.API_URL = \"$API_URL\";" > frontend/config.js
+    staticPublishPath: ./frontend
+    buildFilter:
+      paths:
+        - frontend/**       # redeploy the site only when the frontend changes
+    envVars:
+      - key: API_URL        # if Render gives the API a different URL (name taken), change it here
+        value: https://career-guidance-api.onrender.com

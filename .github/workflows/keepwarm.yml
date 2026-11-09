@@ -1,0 +1,22 @@
+# Keep the free Render API awake for the demo: it sleeps after 15 min without traffic, and waking
+# takes ~3 min on 0.1 CPU. A ping every 10 min keeps it up. One always-on service ≈ 744 h/month,
+# just inside Render's 750 free hours. (Free-tier workaround; GitHub may delay scheduled runs, and
+# pauses them after 60 days with no repository activity.) Disable it after the presentation:
+#   gh workflow disable keepwarm.yml
+
+name: Keep warm
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    if: vars.RENDER_API_URL != ''
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Ping /health
+        run: curl -fsS --max-time 60 "${{ vars.RENDER_API_URL }}/health" || echo "no answer yet (it may be waking up)"
