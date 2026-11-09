@@ -1,0 +1,51 @@
+index,skill,course_title,provider,url,is_relevant
+1,cold calling,Professional Selling: Step 2 - Prepare Like a High-Performer,Coursera,https://www.coursera.org/learn/professional-selling-step-2,True
+2,analytical,Advanced Food Analytical Techniques,SWAYAM,https://onlinecourses.swayam2.ac.in/ini26_ag05/preview,True
+3,jira,Agile with Atlassian Jira,Coursera,https://www.coursera.org/learn/agile-atlassian-jira,True
+4,hr,HR Analytics Using Excel,SWAYAM,https://onlinecourses.swayam2.ac.in/imb25_mg43/preview,True
+5,front office operations,Hotel Front Office Operations,Coursera,https://www.coursera.org/learn/hotel-front-office-operations,True
+6,css,"Programming with CSS, Javascript and HTML",Coursera,https://www.coursera.org/learn/bits-web-programming-with-css-javascript-html,True
+7,clinical data management,Introduction to Bioinformatics,Coursera,https://www.coursera.org/learn/bits-introduction-to-bioinformatics,True
+8,ux design,Figma UI UX Design Essentials Pt.2: Layout & Components,Coursera,https://www.coursera.org/learn/figma-ui-ux-design-essentials-pt2-layout--components,True
+9,calendar management,Google Meet,Coursera,https://www.coursera.org/learn/google-meet,True
+10,regulatory,Current regulatory requirements for conducting clinical trials in India for investigational new drug/new drug (Version 2.0),SWAYAM,https://onlinecourses.nptel.ac.in/noc20_ge13/preview,True
+11,ansible,Fundamentals of Ansible,Coursera,https://www.coursera.org/learn/fundamentals-of-ansible,True
+12,angular,Frontend for Java Full Stack Development,Coursera,https://www.coursera.org/learn/frontend-development-for-java-full-stack,True
+13,channel sales,Sales And Distribution Management,SWAYAM,https://onlinecourses.nptel.ac.in/noc22_mg46/preview,True
+14,food safety,Environmental Contaminants and Risk to Food Safety,SWAYAM,https://onlinecourses.swayam2.ac.in/ini26_ag04/preview,True
+15,google ads,Assess for Success: Marketing Analytics and Measurement,Coursera,https://www.coursera.org/learn/assess-for-success,True
+16,tableau,Advanced Data Visualization with Tableau,Coursera,https://www.coursera.org/learn/advanced-data-visualization-with-tableau,True
+17,android,Android Mobile Application Development,SWAYAM,https://onlinecourses.swayam2.ac.in/nou22_ge57/preview,True
+18,web services,CIT-003: Web Based Technologies and Multimedia Applications,SWAYAM,https://onlinecourses.swayam2.ac.in/nou24_cs12/preview,False
+19,excel,HR Analytics Using Excel,SWAYAM,https://onlinecourses.swayam2.ac.in/imb25_mg43/preview,True
+20,regional sales,B2B and Territory Sales Strategies and Techniques,Coursera,https://www.coursera.org/learn/b2b-and-territory-sales-strategies-and-techniques,True
+21,forecasting,Time Series Modelling and Forecasting with Applications in R,SWAYAM,https://onlinecourses.nptel.ac.in/noc25_cs71/preview,True
+22,salesforce,Lead Management in Salesforce,Coursera,https://www.coursera.org/learn/lead-management-in-salesforce,True
+23,keyword research,Generative AI: Accelerate your Digital Marketing Career,Coursera,https://www.coursera.org/learn/generative-ai--accelerate-your-digital-marketing-career,True
+24,accounting,Beginners Blueprint to Cost and Management Accounting,SWAYAM,https://onlinecourses.swayam2.ac.in/imb25_mg155/preview,True
+25,database design,NOC:Database Design,NPTEL,https://nptel.ac.in/courses/106106093,True
+26,regulatory,Regulatory requirements for medical devices including in vitro diagnostics in India (Version 2.0),SWAYAM,https://onlinecourses.nptel.ac.in/noc20_ge14/preview,True
+27,network engineering,Introduction to Network Automation,Coursera,https://www.coursera.org/learn/introduction-to-network-automation,True
+28,data visualization,Advanced Data Visualization with Tableau,Coursera,https://www.coursera.org/learn/advanced-data-visualization-with-tableau,True
+29,flutter,"Flutter and Dart: Developing iOS, Android, and Mobile Apps",Coursera,https://www.coursera.org/learn/flutter-and-dart-developing-ios-android-mobile-apps,True
+30,natural language processing,Applied Natural Language Processing,SWAYAM,https://onlinecourses.nptel.ac.in/noc20_cs87/preview,True
+31,ccna,CCNA Foundations – Networking Basics and Cisco IOS Essentials,Coursera,https://www.coursera.org/learn/packt-fundamentals-of-networking-and-cisco-devices-gvjwp,True
+32,product management,AI in Product Management,SWAYAM,https://onlinecourses.nptel.ac.in/noc25_mg07/preview,True
+33,cisco,Basics of Cisco Networking,Coursera,https://www.coursera.org/learn/basics-of-cisco-networking,True
+34,performance management,Total Rewards & the Role of Compensation & Benefits,Coursera,https://www.coursera.org/learn/adp-total-rewards-and-role-of-comp-and-benefits,True
+35,node.js,Deploying Microservices to Kubernetes using Azure DevOps,Coursera,https://www.coursera.org/learn/deploying-microservices-to-kubernetes-using-azure-devops,True
+36,inventory,Inventory and Store Management in Construction Industry,SWAYAM,https://onlinecourses.swayam2.ac.in/nou22_ce05/preview,True
+37,asp.net,C# for .NET Developers,Coursera,https://www.coursera.org/learn/c-sharp-for-dot-net,True
+38,security operations,CISSP Domain 7: Security Operations,Coursera,https://www.coursera.org/learn/cissp-domain-7-security-operations,True
+39,troubleshooting,Core 1: Hardware and Network Troubleshooting,Coursera,https://www.coursera.org/learn/core1-hardware-and-network-troubleshooting,True
+40,content management systems,Get Interactive: Practical Teaching with Technology,Coursera,https://www.coursera.org/learn/getinmooc,True
+41,product design,Product Design Using Value Engineering,SWAYAM,https://onlinecourses.nptel.ac.in/noc26_me113/preview,True
+42,business development,Customer Relationship Management,Coursera,https://www.coursera.org/learn/customer-relationship-management,True
+43,visual merchandising,Introduction to Merchandising,Coursera,https://www.coursera.org/learn/introduction-to-merchandising,True
+44,linux administration,Bash Scripting and System Configuration,Coursera,https://www.coursera.org/learn/codio-bash-scripting-and-system-configuration,True
+45,performance tuning,Advanced Learning Algorithms,Coursera,https://www.coursera.org/learn/advanced-learning-algorithms,True
+46,employee engagement,"Brand Management: Aligning Business, Brand and Behaviour",Coursera,https://www.coursera.org/learn/brand,True
+47,brand marketing,Introduction to Advertising & Brand Management,SWAYAM,https://onlinecourses.swayam2.ac.in/cec24_mg22/preview,True
+48,auditing,MGSE-002: Gender Auditing and Gender Budgting,SWAYAM,https://onlinecourses.swayam2.ac.in/nou25_ge89/preview,True
+49,gcp,NOC:Google Cloud Computing Foundation Course,NPTEL,https://nptel.ac.in/courses/106105223,True
+50,legal research,Chemerinsky on Constitutional Law – Individual Rights and Liberties,Coursera,https://www.coursera.org/learn/chemerinsky-individual-rights,True

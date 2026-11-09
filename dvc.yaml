@@ -174,3 +174,34 @@ stages:
     metrics:
       - reports/validation.json:
           cache: false
+
+  courses:
+    cmd: uv run python -m src.models.courses
+    deps:
+      - src/models/courses.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - models/skill_profiles.json
+      - data/raw/courses/coursera_courses_2025.csv
+      - data/raw/courses/nptel_swayam_courses.csv
+    params:
+      - courses
+    outs:
+      - models/skill_courses.json
+    metrics:
+      - reports/courses_summary.json:
+          cache: false
+
+  resume_keyness:          # Phase 2: lookup for the resume -> skills extractor (src/serving/resume.py)
+    cmd: uv run python -m src.serving.keyness
+    deps:
+      - src/serving/keyness.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - models/skill_vocab.json
+      - data/raw/naukri_2022
+      - data/raw/naukri_2025
+    params:
+      - resume.keyness
+    outs:
+      - models/skill_keyness.json

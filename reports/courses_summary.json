@@ -1,0 +1,12 @@
+{
+  "total_skills": 752,
+  "skills_with_courses": 449,
+  "coverage_pct": 0.5971,
+  "nptel_swayam_skills": 251,
+  "nptel_swayam_coverage_pct": 0.3338,
+  "coursera_skills": 272,
+  "coursera_coverage_pct": 0.3617,
+  "relevance_sample_size": 50,
+  "relevance_sample_relevant": 49,
+  "relevance_pct": 0.98
+}

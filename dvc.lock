@@ -846,3 +846,111 @@ stages:
       hash: md5
       md5: 4b17f5997750d61f8a999dee165344c7
       size: 149
+  courses:
+    cmd: uv run python -m src.models.courses
+    deps:
+    - path: configs/skill_aliases.yaml
+      hash: md5
+      md5: 9b6375b90636222b2a410fd6fa336808
+      size: 3744
+    - path: data/raw/courses/coursera_courses_2025.csv
+      hash: md5
+      md5: 6a917849fdaeb974085e85419e0dceb5
+      size: 10543467
+    - path: data/raw/courses/nptel_swayam_courses.csv
+      hash: md5
+      md5: dfeae26ce3cebb4a82299a7ce98c7afa
+      size: 28539523
+    - path: models/skill_profiles.json
+      hash: md5
+      md5: 574e5777b7b711976ea836b7e1e6ccb6
+      size: 328309
+    - path: src/models/courses.py
+      hash: md5
+      md5: ba53f1983cea41cfb62ffc5beaaf676f
+      size: 17165
+    - path: src/utils.py
+      hash: md5
+      md5: 286f890481c553069b6bbd6b82a6a222
+      size: 3697
+    params:
+      params.yaml:
+        courses:
+          max_courses_per_skill: 3
+          min_nptel_similarity: 0.35
+          prefer_free_first: true
+          relevance_sample_seed: 42
+          relevance_sample_size: 50
+          vague_skills:
+          - core
+          - development
+          - data
+          - management
+          - hospital
+          - operations
+          - process
+          - engineering
+          - software
+          - skills
+          - general
+          - support
+          - services
+          - site
+          - desk
+          - key
+          - system
+          - content
+          - civil
+          - resource
+          - control
+          - stack
+    outs:
+    - path: models/skill_courses.json
+      hash: md5
+      md5: 1b9d0d385f3182cfc0b51585538f4604
+      size: 231572
+    - path: reports/courses_summary.json
+      hash: md5
+      md5: fb9edf03331206f3cf3f6242dcfc92ef
+      size: 315
+  resume_keyness:
+    cmd: uv run python -m src.serving.keyness
+    deps:
+    - path: configs/skill_aliases.yaml
+      hash: md5
+      md5: 9b6375b90636222b2a410fd6fa336808
+      size: 3744
+    - path: data/raw/naukri_2022
+      hash: md5
+      md5: 6dd971bbfe19a1119afb207607d2f58f.dir
+      size: 9855664
+      nfiles: 1
+    - path: data/raw/naukri_2025
+      hash: md5
+      md5: eee95efc046d24e12fe616376b8547eb.dir
+      size: 31709363
+      nfiles: 1
+    - path: models/skill_vocab.json
+      hash: md5
+      md5: 6ae92e4b7b5b6ce462064651973d32b9
+      size: 112733
+    - path: src/serving/keyness.py
+      hash: md5
+      md5: e1a4986abeb34170ef5fd26b855f1164
+      size: 3368
+    - path: src/utils.py
+      hash: md5
+      md5: 286f890481c553069b6bbd6b82a6a222
+      size: 3697
+    params:
+      params.yaml:
+        resume.keyness:
+          min_docs: 30
+          sources:
+          - 2025
+          - 2022
+    outs:
+    - path: models/skill_keyness.json
+      hash: md5
+      md5: 6f21e4469babcce7b79ddce553ae0f61
+      size: 35117
