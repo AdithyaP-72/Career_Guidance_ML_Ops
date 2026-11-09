@@ -1,6 +1,7 @@
 """Compare every baseline, keep the best one, and upload it to its MLflow run.
 
-Compares every model in params.yaml → train.models on select.metric (higher is better):
+Compares every model in params.yaml → train.models on select.metric (higher is better), skipping
+any listed in select.exclude (they still appear in the comparison table):
     models/model.joblib            copy of the best baseline's pipeline
     reports/metrics.json           its metrics + margin over profile matching (DVC metric)
     reports/model_comparison.csv   every baseline side by side
@@ -45,18 +46,30 @@ def main() -> None:
     table.index.name = "model"
     table[[c for c in COMPARE if c in table]].to_csv(REPORTS / "model_comparison.csv")
 
-    best = table.index[0]
+    excluded = [m for m in p["select"].get("exclude", []) if m in table.index]
+    best = table.drop(index=excluded).index[0]  # excluded models stay in the comparison table
+    if excluded:
+        log.info("not eligible for selection (params.yaml → select.exclude): %s", excluded)
     shutil.copyfile(MODELS / "baselines" / f"{best}.joblib", MODELS / "model.joblib")
     best_metrics = read_json(REPORTS / "metrics" / f"{best}.json")
     run = read_json(REPORTS / "runs" / f"{best}.json")
     log.info("best baseline: %s (%s = %.4f)\n%s", best, metric, best_metrics[metric], table[[metric]].to_string())
 
-    configure(run["experiment"])
+    uri = configure(run["experiment"])
+    here = "local" if uri.startswith("sqlite") else uri
+    if run["tracking"] != here:
+        raise SystemExit(
+            f"{best}'s MLflow run {run['run_id']} was logged to {run['tracking']!r}, but MLflow now points at "
+            f"{here!r}, so the run can't be reopened. Retrain it against this server first:\n"
+            f"    uv run dvc repro -f -s train@{best}   and then   uv run dvc repro"
+        )
     model_uri = None
     try:
         with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
             mlflow.set_tag("best_baseline", "true")
-            model_uri = log_model(joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval"))
+            model_uri = log_model(
+                joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval")
+            )
     except PermissionError:
         # Windows may raise WinError 5 when MLflow cleans up its temp dir while handles
         # are still open. The model has already been logged successfully at this point.
