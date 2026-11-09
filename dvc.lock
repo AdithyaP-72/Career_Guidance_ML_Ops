@@ -913,3 +913,44 @@ stages:
       hash: md5
       md5: fb9edf03331206f3cf3f6242dcfc92ef
       size: 315
+  resume_keyness:
+    cmd: uv run python -m src.serving.keyness
+    deps:
+    - path: configs/skill_aliases.yaml
+      hash: md5
+      md5: 9b6375b90636222b2a410fd6fa336808
+      size: 3744
+    - path: data/raw/naukri_2022
+      hash: md5
+      md5: 6dd971bbfe19a1119afb207607d2f58f.dir
+      size: 9855664
+      nfiles: 1
+    - path: data/raw/naukri_2025
+      hash: md5
+      md5: eee95efc046d24e12fe616376b8547eb.dir
+      size: 31709363
+      nfiles: 1
+    - path: models/skill_vocab.json
+      hash: md5
+      md5: 6ae92e4b7b5b6ce462064651973d32b9
+      size: 112733
+    - path: src/serving/keyness.py
+      hash: md5
+      md5: e1a4986abeb34170ef5fd26b855f1164
+      size: 3368
+    - path: src/utils.py
+      hash: md5
+      md5: 286f890481c553069b6bbd6b82a6a222
+      size: 3697
+    params:
+      params.yaml:
+        resume.keyness:
+          min_docs: 30
+          sources:
+          - 2025
+          - 2022
+    outs:
+    - path: models/skill_keyness.json
+      hash: md5
+      md5: 6f21e4469babcce7b79ddce553ae0f61
+      size: 35117

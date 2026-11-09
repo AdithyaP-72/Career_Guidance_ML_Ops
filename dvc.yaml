@@ -167,4 +167,16 @@ stages:
       - reports/courses_summary.json:
           cache: false
 
-
+  resume_keyness:          # Phase 2: lookup for the resume -> skills extractor (src/serving/resume.py)
+    cmd: uv run python -m src.serving.keyness
+    deps:
+      - src/serving/keyness.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - models/skill_vocab.json
+      - data/raw/naukri_2022
+      - data/raw/naukri_2025
+    params:
+      - resume.keyness
+    outs:
+      - models/skill_keyness.json

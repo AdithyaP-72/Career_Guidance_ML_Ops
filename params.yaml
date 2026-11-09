@@ -117,3 +117,8 @@ courses:                   # Objective O3: Learning path course recommendations 
     - resource
     - control
     - stack
+
+resume:                    # resume -> skills extractor (src/serving/resume.py)
+  keyness:                 # src/serving/keyness.py: how skill-like is each single-word skill
+    min_docs: 30           # a word must appear in at least this many job descriptions to get a score
+    sources: [2025, 2022]  # postings with a description AND a skill list (2022 alone is software-heavy)
