@@ -23,7 +23,7 @@ digraph cicd {
   subgraph cluster_ci {
     label=<<b>CI</b>  <font point-size="10">ci.yml: is this change safe to merge?</font>>;
     style="rounded,filled"; fillcolor="#eaf1fd"; color="#9db8ec"; fontsize=13;
-    ci_test [label=<<b>test</b><br/><font point-size="9">uv sync --frozen<br/>ruff check + format<br/>pytest (88 tests)</font>>, color="#2459d6"];
+    ci_test [label=<<b>test</b><br/><font point-size="9">uv sync --frozen<br/>ruff check + format<br/>pytest (138 tests)</font>>, color="#2459d6"];
     ci_cont [label=<<b>container</b><br/><font point-size="9">toy model bundle<br/>podman build --format docker<br/>smoke_test.sh</font>>, color="#2459d6", width=2.1];
     ci_gate [label=<<b>model-gate</b><br/><font point-size="9">dvc pull model + test split<br/>validate --strict<br/>model card → run summary</font>>, color="#2459d6", width=2.1];
     ci_ok   [label=<<b>All jobs passed<br/>on main?</b>>, shape=diamond, style="filled", fillcolor="#eaf1fd", color="#2459d6", fontsize=10, width=2.0];
