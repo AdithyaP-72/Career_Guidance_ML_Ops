@@ -17,6 +17,7 @@ from __future__ import annotations
 import hashlib
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import mlflow
@@ -26,6 +27,10 @@ from src.utils import PROCESSED, ROOT
 
 
 def configure(experiment: str) -> str:
+    # Hosted MLflow prints emoji run links; Windows redirected stdout may default
+    # to cp1252 and otherwise fail after a successful upload.
+    if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     load_dotenv(ROOT / ".env")
     uri = os.environ.get("MLFLOW_TRACKING_URI") or f"sqlite:///{(ROOT / 'mlflow.db').as_posix()}"
     mlflow.set_tracking_uri(uri)

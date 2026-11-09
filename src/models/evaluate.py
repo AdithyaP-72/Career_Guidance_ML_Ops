@@ -44,6 +44,24 @@ def inputs(df: pd.DataFrame, skills_col: str = SKILLS) -> pd.DataFrame:
     return pd.DataFrame({SKILLS: df[skills_col].values, EXPERIENCE: df[EXPERIENCE].values})
 
 
+def expected_calibration_error(y, proba, classes, n_bins: int = 10) -> float:
+    """Top-label ECE: weighted absolute accuracy-confidence gap in 10 uniform bins.
+
+    Bins are [0, .1), [.1, .2), ..., [.9, 1], including confidence exactly 1.
+    Only the confidence of the highest-ranked role is assessed.
+    """
+    proba = np.asarray(proba)
+    confidence = proba.max(axis=1)
+    correct = np.asarray(classes)[proba.argmax(axis=1)] == np.asarray(y)
+    bins = np.minimum((confidence * n_bins).astype(int), n_bins - 1)
+    error = 0.0
+    for i in range(n_bins):
+        mask = bins == i
+        if mask.any():
+            error += mask.mean() * abs(correct[mask].mean() - confidence[mask].mean())
+    return float(error)
+
+
 def score(pipe, df: pd.DataFrame, skills_col: str, family_of: dict[str, str]):
     proba = pipe.predict_proba(inputs(df, skills_col))
     classes = pipe.classes_
@@ -52,6 +70,7 @@ def score(pipe, df: pd.DataFrame, skills_col: str, family_of: dict[str, str]):
     out = {f"top{k}": float(top_k_accuracy_score(y, proba, k=k, labels=classes)) for k in TOP_K}
     out["macro_f1"] = float(f1_score(y, pred, average="macro", labels=np.unique(y), zero_division=0))
     out["family_top1"] = float(np.mean([family_of[p] == f for p, f in zip(pred, df["family"], strict=True)]))
+    out["ece"] = expected_calibration_error(y, proba, classes)
     return out, pred
 
 
@@ -67,6 +86,15 @@ def _timed(fn, arg) -> float:
     return time.perf_counter() - t
 
 
+def latency_ms_per_request(pipe, df: pd.DataFrame, repeats: int = 20) -> float:
+    """Median warmed single-request prediction latency, including feature preprocessing."""
+    row = inputs(df.head(1), "skills_eval")
+    if row.empty:
+        raise ValueError("single-request latency requires at least one test posting")
+    pipe.predict_proba(row)
+    return round(float(np.median([_timed(pipe.predict_proba, row) for _ in range(repeats)])) * 1000, 4)
+
+
 def evaluate(pipe, test: pd.DataFrame, ref: pd.DataFrame | None, family_of: dict[str, str], out_dir: Path) -> dict:
     """All metrics as a flat dict + review files in out_dir (per-role report, confusions, chart)."""
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -77,6 +105,7 @@ def evaluate(pipe, test: pd.DataFrame, ref: pd.DataFrame | None, family_of: dict
         mref, _ = score(pipe, ref, "skills_eval", family_of)
         metrics |= {f"ref2019_{k}_5skills": v for k, v in mref.items()}
     metrics["predict_ms_per_1k"] = latency_ms_per_1k(pipe, test)
+    metrics["predict_ms_per_request"] = latency_ms_per_request(pipe, test)
 
     report = pd.DataFrame(classification_report(test["role"], pred5, output_dict=True, zero_division=0)).T
     report.index.name = "role"

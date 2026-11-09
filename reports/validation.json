@@ -1,0 +1,24 @@
+{
+  "best_model": "complement_nb_cal",
+  "passed": true,
+  "checks": {
+    "top3_5skills": {
+      "value": 0.8022,
+      "threshold": 0.75,
+      "direction": "minimum",
+      "passed": true
+    },
+    "ece_5skills": {
+      "value": 0.0719,
+      "threshold": 0.1,
+      "direction": "maximum",
+      "passed": true
+    },
+    "predict_ms_per_request": {
+      "value": 60.4905,
+      "threshold": 100.0,
+      "direction": "maximum",
+      "passed": true
+    }
+  }
+}

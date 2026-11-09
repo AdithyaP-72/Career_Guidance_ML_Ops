@@ -9,7 +9,7 @@ taxonomy:                  # which candidate roles become classes (src/data/taxo
   train_snapshot: 2025
   reference_snapshot: 2019
   min_train_postings: 100  # role needs at least this many usable 2025 postings to be a class
-  min_reference_postings: 20  # below this in 2019 → "emerging" (no 2019 baseline for drift)
+  min_reference_postings: 20  # below this in 2019 â†’ "emerging" (no 2019 baseline for drift)
 
 split:
   test_size: 0.2
@@ -26,7 +26,7 @@ features:
     seed: 42
 
 profiles:
-  core_min_share: 0.08     # a skill is "core" for a role if ≥ 8% of its postings ask for it
+  core_min_share: 0.08     # a skill is "core" for a role if â‰¥ 8% of its postings ask for it
   max_core_skills: 12
   top_n_skills: 30
   top_n_titles: 5
@@ -36,7 +36,7 @@ profiling:
   snapshots: [2017, 2019, 2022, 2025]
 
 train:                     # Step 5 baselines (src/models/train.py; one dvc stage per model)
-  models: [dummy, profile, logreg, random_forest, lightgbm, mlp, sgd, complement_nb]
+  models: [dummy, profile, logreg, random_forest, lightgbm, mlp, sgd, complement_nb, complement_nb_cal]
   skill_dropout: true      # train on postings + their cut-down copies (features.dropout)
   experiment: career-role-baselines   # MLflow experiment name
   # Each block below is passed straight to the model's constructor.
@@ -84,6 +84,16 @@ train:                     # Step 5 baselines (src/models/train.py; one dvc stag
   complement_nb:           # Phase 4b challenger: purpose-built for imbalanced sparse counts
     alpha: 1.0             # Laplace smoothing
     norm: false
+  complement_nb_cal:       # Isotonic confidence calibration; one final model (ensemble=False)
+    alpha: 1.0
+    norm: false
+    method: isotonic
+    cv: 3
 
 select:                    # src/models/select.py
   metric: top3_5skills     # best baseline = highest top-3 accuracy on 5-skill test inputs
+
+validate:                  # Held-out metrics and measured single-request inference latency
+  min_top3_5skills: 0.75
+  max_ece_5skills: 0.10
+  max_predict_ms_per_request: 100.0

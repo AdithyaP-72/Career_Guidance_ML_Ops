@@ -150,3 +150,17 @@ stages:
       - reports/metrics.json:
           cache: false
 
+  validate:
+    cmd: uv run python -m src.models.validate
+    deps:
+      - src/models/validate.py
+      - reports/metrics.json
+    params:
+      - validate
+    outs:
+      - reports/model_card.md:
+          cache: false
+    metrics:
+      - reports/validation.json:
+          cache: false
+

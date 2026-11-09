@@ -29,11 +29,13 @@ COMPARE = [
     "top5_5skills",
     "macro_f1_5skills",
     "family_top1_5skills",
+    "ece_5skills",
     "top3_full",
     "ref2019_top3_5skills",
     "fit_seconds",
     "model_size_mb",
     "predict_ms_per_1k",
+    "predict_ms_per_request",
 ]
 
 
@@ -52,15 +54,11 @@ def main() -> None:
     log.info("best baseline: %s (%s = %.4f)\n%s", best, metric, best_metrics[metric], table[[metric]].to_string())
 
     configure(run["experiment"])
-    model_uri = None
-    try:
-        with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
-            mlflow.set_tag("best_baseline", "true")
-            model_uri = log_model(joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval"))
-    except PermissionError:
-        # Windows may raise WinError 5 when MLflow cleans up its temp dir while handles
-        # are still open. The model has already been logged successfully at this point.
-        log.warning("Windows temp-dir cleanup error (safe to ignore); model already logged to MLflow.")
+    with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
+        mlflow.set_tag("best_baseline", "true")
+        model_uri = log_model(joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval"))
+    if not model_uri or not model_uri.startswith("models:/"):
+        raise RuntimeError(f"MLflow model upload did not return a models:/ URI: {model_uri!r}")
     log.info("uploaded %s to MLflow: %s", best, model_uri)
 
     profile_score = table.loc["profile", metric] if "profile" in table.index else float("nan")
