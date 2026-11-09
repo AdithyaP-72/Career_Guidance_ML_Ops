@@ -150,3 +150,21 @@ stages:
       - reports/metrics.json:
           cache: false
 
+  courses:
+    cmd: uv run python -m src.models.courses
+    deps:
+      - src/models/courses.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - models/skill_profiles.json
+      - data/raw/courses/coursera_courses_2025.csv
+      - data/raw/courses/nptel_swayam_courses.csv
+    params:
+      - courses
+    outs:
+      - models/skill_courses.json
+    metrics:
+      - reports/courses_summary.json:
+          cache: false
+
+
