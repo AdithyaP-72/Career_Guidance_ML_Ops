@@ -96,7 +96,7 @@ def from_registry(out: Path, alias: str) -> dict:
     meta = {
         "source": "registry",
         "model_name": name,
-        "version": mv.version,
+        "version": str(mv.version),
         "alias": alias,
         "algorithm": mv.tags.get("model"),
         "run_id": mv.run_id,

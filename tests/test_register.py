@@ -82,3 +82,30 @@ def test_dry_run_changes_nothing(registry):
     tags = {"model_md5": "md5-a", "top3_5skills": "0.8"}
     assert register_candidate(client, NAME, uri, tags, "top3_5skills", True, 0.0, dry_run=True) == (None, CHAMPION)
     assert client.search_registered_models() == []
+
+
+def test_champion_round_trip_registry_to_bundle_to_prediction(tmp_path, monkeypatch):
+    """What CD does: register.py stores model + serving files → bundle.py --from-registry → the API loads it."""
+    from src.serving.bundle import LOOKUPS, from_registry
+    from src.serving.recommender import Recommender
+    from tests.toy_bundle import make_toy_bundle
+
+    db = f"sqlite:///{(tmp_path / 'mlflow.db').as_posix()}"
+    monkeypatch.setenv("MLFLOW_TRACKING_URI", db)  # bundle.py's configure() reads this, like CD does
+    mlflow.set_tracking_uri(db)
+    toy = make_toy_bundle(tmp_path / "toy")  # provides the serving lookup files
+    df = toy_postings()
+    pipe = build_pipeline("logreg", load_params()).fit(df[["skills", "exp_min"]], df["role"])
+    with mlflow.start_run():
+        uri = log_model(pipe, df[["skills", "exp_min"]].head(2))
+        for f in LOOKUPS:
+            mlflow.log_artifact(str(toy / f), artifact_path="serving")
+    name = load_params()["register"]["model_name"]
+    tags = {"model_md5": "md5-x", "top3_5skills": "0.8", "model": "logreg"}
+    assert register_candidate(MlflowClient(), name, uri, tags, "top3_5skills", True, 0.0) == ("1", CHAMPION)
+
+    meta = from_registry(tmp_path / "bundle", "champion")
+    assert (meta["version"], meta["alias"], meta["algorithm"]) == ("1", "champion", "logreg")
+    rec = Recommender(tmp_path / "bundle")
+    assert rec.recommend(["accounting", "tally", "gst", "tds", "excel"], 2)[0]["role"] == "Accountant"
+    mlflow.set_tracking_uri(None)

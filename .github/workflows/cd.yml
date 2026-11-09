@@ -72,7 +72,11 @@ jobs:
         env:
           API_URL: ${{ vars.RENDER_API_URL }}
           MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
+          RENDER_READY: ${{ secrets.RENDER_DEPLOY_HOOK_URL != '' && vars.RENDER_API_URL != '' }}
         run: |
+          # Before Render is set up (first run), still build + test + push the image, then stop.
+          echo "render=$RENDER_READY" >> "$GITHUB_OUTPUT"
+          [ "$RENDER_READY" = "true" ] || echo "Render not configured yet (secret RENDER_DEPLOY_HOOK_URL / variable RENDER_API_URL): image will be pushed but not deployed." >> "$GITHUB_STEP_SUMMARY"
           SHA=$(git rev-parse --short=7 HEAD)
           VERSION=$(python3 -c 'import json; print(json.load(open("bundle/meta.json"))["version"])')
           IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/career-guidance-api"   # GHCR needs lowercase
@@ -128,7 +132,7 @@ jobs:
           podman push ${{ steps.plan.outputs.image }}:latest
 
       - name: Tell Render to deploy this exact image
-        if: steps.plan.outputs.deploy == 'true'
+        if: steps.plan.outputs.deploy == 'true' && steps.plan.outputs.render == 'true'
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
           TAG: ${{ steps.plan.outputs.tag }}
@@ -138,7 +142,7 @@ jobs:
           echo "deploy requested for $TAG"
 
       - name: Wait until Render serves the new version
-        if: steps.plan.outputs.deploy == 'true'
+        if: steps.plan.outputs.deploy == 'true' && steps.plan.outputs.render == 'true'
         env:
           API_URL: ${{ vars.RENDER_API_URL }}
           WANT_SHA: ${{ steps.plan.outputs.sha }}
