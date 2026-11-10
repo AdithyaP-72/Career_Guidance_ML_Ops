@@ -121,10 +121,16 @@ OTHER_HEADERS = _phrases(
     academic projects|personal projects|certifications|certificates|licenses|licenses & certifications|
     awards|achievements|accomplishments|publications|references|interests|hobbies|volunteering|activities|
     extracurricular|personal details|personal information|declaration|contact|contact information|training|
-    internships|internship|positions of responsibility|courses
+    internships|internship|positions of responsibility|courses|
+    position of responsibility|extracurricular activity|extracurricular activities|extra curricular activities|
+    extra curricular|cocurricular activities|co curricular activities|activities and interests|interests and hobbies|
+    hobbies and interests|leadership experience|volunteer experience|honors and awards|awards and honors
     """
 )
 SKILLS_SECTION_MAX_LINES = 30  # an unterminated "Skills" section stops being trusted after this many lines
+_VERSIONED = re.compile(r"([a-z][a-z+#]{1,}[a-z+#])v?\d+(?:\.\d+)*")  # 3+ letters, then a version
+_CONTINUES = re.compile(r"[,;+&/]\s*$")  # a list line that wraps onto the next line
+_SPLIT_INITIAL = re.compile(r"\b([A-Z]) (?=[a-z]{2,}\b|[A-Z]{2,}\b)")  # "T echnical" / "S KILLS"
 _HEADER_LINE = re.compile(r"^\s*([A-Za-z][A-Za-z &/,\-]{1,60}?)\s*[:\-–—]?\s*$")
 _INLINE_LABEL = re.compile(r"^\s*([A-Za-z][A-Za-z &/\-]{1,40}?)\s*[:–—]\s*(\S.*)$")
 # A skill phrase never spans a comma, semicolon, bracket, bullet, column gap or sentence end,
@@ -285,22 +291,47 @@ class SkillExtractor:
                 norm.append(t.lower())
         return raw, norm
 
+    @staticmethod
+    def _label(text: str) -> tuple[str, str]:
+        """Heading text -> (repaired text, lookup key). Small caps and drop caps often come out of a PDF with the
+        first letter split off ("T echnical Skills", "S KILLS"); only the heading is repaired, never the skills."""
+        raw = _SPLIT_INITIAL.sub(r"\1", text).strip()
+        return raw, re.sub(r"[^a-z &/]", "", raw.lower()).strip()
+
+    @staticmethod
+    def _is_skills_label(raw: str, key: str) -> bool:
+        if key in SKILL_HEADERS:
+            return True
+        # Combined headings: "Frameworks/Tools", "Languages & Frameworks", "Web Development and Tools".
+        parts = [p.strip() for p in re.split(r"/|&|\band\b", key)]
+        if len(parts) > 1 and all(parts) and any(p in SKILL_HEADERS for p in parts):
+            return True
+        # Any short, heading-styled label that names skills: "Courses and Skills", "SKILLS & INTERESTS".
+        words = raw.split()
+        return (
+            re.search(r"\bskills?\b", key) is not None
+            and len(words) <= 5
+            and all(w[0].isupper() for w in words if len(w) > 3)
+        )
+
     def _header(self, line: str) -> tuple[str | None, str]:
-        """(kind, remainder). kind is 'skills', 'other' or None; remainder is text after an inline 'Label:'."""
+        """(kind, remainder); remainder is the text after an inline 'Label:'. kind is 'skills' (opens a skills
+        section), 'skills-line' (a labelled list such as "Tech Stack: ...": this line is a skills list, but inside
+        another section the lines after it are not), 'other', or None."""
         m = _INLINE_LABEL.match(line)
         if m:
-            label = re.sub(r"[^a-z &/]", "", m.group(1).lower()).strip()
-            if label in SKILL_HEADERS:
-                return "skills", m.group(2)
-            if label in OTHER_HEADERS:
+            raw, key = self._label(m.group(1))
+            if self._is_skills_label(raw, key):
+                return ("skills" if "skill" in key else "skills-line"), m.group(2)
+            if key in OTHER_HEADERS:
                 return "other", m.group(2)
             return None, line
         m = _HEADER_LINE.match(line)
         if m:
-            label = re.sub(r"[^a-z &/]", "", m.group(1).lower()).strip()
-            if label in SKILL_HEADERS:
+            raw, key = self._label(m.group(1))
+            if self._is_skills_label(raw, key):
                 return "skills", ""
-            if label in OTHER_HEADERS:
+            if key in OTHER_HEADERS:
                 return "other", ""
             words = line.split()
             bare = line.strip().strip(_TOKEN_EDGE + ".").lower()
@@ -312,6 +343,17 @@ class SkillExtractor:
                 and bare not in self.index  # "SQL" / "AWS," on its own line is a skill, not a heading
             ):
                 return "other", ""  # unknown ALL-CAPS heading ends the skills section
+        # A table row with the heading in one cell and the list in the next, no colon:
+        # "Technical Proficiency JavaScript, Java, ...". Multi-word headings only, so a list line that starts
+        # with "Cloud," or prose like "Tools like Jira, Git" is not mistaken for one.
+        if "," in line:
+            ends = [t.end() for t in re.finditer(r"\S+", line)]
+            for k in range(min(len(ends) - 1, 6), 1, -1):  # longest heading first, at least one word left over
+                if line[: ends[k - 1]].rstrip().endswith(","):
+                    continue
+                raw, key = self._label(line[: ends[k - 1]])
+                if " " in key and self._is_skills_label(raw, key):
+                    return ("skills" if "skill" in key else "skills-line"), line[ends[k - 1] :]
         return None, line
 
     # -- matching ----------------------------------------------------------------
@@ -342,6 +384,9 @@ class SkillExtractor:
         n = normalise_skill(tok)
         if n != tok and n in self.index:
             return self.index[n], n
+        m = _VERSIONED.fullmatch(tok)  # "python3", "es6", "angular2" -> the base skill (html5 / css3 are aliases)
+        if m and m.group(1) in self.index:
+            return self.index[m.group(1)], m.group(1)
         return None, tok
 
     def _grade(self, canon: str, key: str, surface: str, in_skills: bool) -> str | None:
@@ -417,22 +462,30 @@ class SkillExtractor:
         found: dict[str, dict] = defaultdict(
             lambda: {"solid": 0, "generic": 0, "skills": False, "multi": False, "fuzzy": False}
         )
-        in_skills, lines_left = False, 0
+        in_skills, lines_left, carry = False, 0, False
         for line in self._clean(text).splitlines():
             if not line.strip():
                 continue
             kind, rest = self._header(line)
-            if kind is not None:
-                in_skills, lines_left = kind == "skills", SKILLS_SECTION_MAX_LINES
+            line_is_skills = None  # None: follow the section
+            if kind == "skills-line" and not in_skills:
+                line_is_skills = True  # "Tech Stack: Python, Flask" under Projects: this line only...
+                carry = _CONTINUES.search(rest) is not None  # ...plus the next line if the list wraps
+                line = rest
+            elif kind is not None:
+                in_skills, lines_left, carry = kind != "other", SKILLS_SECTION_MAX_LINES, False
                 line = rest
                 if not line.strip():
                     continue
+            elif carry:
+                line_is_skills, carry = True, _CONTINUES.search(line) is not None
             elif in_skills:
                 lines_left -= 1
                 in_skills = lines_left > 0
+            flag = in_skills if line_is_skills is None else line_is_skills
             for segment in _SEGMENT_SPLIT.split(line):
                 raw, norm = self._tokens(segment)
-                self._scan(raw, norm, in_skills, found)
+                self._scan(raw, norm, flag, found)
 
         out = []
         for canon, f in found.items():
