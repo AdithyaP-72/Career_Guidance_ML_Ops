@@ -17,8 +17,8 @@ services:
     region: singapore       # closest Render region to India
     healthCheckPath: /health
     envVars:
-      - key: CORS_ORIGINS   # who may call the API from a browser. "*" is fine for a demo;
-        value: "*"          # for real use, set it to the frontend's URL only.
+      - key: CORS_ORIGINS   # the only website allowed to call the API from a browser (the frontend below)
+        value: https://career-guidance-web.onrender.com
 
   - type: web
     name: career-guidance-web
