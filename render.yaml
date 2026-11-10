@@ -28,7 +28,8 @@ services:
     staticPublishPath: ./frontend
     buildFilter:
       paths:
-        - frontend/**       # redeploy the site only when the frontend changes
+        - frontend/**       # redeploy the site only when the frontend changes...
+        - render.yaml       # ...or this file (API_URL is baked into config.js at build time)
     envVars:
       - key: API_URL        # if Render gives the API a different URL (name taken), change it here
         value: https://career-guidance-api-txmh.onrender.com   # Render added "-txmh": the plain name was taken
