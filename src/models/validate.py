@@ -261,7 +261,7 @@ def main() -> None:
     cases = load_yaml(CONFIGS / "behaviour_cases.yaml")["cases"]
     report = run(pipe, read_split("test"), selected, cases, cfg) | {"mlflow_run_id": selected.get("mlflow_run_id")}
     write_json(report, REPORTS / "validation.json")
-    (REPORTS / "model_card.md").write_text(model_card(report, selected), encoding="utf-8")
+    (REPORTS / "model_card.md").write_text(model_card(report, selected), encoding="utf-8", newline="\n")
     for name, c in report["checks"].items():
         log.info("%s %-32s %s %s %s", "PASS" if c["passed"] else "FAIL", name, c["value"], c["rule"], c["threshold"])
     log.info("%s: quality gate %s", report["model"], "PASSED" if report["passed"] else "FAILED")

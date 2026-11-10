@@ -415,7 +415,7 @@ def main() -> None:
     if sample_report:
         df_sample = pd.DataFrame(sample_report)
         sample_csv_path = REPORTS / "courses_relevance_sample.csv"
-        df_sample.to_csv(sample_csv_path, index=False)
+        df_sample.to_csv(sample_csv_path, index=False, lineterminator="\n")
         log.info("Saved relevance verification sample to %s", sample_csv_path)
 
     log.info("=== Courses Stage Summary ===")

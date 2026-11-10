@@ -44,7 +44,7 @@ def main() -> None:
     table = pd.DataFrame({m: read_json(REPORTS / "metrics" / f"{m}.json") for m in models}).T
     table = table.sort_values(metric, ascending=False)
     table.index.name = "model"
-    table[[c for c in COMPARE if c in table]].to_csv(REPORTS / "model_comparison.csv")
+    table[[c for c in COMPARE if c in table]].to_csv(REPORTS / "model_comparison.csv", lineterminator="\n")
 
     excluded = [m for m in p["select"].get("exclude", []) if m in table.index]
     best = table.drop(index=excluded).index[0]  # excluded models stay in the comparison table

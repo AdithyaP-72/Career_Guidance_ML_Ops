@@ -557,6 +557,9 @@ ComplementNB ranks best (80.0% top-3) but its confidence % is far too low (ECE 0
    `complement_nb_cal: {alpha: 1.0, norm: false, method: isotonic, cv: 3}`.
 4. `src/models/train.py`: add `"sklearn.calibration._CalibratedClassifier"` to `TRUSTED_TYPES`;
    `uv run pytest -q`.
+   Also in `src/models/evaluate.py`, add `lineterminator="\n"` to the three `.to_csv(...)` calls.
+   (On Windows pandas writes `\r\n`; DVC hashes that, git commits `\n`, and everyone else's
+   `dvc repro` then retrains every model. This PR retrains everything anyway, so it costs nothing extra.)
 5. `uv run dvc repro` (retrains every model, ~1 h, mostly the MLP; this time all logged to DagsHub).
    Check: `reports/metrics.json` → `best_model: complement_nb_cal`, `mlflow_model_uri` starts with
    `models:/` (not null); `reports/model_card.md` → PASSED.
