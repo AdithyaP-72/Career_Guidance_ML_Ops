@@ -17,7 +17,7 @@ VOCAB = [
     "communication skills", "data", "core", "sales", "html", "css", "html/css", "aws", "kubernetes", "learning",
     "data analysis", "go", "ci/cd", "ms office", "e-commerce", "team", "case", "senior",
     "powerpoint", "bilingual", "spreadsheets", "company", "program", "leadership", "interpersonal", "excel powerpoint",
-    "jee", "java", "english", "hindi", "bash",
+    "jee", "java", "english", "hindi", "bash", "flask", "monitoring", "events", "t", "redux", "git", "angular",
 ]  # fmt: skip
 ALIASES = {
     "react": "react.js", "reactjs": "react.js", "react js": "react.js", "ml": "machine learning",
@@ -128,6 +128,45 @@ def test_languages_heading_is_a_skills_section(kx):
     assert "c" not in names(kx, "EXPERIENCE\nReported to the C suite")
 
 
+def test_split_first_letter_headings_are_repaired(ex):
+    # Small caps / drop caps: PDF text says "T echnical Skills" or "S KILLS". The stray "T" is not a skill.
+    for heading in ("T echnical Skills", "S KILLS", "T ECHNICAL S KILLS"):
+        got = {s.skill: s for s in ex.from_text(f"{heading}\nPython, Git")}
+        assert got["python"].in_skills_section and "t" not in got, heading
+    got = names(ex, "EXPERIENCE\nFrameworks/T ools: Flask, Git")
+    assert {"flask", "git"} <= set(got) and "t" not in got
+
+
+def test_heading_cell_followed_by_list_without_colon(ex):
+    got = {s.skill: s for s in ex.from_text("T echnical Proficiency JavaScript, Python, Redux")}
+    assert all(got[k].in_skills_section for k in ("javascript", "python", "redux"))
+
+
+def test_any_heading_that_names_skills_opens_a_skills_section(ex):
+    for heading in ("COURSES AND SKILLS", "Skills & Interests", "Languages & Frameworks: C, R"):
+        got = {s.skill: s for s in ex.from_text(f"{heading}\nC, R, Python")}
+        assert got["c"].in_skills_section and got["r"].in_skills_section, heading
+
+
+def test_tech_stack_line_inside_projects_does_not_turn_the_project_into_a_skills_section(ex):
+    text = "PROJECTS\nTech Stack: Python, Flask\nBuilt monitoring for the events team"
+    got = {s.skill: s for s in ex.from_text(text)}
+    assert got["python"].in_skills_section and got["flask"].in_skills_section
+    # the project description is prose again (in production, keyness then drops words like these)
+    assert not got["monitoring"].in_skills_section and not got["events"].in_skills_section
+    wrapped = {s.skill: s for s in ex.from_text("PROJECTS\nTech Stack: Python, Flask,\nRedux, Git\nNotes")}
+    assert wrapped["redux"].in_skills_section  # a list that wraps keeps going on the next line
+
+
+def test_extracurricular_heading_ends_the_skills_section(ex):
+    got = {s.skill: s for s in ex.from_text("SKILLS\nPython\nExtracurricular Activity\nI enjoy social events.")}
+    assert got["python"].in_skills_section and not got["events"].in_skills_section
+
+
+def test_versioned_skill_names(ex):
+    assert {"python", "angular"} <= set(names(ex, "SKILLS\nPython3, Angular2"))
+
+
 def test_inline_label_and_section_end(ex):
     text = "Technical Skills: Python, SQL\nEXPERIENCE\nI ran a team and a case study."
     got = names(ex, text)
@@ -164,6 +203,49 @@ def test_pdf_end_to_end(ex):
     res = extract_skills(make_pdf([RESUME_LINES]), "cv.pdf", extractor=ex)
     assert res.code == "ok" and res.message is None
     assert {"python", "react.js", "machine learning", "node.js", "tally"} <= set(res.names)
+
+
+def test_word_per_line_pdf_falls_back_to_layout_mode(ex, monkeypatch):
+    # Google Docs exports write each word as its own text object; pypdf's default mode then returns one word per
+    # line, so "TECHNICAL SKILLS" and "Languages : C, ..." fall apart. Simulated here at the pypdf boundary.
+    import pypdf
+
+    lines = ["TECHNICAL SKILLS", "Languages : C, Python, SQL", "Web Development : HTML, CSS, React"]
+    fragmented = "\n".join(w for ln in lines for w in ln.split())
+    calls = []
+
+    def fake_extract(self, *args, extraction_mode="plain", **kwargs):
+        calls.append(extraction_mode)
+        return "\n".join(lines) if extraction_mode == "layout" else fragmented
+
+    monkeypatch.setattr(pypdf.PageObject, "extract_text", fake_extract)
+    out = extract_skills(make_pdf([["placeholder"]]), "cv.pdf", extractor=ex)
+    assert calls == ["plain", "layout"]
+    by = {s.skill: s for s in out.skills}
+    assert {"c", "python", "sql", "html", "css", "react.js"} <= set(by)
+    assert all(by[s].in_skills_section for s in ("c", "html", "css"))
+
+
+def test_normal_pdf_does_not_use_layout_mode(ex, monkeypatch):
+    import pypdf
+
+    calls = []
+    real = pypdf.PageObject.extract_text
+
+    def spy(self, *args, **kwargs):
+        calls.append(kwargs.get("extraction_mode", "plain"))
+        return real(self, *args, **kwargs)
+
+    monkeypatch.setattr(pypdf.PageObject, "extract_text", spy)
+    extract_skills(make_pdf([RESUME_LINES]), "cv.pdf", extractor=ex)
+    assert calls == ["plain"]
+
+
+def test_list_items_on_their_own_line_are_not_headings(ex):
+    # One skill per line (seen in word-per-line PDFs): "HTML," must not end the Skills section or be swallowed.
+    got = ex.from_text("SKILLS\nC,\nHTML,\nCSS,\nPython")
+    assert {"c", "html", "css", "python"} <= set(s.skill for s in got)
+    assert all(s.in_skills_section for s in got)
 
 
 def test_docx_end_to_end_with_table(ex):

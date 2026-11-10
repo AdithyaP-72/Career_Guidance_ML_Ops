@@ -11,8 +11,26 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore:
+      # Nothing below is tested by CI or goes into the image, so a change that touches only these
+      # skips CI (and therefore CD). Render rebuilds the frontend by itself.
+      - "**.md"
+      - "docs/**"
+      - "ppt/**"
+      - "notebooks/**"
+      - "frontend/**"
+      - "render.yaml"
+      - ".github/workflows/keepwarm.yml"
   push:
     branches: [main]
+    paths-ignore:   # same list as above
+      - "**.md"
+      - "docs/**"
+      - "ppt/**"
+      - "notebooks/**"
+      - "frontend/**"
+      - "render.yaml"
+      - ".github/workflows/keepwarm.yml"
   workflow_dispatch:
 
 # A newer push to the same branch/PR cancels the older, now-pointless run.

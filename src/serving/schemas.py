@@ -3,11 +3,15 @@ publishes them in the OpenAPI docs at /docs."""
 
 from __future__ import annotations
 
+from typing import Annotated
+
 from pydantic import BaseModel, Field
+
+Skill = Annotated[str, Field(min_length=1, max_length=100)]  # the longest skill in the vocabulary has 49 characters
 
 
 class PredictRequest(BaseModel):
-    skills: list[str] = Field(
+    skills: list[Skill] = Field(
         min_length=1,
         max_length=30,
         description="Your skills. Use /skills?q=... to find the spellings the model knows.",
@@ -62,6 +66,11 @@ class PredictResponse(BaseModel):
 
 class ResumeSkills(BaseModel):
     skills: list[str] = Field(description="Best first, in the model's spelling; pre-fill the skill box with these")
+    from_skills_section: list[str] = Field(
+        default_factory=list,
+        description="The ones listed under the resume's Skills heading. Reliable, so pre-fill all of them; skills "
+        "picked up from sentences elsewhere are noisier.",
+    )
     ignored: int = Field(description="Skills found that this model version does not know")
     message: str | None = Field(None, description="Why nothing was found (e.g. a scanned PDF); safe to show")
     warnings: list[str] = []

@@ -163,7 +163,14 @@ not on an allow-list, and `finalise()` checks that list against `TRUSTED_TYPES` 
 - **Readiness** = share of the role's core-skill weight you already have.
 - **Learning path** = missing core skills ordered by
   `share of role postings × (1 + affinity with your skills) × market growth (2019→2025)`.
-- **Validation** (Pydantic): bad input (empty list, negative experience, `top_k` > 10) → 422 automatically.
+- **Validation** (Pydantic): bad input (empty list, negative experience, `top_k` > 10, a skill over 100
+  characters) → 422 automatically.
+- **Abuse protection** (`src/serving/limits.py`; the site is public and runs on 0.1 CPU):
+  - Request bodies over 64 KB (6 MB for resume uploads) are refused with 413 *before* being read.
+  - Rate limits per visitor and in total, per minute: uploads 10 / 20, predictions 60 / 600,
+    autocomplete 120 / 1200. Over the limit → 429 with `Retry-After`; `/health` is never limited.
+    The visitor's address comes from proxy headers a client can fake, so the total limit is the backstop.
+  - `CORS_ORIGINS` (Render env var) restricts which website may call the API from a browser.
 - **Logging**: one JSON line per prediction (version, #skills, top role, confidence, latency):
   the raw material for Phase 3 monitoring. Resume text is never logged.
 

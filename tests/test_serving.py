@@ -23,6 +23,9 @@ def bundle(tmp_path_factory):
 def client(bundle):
     mp = pytest.MonkeyPatch()
     mp.setenv("BUNDLE_DIR", str(bundle))
+    for name in ("UPLOAD", "PREDICT", "SEARCH"):  # this module makes many requests; limits are tested in test_limits
+        mp.setenv(f"RATE_{name}_PER_MIN", "10000")
+        mp.setenv(f"RATE_{name}_TOTAL_PER_MIN", "10000")
     with TestClient(app) as c:  # `with` runs the startup (lifespan) that loads the bundle
         yield c
     mp.undo()
@@ -153,6 +156,8 @@ def test_resume_pdf_and_docx_prefill_skills_in_the_models_spelling(client):
         assert r.status_code == 200, r.text
         body = r.json()
         assert {"tally", "gst", "tds", "accounting", "excel"} <= set(body["skills"]), (name, body)
+        assert {"tally", "gst", "tds", "accounting", "excel"} <= set(body["from_skills_section"]), (name, body)
+        assert set(body["from_skills_section"]) <= set(body["skills"])
         assert body["message"] is None
         # ...and those skills go straight into /predict
         assert client.post("/predict", json={"skills": body["skills"]}).json()["recommendations"][0]["role"] == (

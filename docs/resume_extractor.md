@@ -22,8 +22,14 @@ Keep the 5-10 you pre-fill from `result.names[:10]`; the order is meaningful.
 
 ## How it works
 1. Text out of the file **in memory** (`pypdf`, `python-docx` incl. tables). Scanned PDFs have no text: empty result + message.
+   Google Docs PDFs come out of pypdf's default mode one word per line; when the text averages < 1.5 words per line it
+   is re-read in pypdf's layout mode, which rebuilds the lines from word positions.
 2. Find the "Skills" / "Technical Skills" / "Highlights" / "Qualifications" section (also inline `Skills: a, b`); skills
-   there rank higher and short or generic skills are trusted there.
+   there rank higher and short or generic skills are trusted there. Headings are matched after repairing split first
+   letters from small caps ("T echnical Skills", "S KILLS"); any short heading naming skills counts ("Courses and
+   Skills"), as do combined ones ("Frameworks/Tools") and a heading cell followed by a list without a colon. A labelled
+   list such as `Tech Stack: a, b` under Projects is a skills list for that line only (plus a wrapped next line), not a
+   whole section. A one-word line such as `HTML,` is a list item, never a heading.
 3. Longest-phrase matching of word n-grams against the vocabulary, after the training pipeline's own normaliser and
    `configs/skill_aliases.yaml` (ReactJS -> react.js, ML -> machine learning, Tally ERP 9 -> tally). Phrases never span a
    comma, bracket, bullet or column gap, so two-column layouts do not glue words together. Spacing / hyphen / plural
