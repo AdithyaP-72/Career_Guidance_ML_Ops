@@ -17,6 +17,7 @@ VOCAB = [
     "communication skills", "data", "core", "sales", "html", "css", "html/css", "aws", "kubernetes", "learning",
     "data analysis", "go", "ci/cd", "ms office", "e-commerce", "team", "case", "senior",
     "powerpoint", "bilingual", "spreadsheets", "company", "program", "leadership", "interpersonal", "excel powerpoint",
+    "jee", "java", "english", "hindi", "bash",
 ]  # fmt: skip
 ALIASES = {
     "react": "react.js", "reactjs": "react.js", "react js": "react.js", "ml": "machine learning",
@@ -110,6 +111,21 @@ def test_skills_section_ranks_first(ex):
     by = {s.skill: s for s in out}
     assert by["python"].in_skills_section and not by["kubernetes"].in_skills_section
     assert [s.skill for s in out].index("python") < [s.skill for s in out].index("kubernetes")
+
+
+def test_exam_names_are_not_skills_outside_a_skills_section(ex):
+    # "jee" is Java EE in job ads, but on a student resume it is the entrance exam.
+    got = names(ex, "EDUCATION\nJEE Main 2021: 98.2 percentile\n\nSKILLS\nPython, Java")
+    assert "jee" not in got and {"python", "java"} <= set(got)
+    assert "jee" in names(ex, "SKILLS\nJava, JEE, SQL")  # listed as a skill: kept
+
+
+def test_languages_heading_is_a_skills_section(kx):
+    # Students often list programming (and spoken) languages under "Languages": short ones like C / R need a
+    # skills context, and spoken ones have low keyness, so both were dropped when the heading counted as "other".
+    got = names(kx, "LANGUAGES\nC, R, Bash, SQL\n\nLanguages: English, Hindi")
+    assert {"c", "r", "bash", "sql", "english", "hindi"} <= set(got)
+    assert "c" not in names(kx, "EXPERIENCE\nReported to the C suite")
 
 
 def test_inline_label_and_section_end(ex):

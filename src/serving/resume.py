@@ -74,6 +74,10 @@ STRICT = frozenset(
     snow soft sol sub target team thai time top unit usa uk word wire yoga senior junior manager executive associate
     analyst engineer developer intern fresher trainee strong good excellent experience experienced
     """.split()
+) | frozenset(
+    # Exam and school-board names. Some are vocabulary skills with another meaning ("jee" = Java EE in job ads),
+    # but on a resume they almost always sit under Education ("JEE Main 2021: 98 percentile").
+    "jee neet gate cat gre gmat cet ssc hsc cbse icse isc upsc ielts toefl sat clat".split()
 )
 
 # Soft skills that job-ad tags rarely carry (so keyness is low) but that people do list in a Skills section.
@@ -103,7 +107,9 @@ SKILL_HEADERS = _phrases(
     technical knowledge|computer skills|software skills|skills and qualifications|skills & qualifications|
     skill highlights|highlights|key qualifications|core qualifications|qualifications|programming languages|
     frameworks|libraries|databases|platforms|operating systems|
-    methodologies|cloud|web technologies|technical environment|tech stack
+    methodologies|cloud|web technologies|technical environment|tech stack|
+    languages|languages known|known languages|spoken languages|language skills|language proficiency|
+    coding languages|programming|programming skills|computer languages
     """
 )
 OTHER_HEADERS = _phrases(
@@ -115,7 +121,7 @@ OTHER_HEADERS = _phrases(
     academic projects|personal projects|certifications|certificates|licenses|licenses & certifications|
     awards|achievements|accomplishments|publications|references|interests|hobbies|volunteering|activities|
     extracurricular|personal details|personal information|declaration|contact|contact information|training|
-    internships|internship|positions of responsibility|courses|languages
+    internships|internship|positions of responsibility|courses
     """
 )
 SKILLS_SECTION_MAX_LINES = 30  # an unterminated "Skills" section stops being trusted after this many lines
