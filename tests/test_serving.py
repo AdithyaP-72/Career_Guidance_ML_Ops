@@ -153,6 +153,8 @@ def test_resume_pdf_and_docx_prefill_skills_in_the_models_spelling(client):
         assert r.status_code == 200, r.text
         body = r.json()
         assert {"tally", "gst", "tds", "accounting", "excel"} <= set(body["skills"]), (name, body)
+        assert {"tally", "gst", "tds", "accounting", "excel"} <= set(body["from_skills_section"]), (name, body)
+        assert set(body["from_skills_section"]) <= set(body["skills"])
         assert body["message"] is None
         # ...and those skills go straight into /predict
         assert client.post("/predict", json={"skills": body["skills"]}).json()["recommendations"][0]["role"] == (

@@ -170,5 +170,9 @@ async def extract_skills(request: Request, file: Annotated[UploadFile, File()]):
     # Never log resume content (personal data): counts only.
     log.info("resume %s", json.dumps({"type": suffix, "bytes": len(data), "code": result.code, "skills": len(skills)}))
     return ResumeSkills(
-        skills=skills, ignored=len(result.names) - len(skills), message=message, warnings=result.warnings
+        skills=skills,
+        from_skills_section=[s.skill for s in result.skills if s.in_skills_section and s.skill in vocab],
+        ignored=len(result.names) - len(skills),
+        message=message,
+        warnings=result.warnings,
     )

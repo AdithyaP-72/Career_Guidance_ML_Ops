@@ -62,6 +62,11 @@ class PredictResponse(BaseModel):
 
 class ResumeSkills(BaseModel):
     skills: list[str] = Field(description="Best first, in the model's spelling; pre-fill the skill box with these")
+    from_skills_section: list[str] = Field(
+        default_factory=list,
+        description="The ones listed under the resume's Skills heading. Reliable, so pre-fill all of them; skills "
+        "picked up from sentences elsewhere are noisier.",
+    )
     ignored: int = Field(description="Skills found that this model version does not know")
     message: str | None = Field(None, description="Why nothing was found (e.g. a scanned PDF); safe to show")
     warnings: list[str] = []

@@ -4,6 +4,7 @@
 const API = (window.API_URL || "http://localhost:8000").replace(/\/$/, "");
 const MIN_SKILLS = 5;
 const MAX_SKILLS = 30; // the API rejects more (schemas.py: PredictRequest.skills)
+const PREFILL_TOTAL = 15; // resume pre-fill: all Skills-section skills, topped up to this many
 const $ = (id) => document.getElementById(id);
 
 const state = { skills: [], suggestions: [], active: -1, resumeReady: false };
@@ -177,10 +178,18 @@ $("resume").addEventListener("change", async (e) => {
   try {
     const { ok, status, body } = await api("/extract-skills", { method: "POST", body: form }, 60000);
     if (ok) {
-      body.skills.slice(0, 15).forEach(addSkill); // best first; 15 is plenty to start from
+      // Every skill from the resume's Skills section (reliable), plus the best of the rest up to 15 in total:
+      // skills picked up from sentences are noisier, and noise makes predictions worse.
+      const listed = new Set(body.from_skills_section ?? []);
+      const prefill = [];
+      for (const s of body.skills) {
+        if (prefill.length >= MAX_SKILLS) break;
+        if (listed.has(s) || prefill.length < PREFILL_TOTAL) prefill.push(s);
+      }
+      prefill.forEach(addSkill);
       const note = body.warnings?.length ? ` ${body.warnings.join(" ")}` : "";
-      $("resume-status").textContent = body.skills.length
-        ? `Found ${body.skills.length} skills. Check them below and remove any that are wrong.${note}`
+      $("resume-status").textContent = prefill.length
+        ? `Added ${prefill.length} skills from your resume. Check them below and remove any that are wrong.${note}`
         : (body.message ?? "No skills found in this file. Add them by hand below.");
     } else {
       $("resume-status").textContent =
