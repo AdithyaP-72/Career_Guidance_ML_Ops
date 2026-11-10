@@ -192,3 +192,61 @@ def test_learning_path_links_courses(client):
         {"title": "GST Basics", "provider": "NPTEL", "url": "https://onlinecourses.nptel.ac.in/gst"}
     ]
     assert all(isinstance(c, list) for c in steps.values())  # skills without a course: an empty list, not missing
+
+
+# ── skill gap: synonyms, vague tags, course relevance (configs/skill_equivalents.yaml) ──
+
+
+@pytest.fixture
+def gap(bundle):
+    eq = {
+        "same_skill": [["ci/cd", "continuous integration"]],
+        "too_vague": {"api", "development"},
+        "no_courses": {"automation"},
+    }
+    r = Recommender(bundle, equivalents=eq)
+    core = {"fast api": 0.4, "flask": 0.3, "api": 0.2, "python development": 0.1}
+    core |= {"continuous integration": 0.2, "automation": 0.1}
+    r.roles["Test Role"] = {"core_skills": core, "family": "Test"}
+    for s in ("fastapi", "fast api", "python", "python development"):  # names the vocabulary knows
+        r.co_index.setdefault(s, 0)
+    r.canon = r._same_skill_map(eq["same_skill"])
+    r.members.clear()
+    for name, c in r.canon.items():
+        r.members[c].add(name)
+    r.courses = {
+        "flask": [
+            {"title": "REST APIs with Flask", "provider": "Coursera", "url": "https://example.org/1"},
+            {
+                "title": "Advanced Data Engineering with Snowflake",
+                "provider": "Coursera",
+                "url": "https://example.org/2",
+            },
+        ],
+        "automation": [{"title": "Industrial Automation", "provider": "SWAYAM", "url": "https://example.org/3"}],
+    }
+    return r
+
+
+def test_synonyms_count_as_the_same_skill(gap):
+    score, have, missing = gap.readiness("Test Role", ["fastapi", "python", "ci/cd"])
+    assert set(have) == {"fastapi", "python", "ci/cd"}  # fast api, python development, continuous integration
+    assert missing == ["flask", "automation"]
+    assert score == round((0.4 + 0.1 + 0.2) / (0.4 + 0.3 + 0.1 + 0.2 + 0.1), 4)  # "api" left out entirely
+
+
+def test_vague_tags_are_not_a_skill_gap(gap):
+    _, have, missing = gap.readiness("Test Role", ["python"])
+    assert "api" not in missing and "development" not in missing and "api" not in have
+
+
+def test_courses_must_be_about_the_skill(gap):
+    steps = {s["skill"]: s["courses"] for s in gap.learning_path("Test Role", ["python"], ["flask", "automation"])}
+    assert [c["title"] for c in steps["flask"]] == ["REST APIs with Flask"]  # the Snowflake course is dropped
+    assert steps["automation"] == []  # listed under no_courses: better none than a wrong one
+
+
+def test_real_config_loads_and_twins_merge(bundle):
+    r = Recommender(bundle)
+    assert "api" in r.vague and "automation" in r.no_courses
+    assert r.same("continuous integration") == r.same("ci/cd")

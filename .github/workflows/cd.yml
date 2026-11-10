@@ -94,7 +94,7 @@ jobs:
           LIVE_VERSION=$(echo "$LIVE" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))')
           echo "live: revision=$LIVE_SHA model=v$LIVE_VERSION | wanted: revision=$SHA model=v$VERSION"
 
-          SERVING_PATHS=(src/ configs/skill_aliases.yaml Dockerfile pyproject.toml uv.lock)   # what goes into the image
+          SERVING_PATHS=(src/ configs/skill_aliases.yaml configs/skill_equivalents.yaml Dockerfile pyproject.toml uv.lock)   # what goes into the image
           if [ "$MANUAL" = "true" ]; then
             DEPLOY=true; WHY="manual run"
           elif [ -z "$LIVE_SHA" ] || ! git cat-file -e "$LIVE_SHA^{commit}" 2>/dev/null; then
