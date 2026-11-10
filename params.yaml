@@ -36,7 +36,7 @@ profiling:
   snapshots: [2017, 2019, 2022, 2025]
 
 train:                     # Step 5 baselines (src/models/train.py; one dvc stage per model)
-  models: [dummy, profile, logreg, random_forest, lightgbm, sgd, complement_nb]
+  models: [dummy, profile, logreg, random_forest, lightgbm, sgd, complement_nb, complement_nb_cal]
   # mlp is switched off: 50-100 min on CPU per retrain (scikit-learn has no GPU support) and it was the weakest
   # challenger (76.4% top-3; see README). Its settings stay below: add it back to the list above to retrain it.
   skill_dropout: true      # train on postings + their cut-down copies (features.dropout)
@@ -86,6 +86,11 @@ train:                     # Step 5 baselines (src/models/train.py; one dvc stag
   complement_nb:           # Phase 4b challenger: purpose-built for imbalanced sparse counts
     alpha: 1.0             # Laplace smoothing
     norm: false
+  complement_nb_cal:       # ComplementNB + isotonic calibration, so its confidence % is honest (ECE 0.43 → ~0.07)
+    alpha: 1.0
+    norm: false
+    method: isotonic
+    cv: 3                  # ensemble=False (estimators.py): one final model, ~3x faster to predict
 
 select:                    # src/models/select.py
   metric: top3_5skills     # best baseline = highest top-3 accuracy on 5-skill test inputs

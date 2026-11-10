@@ -16,6 +16,7 @@ import numpy as np
 import scipy.sparse as sp
 from lightgbm import LGBMClassifier
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
@@ -57,6 +58,14 @@ class ProfileMatcher(ClassifierMixin, BaseEstimator):
         return self.classes_[self.predict_proba(X).argmax(axis=1)]
 
 
+def calibrated_complement_nb(alpha=1.0, norm=False, method="isotonic", cv=3):
+    """Calibrate ComplementNB confidence with one final estimator for fast inference.
+
+    Class-wise calibration can change multiclass rankings; evaluate them alongside ECE.
+    """
+    return CalibratedClassifierCV(ComplementNB(alpha=alpha, norm=norm), method=method, cv=cv, ensemble=False)
+
+
 MODELS = {
     "dummy": DummyClassifier,
     "profile": ProfileMatcher,
@@ -66,6 +75,7 @@ MODELS = {
     "mlp": MLPClassifier,
     "sgd": SGDClassifier,
     "complement_nb": ComplementNB,
+    "complement_nb_cal": calibrated_complement_nb,
 }
 
 

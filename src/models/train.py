@@ -14,8 +14,11 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
+import tempfile
 import time
+from pathlib import Path
 
 import joblib
 import mlflow
@@ -46,6 +49,7 @@ TRUSTED_TYPES = [
     "sklearn.neural_network._stochastic_optimizers.AdamOptimizer",
     "sklearn.linear_model._stochastic_gradient.SGDClassifier",
     "sklearn.naive_bayes.ComplementNB",
+    "sklearn.calibration._CalibratedClassifier",
 ]
 
 
@@ -69,9 +73,18 @@ def fit(pipe: Pipeline, train, p: dict):
 
 def log_model(pipe: Pipeline, example) -> str:
     """Upload a fitted pipeline to the active MLflow run (skops format + our src/ code). Returns its URI."""
-    info = mlflow.sklearn.log_model(
-        pipe, name="model", code_paths=[str(ROOT / "src")], input_example=example, skops_trusted_types=TRUSTED_TYPES
-    )
+    # OneDrive source directories can have the Windows read-only attribute. MLflow
+    # preserves it when copying code, then fails to clean its temp folder and loses
+    # the returned URI. Stage Python sources without copying directory attributes.
+    with tempfile.TemporaryDirectory() as staging:
+        source = Path(staging) / "src"
+        for path in (ROOT / "src").rglob("*.py"):
+            target = source / path.relative_to(ROOT / "src")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, target)
+        info = mlflow.sklearn.log_model(
+            pipe, name="model", code_paths=[str(source)], input_example=example, skops_trusted_types=TRUSTED_TYPES
+        )
     return info.model_uri
 
 

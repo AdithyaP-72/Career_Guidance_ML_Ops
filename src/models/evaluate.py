@@ -80,17 +80,17 @@ def evaluate(pipe, test: pd.DataFrame, ref: pd.DataFrame | None, family_of: dict
 
     report = pd.DataFrame(classification_report(test["role"], pred5, output_dict=True, zero_division=0)).T
     report.index.name = "role"
-    report.round(4).to_csv(out_dir / "per_role_5skills.csv")
+    report.round(4).to_csv(out_dir / "per_role_5skills.csv", lineterminator="\n")
 
     conf = pd.crosstab(test["role"].rename("true_role"), pd.Series(pred5, name="predicted_role", index=test.index))
     pairs = conf.stack().rename("n").reset_index()
     pairs = pairs[pairs["true_role"] != pairs["predicted_role"]].sort_values("n", ascending=False).head(40)
-    pairs.to_csv(out_dir / "top_confusions_5skills.csv", index=False)
+    pairs.to_csv(out_dir / "top_confusions_5skills.csv", index=False, lineterminator="\n")
 
     pred_family = pd.Series([family_of[p] for p in pred5], index=test.index, name="predicted_family")
     fam = pd.crosstab(test["family"].rename("true_family"), pred_family, normalize="index")
     fam = fam.reindex(index=fam.index, columns=fam.index, fill_value=0.0)
-    fam.round(4).to_csv(out_dir / "family_confusion_5skills.csv")
+    fam.round(4).to_csv(out_dir / "family_confusion_5skills.csv", lineterminator="\n")
     plot_family_confusion(fam, out_dir / "family_confusion_5skills.png")
     return {k: round(v, 4) for k, v in metrics.items()}
 

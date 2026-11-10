@@ -56,6 +56,21 @@ def test_unknown_model_name_is_rejected():
         build_estimator("xgboost", {})
 
 
+def test_calibrated_complement_nb_keeps_one_inference_model():
+    pipe = build_pipeline("complement_nb_cal", PARAMS).fit(TOY[["skills", "exp_min"]], TOY["role"])
+    calibrated = pipe.named_steps["model"]
+    assert calibrated.method == "isotonic"
+    assert calibrated.cv == 3
+    assert calibrated.ensemble is False
+    assert len(calibrated.calibrated_classifiers_) == 1
+    # Clear role examples must still rank correctly after class-wise calibration.
+    assert list(pipe.predict(TOY[["skills", "exp_min"]].iloc[[0, 5, 10]])) == [
+        "Accountant",
+        "Frontend Developer",
+        "Staff Nurse",
+    ]
+
+
 @pytest.mark.parametrize("name", PARAMS["train"]["models"])
 def test_every_configured_model_trains_predicts_and_pickles(name):
     pipe = build_pipeline(name, PARAMS).fit(TOY[["skills", "exp_min"]], TOY["role"])
@@ -76,12 +91,14 @@ def test_every_model_reloads_with_skops_and_our_trusted_types(name):
     )
 
 
-def test_log_model_uploads_a_loadable_model(tmp_path):
+@pytest.mark.parametrize("name", ["logreg", "complement_nb_cal"])
+def test_log_model_uploads_a_loadable_model(tmp_path, name):
     # Same call select.py makes for the best baseline, against a throwaway MLflow database.
     mlflow.set_tracking_uri(f"sqlite:///{(tmp_path / 'mlflow.db').as_posix()}")
-    pipe = build_pipeline("logreg", PARAMS).fit(TOY[["skills", "exp_min"]], TOY["role"])
+    pipe = build_pipeline(name, PARAMS).fit(TOY[["skills", "exp_min"]], TOY["role"])
     with mlflow.start_run():
         uri = log_model(pipe, TOY[["skills", "exp_min"]].head(2))
+    assert uri.startswith("models:/")
     loaded = mlflow.sklearn.load_model(uri)
     assert np.allclose(loaded.predict_proba(TOY[["skills", "exp_min"]]), pipe.predict_proba(TOY[["skills", "exp_min"]]))
 

@@ -63,17 +63,13 @@ def main() -> None:
             f"{here!r}, so the run can't be reopened. Retrain it against this server first:\n"
             f"    uv run dvc repro -f -s train@{best}   and then   uv run dvc repro"
         )
-    model_uri = None
-    try:
-        with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
-            mlflow.set_tag("best_baseline", "true")
-            model_uri = log_model(
-                joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval")
-            )
-    except PermissionError:
-        # Windows may raise WinError 5 when MLflow cleans up its temp dir while handles
-        # are still open. The model has already been logged successfully at this point.
-        log.warning("Windows temp-dir cleanup error (safe to ignore); model already logged to MLflow.")
+    with mlflow.start_run(run_id=run["run_id"]):  # reopen the best model's own run
+        mlflow.set_tag("best_baseline", "true")
+        model_uri = log_model(joblib.load(MODELS / "model.joblib"), inputs(read_split("test").head(3), "skills_eval"))
+    # register.py and CD need this URI; fail here rather than write metrics.json without it.
+    # (The Windows temp-folder error that used to lose it is avoided in train.log_model.)
+    if not model_uri or not model_uri.startswith("models:/"):
+        raise RuntimeError(f"MLflow model upload did not return a models:/ URI: {model_uri!r}")
     log.info("uploaded %s to MLflow: %s", best, model_uri)
 
     profile_score = table.loc["profile", metric] if "profile" in table.index else float("nan")
