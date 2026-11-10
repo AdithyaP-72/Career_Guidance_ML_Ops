@@ -173,6 +173,14 @@ def _kind(data: bytes, filename: str) -> str:
     raise ResumeError("Unsupported file. Please upload a PDF or a .docx file.")
 
 
+FRAGMENTED_WORDS_PER_LINE = 1.5  # a normal PDF gives ~6 words per line; a word-per-line extraction gives ~1
+
+
+def _words_per_line(text: str) -> float:
+    lines = [ln for ln in text.splitlines() if ln.strip()]
+    return sum(len(ln.split()) for ln in lines) / len(lines) if lines else 0.0
+
+
 def _pdf_text(data: bytes, warnings: list[str]) -> str:
     from pypdf import PdfReader  # imported lazily: keeps start-up memory small
     from pypdf.errors import PyPdfError
@@ -184,7 +192,14 @@ def _pdf_text(data: bytes, warnings: list[str]) -> str:
         pages = reader.pages
         if len(pages) > MAX_PAGES:
             warnings.append(f"Only the first {MAX_PAGES} pages were read.")
-        return "\n".join((pages[i].extract_text() or "") for i in range(min(len(pages), MAX_PAGES)))
+        n = min(len(pages), MAX_PAGES)
+        text = "\n".join((pages[i].extract_text() or "") for i in range(n))
+        if text.strip() and _words_per_line(text) < FRAGMENTED_WORDS_PER_LINE:
+            # Some exporters (Google Docs) write every word as its own text object, and the default mode then
+            # returns one word per line: headings and "Label: a, b" lines fall apart. Layout mode rebuilds the
+            # lines from where the words sit on the page. Not the default: it can merge two-column layouts.
+            text = "\n".join((pages[i].extract_text(extraction_mode="layout") or "") for i in range(n))
+        return text
     except ResumeError:
         raise
     except (PyPdfError, ValueError, KeyError, TypeError, OSError, RecursionError) as e:
@@ -288,11 +303,13 @@ class SkillExtractor:
             if label in OTHER_HEADERS:
                 return "other", ""
             words = line.split()
+            bare = line.strip().strip(_TOKEN_EDGE + ".").lower()
             if (
                 line.isupper()
                 and 1 <= len(words) <= 4
                 and not any(ch.isdigit() for ch in line)
-                and line.strip().lower() not in self.index  # "SQL" on its own line is a skill, not a heading
+                and not line.rstrip().endswith(",")  # "HTML," is an item of a list, never a heading
+                and bare not in self.index  # "SQL" / "AWS," on its own line is a skill, not a heading
             ):
                 return "other", ""  # unknown ALL-CAPS heading ends the skills section
         return None, line

@@ -166,6 +166,49 @@ def test_pdf_end_to_end(ex):
     assert {"python", "react.js", "machine learning", "node.js", "tally"} <= set(res.names)
 
 
+def test_word_per_line_pdf_falls_back_to_layout_mode(ex, monkeypatch):
+    # Google Docs exports write each word as its own text object; pypdf's default mode then returns one word per
+    # line, so "TECHNICAL SKILLS" and "Languages : C, ..." fall apart. Simulated here at the pypdf boundary.
+    import pypdf
+
+    lines = ["TECHNICAL SKILLS", "Languages : C, Python, SQL", "Web Development : HTML, CSS, React"]
+    fragmented = "\n".join(w for ln in lines for w in ln.split())
+    calls = []
+
+    def fake_extract(self, *args, extraction_mode="plain", **kwargs):
+        calls.append(extraction_mode)
+        return "\n".join(lines) if extraction_mode == "layout" else fragmented
+
+    monkeypatch.setattr(pypdf.PageObject, "extract_text", fake_extract)
+    out = extract_skills(make_pdf([["placeholder"]]), "cv.pdf", extractor=ex)
+    assert calls == ["plain", "layout"]
+    by = {s.skill: s for s in out.skills}
+    assert {"c", "python", "sql", "html", "css", "react.js"} <= set(by)
+    assert all(by[s].in_skills_section for s in ("c", "html", "css"))
+
+
+def test_normal_pdf_does_not_use_layout_mode(ex, monkeypatch):
+    import pypdf
+
+    calls = []
+    real = pypdf.PageObject.extract_text
+
+    def spy(self, *args, **kwargs):
+        calls.append(kwargs.get("extraction_mode", "plain"))
+        return real(self, *args, **kwargs)
+
+    monkeypatch.setattr(pypdf.PageObject, "extract_text", spy)
+    extract_skills(make_pdf([RESUME_LINES]), "cv.pdf", extractor=ex)
+    assert calls == ["plain"]
+
+
+def test_list_items_on_their_own_line_are_not_headings(ex):
+    # One skill per line (seen in word-per-line PDFs): "HTML," must not end the Skills section or be swallowed.
+    got = ex.from_text("SKILLS\nC,\nHTML,\nCSS,\nPython")
+    assert {"c", "html", "css", "python"} <= set(s.skill for s in got)
+    assert all(s.in_skills_section for s in got)
+
+
 def test_docx_end_to_end_with_table(ex):
     data = make_docx(["Priya Nair", "SKILLS", "Python"], table_rows=[["Tools", "Kubernetes, AWS"], ["Data", "SQL"]])
     res = extract_skills(data, "cv.docx", extractor=ex)
