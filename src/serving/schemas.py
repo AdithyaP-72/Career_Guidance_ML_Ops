@@ -7,13 +7,16 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
+# Up to 60 skills per request: resumes list ~27 under their Skills heading on average, and long ones 50-60.
+# Measured on 11 real resumes, cutting a 63-skill list at 30 hid its strongest signal (DevOps, ranks 31-63).
+MAX_SKILLS = 60
 Skill = Annotated[str, Field(min_length=1, max_length=100)]  # the longest skill in the vocabulary has 49 characters
 
 
 class PredictRequest(BaseModel):
     skills: list[Skill] = Field(
         min_length=1,
-        max_length=30,
+        max_length=MAX_SKILLS,
         description="Your skills. Use /skills?q=... to find the spellings the model knows.",
         examples=[["accounting", "tally", "gst", "tds", "excel"]],
     )

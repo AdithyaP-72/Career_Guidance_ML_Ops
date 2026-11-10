@@ -37,7 +37,7 @@ from starlette.concurrency import run_in_threadpool
 from src.serving import resume
 from src.serving.limits import BodySizeLimit, RateLimiter, rate_limited
 from src.serving.recommender import Recommender
-from src.serving.schemas import ModelInfo, PredictRequest, PredictResponse, ResumeSkills, SkillSearch
+from src.serving.schemas import MAX_SKILLS, ModelInfo, PredictRequest, PredictResponse, ResumeSkills, SkillSearch
 from src.utils import ROOT, get_logger
 
 log = get_logger("api")
@@ -177,7 +177,9 @@ async def extract_skills(request: Request, file: Annotated[UploadFile, File()]):
         raise HTTPException(413, f"The file is too large (limit {MAX_RESUME_BYTES // 1_000_000} MB).")
     try:
         # Parsing is CPU work: run it in a worker thread so the server keeps answering other requests.
-        result = await run_in_threadpool(resume.extract_skills, data, file.filename, 30, request.app.state.extractor)
+        result = await run_in_threadpool(
+            resume.extract_skills, data, file.filename, MAX_SKILLS, request.app.state.extractor
+        )
     except resume.ResumeError as e:  # corrupt, encrypted, wrong content: the message is safe to show
         raise HTTPException(422, str(e)) from None
     vocab = rec(request).vocab

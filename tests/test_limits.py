@@ -83,6 +83,15 @@ def test_oversized_body_without_content_length_is_cut_off(strict_client):
     assert r.status_code == 413
 
 
+def test_up_to_60_skills_per_request(strict_client):
+    from src.serving.schemas import MAX_SKILLS
+
+    assert MAX_SKILLS == 60
+    many = [*ACCOUNTANT, *(f"made-up skill {i}" for i in range(MAX_SKILLS - len(ACCOUNTANT)))]
+    assert strict_client.post("/predict", json={"skills": many}).status_code == 200  # unknown ones are just reported
+    assert strict_client.post("/predict", json={"skills": [*many, "one too many"]}).status_code == 422
+
+
 def test_skill_text_is_capped(strict_client):
     r = strict_client.post("/predict", json={"skills": [*ACCOUNTANT[:4], "y" * 101]})
     assert r.status_code == 422
