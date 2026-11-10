@@ -1,40 +1,40 @@
 {
-  "model": "logreg",
+  "model": "complement_nb_cal",
   "passed": true,
   "failed_checks": [],
   "checks": {
     "top3_5skills": {
-      "value": 0.7939,
+      "value": 0.8022,
       "rule": ">=",
       "threshold": 0.75,
       "passed": true
     },
     "margin_over_profile_matching": {
-      "value": 0.1306,
+      "value": 0.1389,
       "rule": ">=",
       "threshold": 0.05,
       "passed": true
     },
     "ref2019_top3_5skills": {
-      "value": 0.6675,
+      "value": 0.7016,
       "rule": ">=",
       "threshold": 0.6,
       "passed": true
     },
     "ece_top1_5skills": {
-      "value": 0.0476,
+      "value": 0.0719,
       "rule": "<=",
       "threshold": 0.1,
       "passed": true
     },
     "min_family_top3_5skills": {
-      "value": 0.6684,
+      "value": 0.6595,
       "rule": ">=",
       "threshold": 0.6,
       "passed": true
     },
     "min_role_top3_5skills": {
-      "value": 0.4333,
+      "value": 0.5,
       "rule": ">=",
       "threshold": 0.25,
       "passed": true
@@ -46,13 +46,13 @@
       "passed": true
     },
     "model_size_mb": {
-      "value": 4.8,
+      "value": 1.9,
       "rule": "<=",
       "threshold": 100,
       "passed": true
     },
     "p95_latency_ms": {
-      "value": 11.05,
+      "value": 38.25,
       "rule": "<=",
       "threshold": 100,
       "passed": true
@@ -83,25 +83,25 @@
     }
   },
   "context": {
-    "mean_top1_confidence": 0.5585,
-    "top1_accuracy": 0.5647,
+    "mean_top1_confidence": 0.5125,
+    "top1_accuracy": 0.5655,
     "worst_families": {
-      "Strategy & Consulting": 0.6684,
-      "Banking & Financial Services": 0.6705,
-      "IT Infra & Support": 0.6718,
-      "Office Admin & Data Entry": 0.6911,
-      "Construction & Site Engg": 0.6953
+      "Strategy & Consulting": 0.6595,
+      "Banking & Financial Services": 0.6648,
+      "Construction & Site Engg": 0.6738,
+      "Office Admin & Data Entry": 0.6937,
+      "IT Infra & Support": 0.709
     },
     "worst_roles": {
-      "System Administrator": 0.4333,
-      "Brand / Product Marketing Manager": 0.4545,
-      "Technical Writer": 0.4583,
-      "Fashion Designer": 0.52,
-      "Payroll Executive": 0.5429
+      "Architect (Building)": 0.5,
+      "Pre-Sales Consultant": 0.5185,
+      "System Administrator": 0.5333,
+      "Brand / Product Marketing Manager": 0.5758,
+      "Branch Banking Officer": 0.5772
     },
     "behaviour_failures": [],
     "n_test": 13688,
     "n_classes": 103
   },
-  "mlflow_run_id": "64e684947e88478c9698366c35eb6ef6"
+  "mlflow_run_id": "c5d59f5f81ba4979bafafc27af11f949"
 }

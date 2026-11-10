@@ -245,20 +245,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -312,20 +312,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -379,20 +379,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -447,20 +447,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -518,20 +518,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -582,31 +582,31 @@ stages:
       size: 1116202
     - path: models/baselines
       hash: md5
-      md5: 76aef6a55ed386e2457383587bf393da.dir
-      size: 129972172
-      nfiles: 8
+      md5: 3c6081d87a57022ccc4b47b7f1d0587a.dir
+      size: 131873438
+      nfiles: 9
     - path: reports/metrics
       hash: md5
-      md5: 6b513df0e34954c292cd222267af5e48.dir
-      size: 3684
-      nfiles: 7
+      md5: d912eff08277e6868035c2b1fa1264b2.dir
+      size: 4210
+      nfiles: 8
     - path: reports/runs
       hash: md5
-      md5: 6d967d0c1a039b08b4279fb8a54f902c.dir
-      size: 1357
-      nfiles: 7
+      md5: 51ff4d6a94a9ac836b6c7b414ff80dfc.dir
+      size: 1560
+      nfiles: 8
     - path: src/models/select.py
       hash: md5
-      md5: 1f91befe52ab9a78852873fad0bceb9e
-      size: 3892
+      md5: 04a226c2227c09ca4d5c90e7b454cf17
+      size: 3853
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         select:
@@ -621,19 +621,20 @@ stages:
         - lightgbm
         - sgd
         - complement_nb
+        - complement_nb_cal
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: a65cf5a316877920b7e6aaa81d2028c5
-      size: 4797416
+      md5: 98c2d8a9c57f46b0bf25f6467b40e55b
+      size: 1901240
     - path: reports/metrics.json
       hash: md5
-      md5: 923e62fa1932bcc191f82ddf649de8ce
-      size: 808
+      md5: c9c510c70574ea6c907597e653ac9a94
+      size: 820
     - path: reports/model_comparison.csv
       hash: md5
-      md5: d6015db5f738b726cc48521073b39263
-      size: 668
+      md5: d4ba517bef8336724099c84646b47d3b
+      size: 749
   train@sgd:
     cmd: uv run python -m src.models.train sgd
     deps:
@@ -655,20 +656,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -727,20 +728,20 @@ stages:
       size: 2785
     - path: src/models/estimators.py
       hash: md5
-      md5: 93a39a66565edbe63ff54deb7ec885be
-      size: 2917
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/tracking.py
       hash: md5
-      md5: 133f255be24ef03716b004328816e8c5
-      size: 2444
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
     - path: src/models/train.py
       hash: md5
-      md5: 48178a302e986292064f31ea981dd12b
-      size: 5570
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
     params:
       params.yaml:
         features:
@@ -895,16 +896,16 @@ stages:
       size: 1116202
     - path: models/model.joblib
       hash: md5
-      md5: a65cf5a316877920b7e6aaa81d2028c5
-      size: 4797416
+      md5: 98c2d8a9c57f46b0bf25f6467b40e55b
+      size: 1901240
     - path: reports/metrics.json
       hash: md5
-      md5: 923e62fa1932bcc191f82ddf649de8ce
-      size: 808
+      md5: c9c510c70574ea6c907597e653ac9a94
+      size: 820
     - path: src/models/evaluate.py
       hash: md5
-      md5: e72603b3c595e97ceab67bc81a874443
-      size: 6076
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
     - path: src/models/validate.py
       hash: md5
       md5: a26e75543716fd7a957e65ca8d191919
@@ -925,9 +926,79 @@ stages:
     outs:
     - path: reports/model_card.md
       hash: md5
-      md5: e9018b7c77f983889aab18a5abd6ff2d
-      size: 2508
+      md5: b0d475ce36f9a4cc2fd549213150264d
+      size: 2529
     - path: reports/validation.json
       hash: md5
-      md5: e02f077f65548a3c4de501a10cdf0e65
-      size: 2359
+      md5: 515d29222b90e2a3ad9127b72618a707
+      size: 2378
+  train@complement_nb_cal:
+    cmd: uv run python -m src.models.train complement_nb_cal
+    deps:
+    - path: data/processed/reference_2019.parquet
+      hash: md5
+      md5: 063d53dc475234a441118058aa1aeacc
+      size: 1884276
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: d2912e9d775530b6d72dbaaf1d68cf66
+      size: 1116202
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: f1bf72d0ba42bd9fa04da5f1aadbfc93
+      size: 3095584
+    - path: src/features/build.py
+      hash: md5
+      md5: 7241049124b0d558fda1914c17824df0
+      size: 2785
+    - path: src/models/estimators.py
+      hash: md5
+      md5: 02031a87676af5b841941c7648d79da6
+      size: 3396
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 199eb521002e2fae608b9fe27f1f0f80
+      size: 6139
+    - path: src/models/tracking.py
+      hash: md5
+      md5: 41a455affcf682ee600c734e8a018bf7
+      size: 2719
+    - path: src/models/train.py
+      hash: md5
+      md5: 4cbb5861bcb58d2e09601183dd07d564
+      size: 6234
+    params:
+      params.yaml:
+        features:
+          top_k_skills: 6000
+          exp_clip: 20
+          eval_n_skills: 5
+          dropout:
+            copies: 2
+            min_k: 2
+            max_k: 6
+            seed: 42
+        train.complement_nb_cal:
+          alpha: 1.0
+          norm: false
+          method: isotonic
+          cv: 3
+        train.skill_dropout: true
+    outs:
+    - path: models/baselines/complement_nb_cal.joblib
+      hash: md5
+      md5: 98c2d8a9c57f46b0bf25f6467b40e55b
+      size: 1901240
+    - path: reports/eval/complement_nb_cal
+      hash: md5
+      md5: 80f777eb4ad32602af15a626a411b792.dir
+      size: 213794
+      nfiles: 4
+    - path: reports/metrics/complement_nb_cal.json
+      hash: md5
+      md5: 4460e3d28c9bcfa7d7a975138dfd30d1
+      size: 526
+    - path: reports/runs/complement_nb_cal.json
+      hash: md5
+      md5: e794fca32da8d5bcc6f39cf40c907e69
+      size: 203
