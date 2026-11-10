@@ -1,0 +1,72 @@
+# Behavioural test cases for the quality gate (src/models/validate.py).
+#
+# Each case is what a real user might type (5 skills + years of experience) and the role a
+# human would expect to see somewhere in the top 3. These are written by hand on purpose:
+# they are NOT generated from the training data, so they catch a model that scores well on
+# test-set numbers but gives silly answers to obvious inputs.
+#
+# Skills must use the canonical spelling from the model vocabulary (models/skill_vocab.json);
+# validate.py fails loudly if one is unknown. The gate needs params.yaml →
+# validate.min_behaviour_pass_rate of these to pass.
+
+cases:
+  - expected: Accountant
+    skills: [accounting, tally, gst, tds, bank reconciliation]
+    experience: 2
+  - expected: Frontend Developer
+    skills: [javascript, react.js, html, css, typescript]
+    experience: 1
+  - expected: Staff Nurse
+    skills: [nursing, gnm, patient care, icu, hospital]
+    experience: 3
+  - expected: Data Scientist
+    skills: [python, machine learning, data science, deep learning, natural language processing]
+    experience: 3
+  - expected: DevOps Engineer
+    skills: [devops, kubernetes, docker, jenkins, terraform]
+    experience: 4
+  - expected: HR Executive / Generalist
+    skills: [hr operations, hr generalist activities, employee engagement, human resource management, recruitment]
+    experience: 2
+  - expected: Digital Marketing Executive
+    skills: [digital marketing, seo, google ads, social media marketing, google analytics]
+    experience: 1
+  - expected: Graphic Designer
+    skills: [graphic designing, photoshop, illustrator, corel draw, adobe creative suite]
+    experience: 2
+  - expected: Site / Civil Engineer
+    skills: [civil engineering, site supervision, site execution, construction, autocad]
+    experience: 3
+  - expected: School Teacher
+    skills: [teaching, b.ed, tgt, mathematics, education]
+    experience: 4
+  - expected: Customer Support (Voice)
+    skills: [voice process, international voice process, bpo, customer service, communication skills]
+    experience: 0
+  - expected: SAP Consultant
+    skills: [sap, sap sd, sap hana, sap abap, consulting]
+    experience: 5
+  - expected: Android Developer
+    skills: [android, kotlin, java, android studio, mvvm]
+    experience: 2
+  - expected: Manual Test Engineer
+    skills: [manual testing, software testing, test cases, regression testing, quality assurance]
+    experience: 2
+  - expected: Recruiter / Talent Acquisition
+    skills: [recruitment, talent acquisition, sourcing, screening, it recruitment]
+    experience: 1
+  - expected: Chef / Cook
+    skills: [cooking, food production, chef, bakery, culinary]
+    experience: 3
+  - expected: Network Engineer
+    skills: [networking, cisco, ccna, switching, lan]
+    experience: 2
+  - expected: Content Writer
+    skills: [content writing, creative writing, content editing, wordpress, seo writing]
+    experience: 1
+  - expected: Mechanical Design Engineer
+    skills: [mechanical design, solid works, autocad, mechanical engineering, design engineering]
+    experience: 3
+  - expected: Salesforce Developer
+    skills: [salesforce, apex, visualforce, lwc, soql]
+    experience: 3

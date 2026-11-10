@@ -32,3 +32,6 @@ ppt/*.jpg
 
 # Data and model files are tracked by DVC, which writes its own .gitignore entries
 # (e.g. data/raw/.gitignore) when you run `dvc add` or `dvc repro`.
+
+# Phase 2: model bundle for the API image (built from the MLflow registry or models/, never committed)
+bundle/

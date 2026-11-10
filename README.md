@@ -18,7 +18,7 @@ An end-to-end MLOps pipeline for Indian career path guidance. Given a user's ski
 |---|---|---|---|
 | **O1** | Specific role recommendation | Top-3 accuracy on 5-skill inputs (simulating real user interaction) | Champion Complement Naive Bayes: **80.03% top-3** (Target: $\ge 75\%$) |
 | **O2** | Skill gap & readiness | Weighted core skill overlap per role (from 2025 Naukri data) | Deterministic pandas calculations versioned by DVC |
-| **O3** | Ordered learning path | Co-occurrence rank $\times$ market growth ($2019 \to 2025$) mapped to course catalog | NPTEL/SWAYAM matches for top skills |
+| **O3** | Ordered learning path | Co-occurrence rank $\times$ market growth ($2019 \to 2025$) mapped to course catalog | Free NPTEL/SWAYAM courses first, Coursera fallback: **59.7% coverage**, **98.0% relevance** |
 | **O4** | Education prior | Separate education-to-role prior table (PLFS & Naukri historical data) | Independent lookup table (not direct NLP on degrees) |
 | **O5** | Reproducible pipeline | Clone $\to$ sync $\to$ DVC pull $\to$ DVC repro gives identical metrics; all runs in MLflow | **Phase 1 Deliverable (Completed)** |
 | **O6** | Real drift detection | $2019 \to 2025$ natural distribution drift benchmarking | 2019 reference set evaluated across all models |
@@ -102,7 +102,7 @@ Eight candidate models were trained across 164,256 augmented postings (54,752 un
 
 **Complement Naive Bayes is the current champion**, selected by the highest top-3 accuracy on five-skill test inputs (`select.metric: top3_5skills`). Its 80.03% score exceeds Logistic Regression by 0.64 percentage points and Profile Matching by 13.70 percentage points, meeting the 75% target. The selected artifact is `models/model.joblib`, with metrics recorded in `reports/metrics.json`.
 
-The newly added challengers are **MLP** (76.40% top-3), **SGD with modified Huber loss** (76.22%), and **Complement Naive Bayes** (80.03%). MLP uses two hidden layers (256 and 128 units); SGD provides a fast linear classifier for sparse skill features.
+The newly added challengers are **MLP** (76.40% top-3; later removed from `train.models` because it takes 50+ min to train on CPU and never wins), **SGD with modified Huber loss** (76.22%), and **Complement Naive Bayes** (80.03%). MLP uses two hidden layers (256 and 128 units); SGD provides a fast linear classifier for sparse skill features.
 
 Top-3 accuracy means the correct role appears among the model's three highest-ranked recommendations. Macro-F1 measures top-1 performance across roles, while Right Family measures whether the top-ranked role belongs to the correct family. The 2019 column evaluates the historical reference set of 20,183 postings; the champion scores 69.92%, compared with 80.03% on the held-out 2025 test set. This difference provides a historical distribution-shift benchmark. Training and inference timings reflect the recorded run environment and can vary by hardware.
 
@@ -127,19 +127,23 @@ Top-3 accuracy means the correct role appears among the model's three highest-ra
 ├── models/                      # DVC-managed model checkpoints & skill profiles
 │   ├── baselines/               # Trained candidate models (.joblib)
 │   ├── model.joblib             # Selected champion model (Complement Naive Bayes)
-│   └── skill_profiles.json      # Precomputed role skill profiles & co-occurrence matrix
+│   ├── skill_profiles.json      # Precomputed role skill profiles & co-occurrence matrix
+│   └── skill_courses.json       # O3: Skill-to-course mapping (NPTEL/SWAYAM + Coursera)
 ├── notebooks/
-│   └── 01_eda.ipynb             # Exploratory Data Analysis notebook
+│   ├── 01_eda.ipynb             # Exploratory Data Analysis notebook
+│   └── 02_courses_exploration.ipynb # O3 Course catalog exploration & matching notebook
 ├── reports/                     # Metrics, taxonomy support, and evaluation reports
 │   ├── metrics.json             # Selected model performance
 │   ├── model_comparison.csv     # Metrics summary table for all baselines
+│   ├── courses_summary.json     # O3 Course coverage and relevance quality metrics
+│   ├── courses_relevance_sample.csv # O3 50-pair human verification sample
 │   ├── eval/                    # Per-model confusion matrices and error reports
 │   └── profiling/               # fg-data-profiling HTML reports
 ├── src/
 │   ├── data/                    # Ingestion, profiling, labelling, taxonomy & splitting
 │   ├── features/build.py        # CountVectorizer + experience ColumnTransformer
-│   └── models/                  # Estimators, training, MLflow tracking & model selection
-├── tests/                       # Pytest test suite (43 passed unit tests)
+│   └── models/                  # Estimators, training, MLflow tracking, profiles & courses
+├── tests/                       # Pytest test suite (54 passed unit tests)
 ├── dvc.yaml & params.yaml       # DVC multi-stage pipeline definition & hyperparams
 ├── pyproject.toml & uv.lock     # Fully-pinned dependencies managed with uv
 └── journey.md                   # Initial baseline analysis and findings
@@ -169,14 +173,24 @@ A scikit-learn `ColumnTransformer` combines:
 
 ### 5.4 MLOps Architecture & Roadmap
 
+Phase 2 (productionization & deployment) is documented step by step in [docs/PHASE2.md](docs/PHASE2.md).
+
 | Stage | Focus | Tools Used / Planned | Status |
 |---|---|---|---|
 | **1–2** | Ingestion & Features | pandas, pyarrow, scikit-learn, fg-data-profiling | ✅ Done |
 | **3** | Versioning & Storage | Git, DVC, DagsHub Remote Storage (S3 API) | ✅ Done |
 | **4a** | Baselines & Tracking | scikit-learn, LightGBM, MLflow (DagsHub hosted) | ✅ Done |
 | **4b** | Hyperparameter Tuning | Optuna Bayesian optimization | ⏳ Next |
-| **5** | Validation & Testing | pytest (43 tests), skops safe loading, SHAP analysis | 🟡 In progress |
-| **6** | Packaging | Docker / Podman, ONNX model quantization | ⏳ Planned |
-| **7** | Serving & API | FastAPI, Render / Hugging Face Spaces | ⏳ Planned |
+| **5** | Validation & Testing | pytest (87 tests), quality gate (`validate` stage: calibration, slices, behavioural cases), skops safe loading, MLflow Model Registry (`@champion` / `@challenger`) | ✅ Done (Phase 2) |
+| **6** | Packaging & CI/CD | Podman (OCI image), GHCR, GitHub Actions (CI + CD) | ✅ Done (Phase 2) |
+| **7** | Serving & API | FastAPI, static frontend, Render (Blueprint) | ✅ Done (Phase 2) |
 | **8** | Monitoring | Prometheus, Grafana, NannyML / custom JS divergence | ⏳ Planned |
 | **9** | Continuous Retraining | GitHub Actions automated `dvc repro` workflow | ⏳ Planned |
+
+### 5.5 Dataset Licences & Attributions
+* **Coursera Course Metadata 2025:** Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Course titles, metadata, and skills taxonomies are provided by Coursera via Kaggle mirror for academic and coursework non-commercial use. Course links and metadata are attributed in accordance with the licence.
+* **NPTEL / SWAYAM Course Catalog:** MIT License (Government of India, Ministry of Education, and partner IITs/IISc/IIMs).
+* **Naukri 2025 Snapshot:** CC BY-NC-SA 4.0 (academic non-commercial use).
+* **Naukri 2019 Snapshot:** CC0 (Public Domain, PromptCloud).
+* **NCO-2015:** MIT / Govt. of India data (Ministry of Labour & Employment, DGE).
+

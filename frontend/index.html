@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CareerCompass</title>
+  <meta name="description" content="Find job roles that match your skills, see your skill gap and what to learn next.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%232459d6'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <!-- config.js sets window.API_URL. Render writes it at deploy time (render.yaml); the committed
+       file points at a local API (uv run uvicorn src.serving.app:app). -->
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>CareerCompass</h1>
+      <p class="tagline">Your skills → the job roles they fit in India, what you're missing, and what to learn next.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card" aria-labelledby="input-title">
+      <h2 id="input-title">Your profile</h2>
+
+      <div class="field">
+        <label for="resume">Start from your resume <span class="muted">(PDF or DOCX, optional)</span></label>
+        <div class="resume-row">
+          <input id="resume" type="file" accept=".pdf,.docx">
+          <span id="resume-status" class="muted" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="skill-input">Skills <span class="muted">(at least <span id="min-skills">5</span>)</span></label>
+        <div class="chips" id="chips" aria-live="polite"></div>
+        <div class="combo">
+          <input id="skill-input" type="text" autocomplete="off" placeholder="Type a skill, e.g. tally, react, nursing…"
+                 role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
+      </div>
+
+      <div class="field narrow">
+        <label for="experience">Years of experience</label>
+        <input id="experience" type="number" min="0" max="60" step="1" placeholder="e.g. 2">
+      </div>
+
+      <button id="analyze" class="primary" disabled>Analyze</button>
+      <p id="status" class="status" aria-live="polite"></p>
+    </section>
+
+    <section id="results" aria-live="polite" hidden>
+      <div id="low-confidence" class="notice" hidden>
+        The model isn't very sure about these. Add a few more specific skills for a sharper answer.
+      </div>
+      <div id="result-cards" class="results"></div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p id="model-info" class="muted">Connecting to the model…</p>
+    <p class="muted">Trained on Naukri job postings (2019–2025). A starting point for exploring careers, not a hiring decision.</p>
+  </footer>
+</body>
+</html>

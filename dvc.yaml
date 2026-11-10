@@ -7,6 +7,10 @@
 #                                               profiles    train@<model>   (one stage per baseline, each an MLflow run)
 #                                                                 │
 #                                                               select ──▶ models/model.joblib + reports/model_comparison.csv
+#                                                                 │
+#                                                              validate ──▶ reports/validation.json + model_card.md  (quality gate)
+#
+# Then, by hand:  uv run python -m src.models.register   (MLflow Model Registry, @champion alias)
 
 stages:
   ingest:
@@ -150,3 +154,54 @@ stages:
       - reports/metrics.json:
           cache: false
 
+
+  # Phase 2: the quality gate. Records the report even when the gate fails; register.py and CI
+  # (`python -m src.models.validate --strict`) are what refuse a failing model.
+  validate:
+    cmd: uv run python -m src.models.validate
+    deps:
+      - src/models/validate.py
+      - src/models/evaluate.py
+      - configs/behaviour_cases.yaml
+      - models/model.joblib
+      - data/processed/test.parquet
+      - reports/metrics.json
+    params:
+      - validate
+    outs:
+      - reports/model_card.md:
+          cache: false
+    metrics:
+      - reports/validation.json:
+          cache: false
+
+  courses:
+    cmd: uv run python -m src.models.courses
+    deps:
+      - src/models/courses.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - models/skill_profiles.json
+      - data/raw/courses/coursera_courses_2025.csv
+      - data/raw/courses/nptel_swayam_courses.csv
+    params:
+      - courses
+    outs:
+      - models/skill_courses.json
+    metrics:
+      - reports/courses_summary.json:
+          cache: false
+
+  resume_keyness:          # Phase 2: lookup for the resume -> skills extractor (src/serving/resume.py)
+    cmd: uv run python -m src.serving.keyness
+    deps:
+      - src/serving/keyness.py
+      - src/utils.py
+      - configs/skill_aliases.yaml
+      - models/skill_vocab.json
+      - data/raw/naukri_2022
+      - data/raw/naukri_2025
+    params:
+      - resume.keyness
+    outs:
+      - models/skill_keyness.json

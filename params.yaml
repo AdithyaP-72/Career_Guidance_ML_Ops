@@ -36,7 +36,9 @@ profiling:
   snapshots: [2017, 2019, 2022, 2025]
 
 train:                     # Step 5 baselines (src/models/train.py; one dvc stage per model)
-  models: [dummy, profile, logreg, random_forest, lightgbm, mlp, sgd, complement_nb]
+  models: [dummy, profile, logreg, random_forest, lightgbm, sgd, complement_nb]
+  # mlp is switched off: 50-100 min on CPU per retrain (scikit-learn has no GPU support) and it was the weakest
+  # challenger (76.4% top-3; see README). Its settings stay below: add it back to the list above to retrain it.
   skill_dropout: true      # train on postings + their cut-down copies (features.dropout)
   experiment: career-role-baselines   # MLflow experiment name
   # Each block below is passed straight to the model's constructor.
@@ -87,3 +89,62 @@ train:                     # Step 5 baselines (src/models/train.py; one dvc stag
 
 select:                    # src/models/select.py
   metric: top3_5skills     # best baseline = highest top-3 accuracy on 5-skill test inputs
+  # Still trained and shown in model_comparison.csv, but never picked as the model to serve.
+  # complement_nb: best ranking but its confidence % is badly calibrated (ECE 0.43, gate max 0.10);
+  # the calibrated version (complement_nb_cal) is the one that can be selected.
+  exclude: [complement_nb]
+
+# ── Phase 2: productionization ────────────────────────────────────────────────
+
+validate:                  # src/models/validate.py: the quality gate a model must pass before it can be served
+  min_top3_5skills: 0.75           # O1 target
+  min_margin_over_profile: 0.05    # an ML model must clearly beat plain skill matching
+  min_ref2019_top3_5skills: 0.60   # floor under natural 2019 → 2025 drift
+  max_ece_top1: 0.10               # the app shows confidence %, so it must mean something (calibration)
+  min_family_top3: 0.60            # no role family may be badly served (slice check)
+  min_role_top3: 0.25              # ...and no single role
+  min_behaviour_pass_rate: 0.90    # hand-written cases in configs/behaviour_cases.yaml
+  max_model_size_mb: 100           # must fit a free-tier container
+  max_p95_latency_ms: 100          # one request, model only
+  latency_requests: 200
+
+register:                  # src/models/register.py (run by hand, after validate)
+  model_name: career-role-classifier
+  metric: top3_5skills     # promotion rule: passes the gate AND beats the current champion on this
+  min_improvement: 0.0
+
+
+courses:                   # Objective O3: Learning path course recommendations (src/models/courses.py)
+  max_courses_per_skill: 3
+  min_nptel_similarity: 0.35  # minimum TF-IDF cosine similarity for NPTEL text match
+  prefer_free_first: true     # prioritize free Indian courses (NPTEL/SWAYAM) over Coursera
+  relevance_sample_seed: 42
+  relevance_sample_size: 50
+  vague_skills:            # broad/vague skills in vocabulary that return noisy matches
+    - core
+    - development
+    - data
+    - management
+    - hospital
+    - operations
+    - process
+    - engineering
+    - software
+    - skills
+    - general
+    - support
+    - services
+    - site
+    - desk
+    - key
+    - system
+    - content
+    - civil
+    - resource
+    - control
+    - stack
+
+resume:                    # resume -> skills extractor (src/serving/resume.py)
+  keyness:                 # src/serving/keyness.py: how skill-like is each single-word skill
+    min_docs: 30           # a word must appear in at least this many job descriptions to get a score
+    sources: [2025, 2022]  # postings with a description AND a skill list (2022 alone is software-heavy)

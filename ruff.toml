@@ -1,6 +1,8 @@
 # Lint + format settings for `uv run ruff check .` and `uv run ruff format .`
 line-length = 120
 target-version = "py312"
+# Notebooks are exploratory scratch work; lint the package and tests only (CI runs ruff).
+extend-exclude = ["notebooks"]
 
 [lint]
 select = ["E", "F", "I", "UP", "B"]   # pycodestyle, pyflakes, import order, pyupgrade, bugbear
