@@ -24,7 +24,8 @@ services:
     name: career-guidance-web
     runtime: static
     # The only "build": write the API's address into config.js (see frontend/index.html).
-    buildCommand: echo "window.API_URL = \"$API_URL\";" > frontend/config.js
+    # Whitespace is stripped: a newline pasted into the dashboard would otherwise break the JS string.
+    buildCommand: printf 'window.API_URL = "%s";\n' "$(printf '%s' "$API_URL" | tr -d '[:space:]')" > frontend/config.js
     staticPublishPath: ./frontend
     buildFilter:
       paths:
