@@ -17,7 +17,8 @@ VOCAB = [
     "communication skills", "data", "core", "sales", "html", "css", "html/css", "aws", "kubernetes", "learning",
     "data analysis", "go", "ci/cd", "ms office", "e-commerce", "team", "case", "senior",
     "powerpoint", "bilingual", "spreadsheets", "company", "program", "leadership", "interpersonal", "excel powerpoint",
-    "jee", "java", "english", "hindi", "bash", "flask", "monitoring", "events", "t", "redux", "git", "angular",
+    "jee", "java", "english", "hindi", "bash", "aws", "typescript", "gcp",
+    "flask", "monitoring", "events", "t", "redux", "git", "angular",
 ]  # fmt: skip
 ALIASES = {
     "react": "react.js", "reactjs": "react.js", "react js": "react.js", "ml": "machine learning",
@@ -161,6 +162,14 @@ def test_tech_stack_line_inside_projects_does_not_turn_the_project_into_a_skills
 def test_extracurricular_heading_ends_the_skills_section(ex):
     got = {s.skill: s for s in ex.from_text("SKILLS\nPython\nExtracurricular Activity\nI enjoy social events.")}
     assert got["python"].in_skills_section and not got["events"].in_skills_section
+
+
+def test_split_first_letters_inside_skill_lists(ex):
+    # Small caps in PDFs: "A WS" / "T ypeScript" are rejoined only when the result is a known skill
+    got = names(ex, "SKILLS\nCloud & DevOps: A WS, GCP, T ypeScript")
+    assert {"aws", "gcp", "typescript"} <= set(got)
+    got = names(ex, "SKILLS\nC SQL, Python")  # two real skills with a missing comma: not glued into "CSQL"
+    assert {"c", "sql", "python"} <= set(got)
 
 
 def test_versioned_skill_names(ex):

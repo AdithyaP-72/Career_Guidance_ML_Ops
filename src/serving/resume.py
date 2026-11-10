@@ -128,6 +128,7 @@ OTHER_HEADERS = _phrases(
     """
 )
 SKILLS_SECTION_MAX_LINES = 30  # an unterminated "Skills" section stops being trusted after this many lines
+_SPLIT_LETTER_WORD = re.compile(r"\b([A-Z]) ([A-Za-z][A-Za-z0-9+#.]*[A-Za-z0-9+#])")  # "A WS"
 _VERSIONED = re.compile(r"([a-z][a-z+#]{1,}[a-z+#])v?\d+(?:\.\d+)*")  # 3+ letters, then a version
 _CONTINUES = re.compile(r"[,;+&/]\s*$")  # a list line that wraps onto the next line
 _SPLIT_INITIAL = re.compile(r"\b([A-Z]) (?=[a-z]{2,}\b|[A-Z]{2,}\b)")  # "T echnical" / "S KILLS"
@@ -278,6 +279,18 @@ class SkillExtractor:
         text = text.replace("\u00ad", "").replace("\u200b", "")
         text = _SLASH_SPACES.sub("/", text)
         return text[:MAX_CHARS]
+
+    def _rejoin_split_letters(self, text: str) -> str:
+        """Small-caps fonts come out of PDFs as "A WS", "T ypeScript". Rejoin only when the joined word is a known
+        skill and the rest on its own is not, so "C SQL" (two skills, missing comma) is left alone."""
+
+        def fix(m: re.Match) -> str:
+            joined = (m.group(1) + m.group(2)).lower()
+            if joined in self.index and m.group(2).lower() not in self.index:
+                return m.group(1) + m.group(2)
+            return m.group(0)
+
+        return _SPLIT_LETTER_WORD.sub(fix, text)
 
     @staticmethod
     def _tokens(segment: str) -> tuple[list[str], list[str]]:
@@ -463,7 +476,7 @@ class SkillExtractor:
             lambda: {"solid": 0, "generic": 0, "skills": False, "multi": False, "fuzzy": False}
         )
         in_skills, lines_left, carry = False, 0, False
-        for line in self._clean(text).splitlines():
+        for line in self._rejoin_split_letters(self._clean(text)).splitlines():
             if not line.strip():
                 continue
             kind, rest = self._header(line)
