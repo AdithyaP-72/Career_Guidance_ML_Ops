@@ -3,7 +3,7 @@
 
 const API = (window.API_URL || "http://localhost:8000").replace(/\/$/, "");
 const MIN_SKILLS = 5;
-const MAX_SKILLS = 30; // the API rejects more (schemas.py: PredictRequest.skills)
+const MAX_SKILLS = 60; // the API rejects more (schemas.py: MAX_SKILLS)
 const PREFILL_TOTAL = 15; // resume pre-fill: all Skills-section skills, topped up to this many
 const $ = (id) => document.getElementById(id);
 
