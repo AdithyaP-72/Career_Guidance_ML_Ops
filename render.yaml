@@ -31,4 +31,4 @@ services:
         - frontend/**       # redeploy the site only when the frontend changes
     envVars:
       - key: API_URL        # if Render gives the API a different URL (name taken), change it here
-        value: https://career-guidance-api.onrender.com
+        value: https://career-guidance-api-txmh.onrender.com   # Render added "-txmh": the plain name was taken

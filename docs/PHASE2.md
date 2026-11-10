@@ -478,7 +478,7 @@ Create the Render services from the blueprint:
 
 ```bash
 gh secret set RENDER_DEPLOY_HOOK_URL     # paste the deploy hook URL
-gh variable set RENDER_API_URL --body "https://career-guidance-api.onrender.com"
+gh variable set RENDER_API_URL --body "https://career-guidance-api-txmh.onrender.com"   # ours got "-txmh"
 ```
 
 ### Step 9: The first real CD run
@@ -486,7 +486,7 @@ gh variable set RENDER_API_URL --body "https://career-guidance-api.onrender.com"
 ```bash
 gh workflow run cd.yml                   # manual run → always deploys
 gh run watch
-curl https://career-guidance-api.onrender.com/health    # version 1, revision = main's commit
+curl https://career-guidance-api-txmh.onrender.com/health    # version 1, revision = main's commit
 ```
 
 Open `https://career-guidance-web.onrender.com`. The repo's **Deployments** section now lists the
