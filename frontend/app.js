@@ -3,6 +3,7 @@
 
 const API = (window.API_URL || "http://localhost:8000").replace(/\/$/, "");
 const MIN_SKILLS = 5;
+const MAX_SKILLS = 30; // the API rejects more (schemas.py: PredictRequest.skills)
 const $ = (id) => document.getElementById(id);
 
 const state = { skills: [], suggestions: [], active: -1, resumeReady: false };
@@ -86,7 +87,12 @@ function renderChips() {
 
 function addSkill(skill) {
   const s = skill.trim().toLowerCase();
-  if (s && !state.skills.includes(s)) state.skills.push(s);
+  if (!s || state.skills.includes(s)) return;
+  if (state.skills.length >= MAX_SKILLS) {
+    setStatus(`Up to ${MAX_SKILLS} skills. Remove one to add another.`, true);
+    return;
+  }
+  state.skills.push(s);
   renderChips();
 }
 
