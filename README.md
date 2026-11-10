@@ -102,7 +102,7 @@ Eight candidate models were trained across 164,256 augmented postings (54,752 un
 
 **Complement Naive Bayes is the current champion**, selected by the highest top-3 accuracy on five-skill test inputs (`select.metric: top3_5skills`). Its 80.03% score exceeds Logistic Regression by 0.64 percentage points and Profile Matching by 13.70 percentage points, meeting the 75% target. The selected artifact is `models/model.joblib`, with metrics recorded in `reports/metrics.json`.
 
-The newly added challengers are **MLP** (76.40% top-3), **SGD with modified Huber loss** (76.22%), and **Complement Naive Bayes** (80.03%). MLP uses two hidden layers (256 and 128 units); SGD provides a fast linear classifier for sparse skill features.
+The newly added challengers are **MLP** (76.40% top-3; later removed from `train.models` because it takes 50+ min to train on CPU and never wins), **SGD with modified Huber loss** (76.22%), and **Complement Naive Bayes** (80.03%). MLP uses two hidden layers (256 and 128 units); SGD provides a fast linear classifier for sparse skill features.
 
 Top-3 accuracy means the correct role appears among the model's three highest-ranked recommendations. Macro-F1 measures top-1 performance across roles, while Right Family measures whether the top-ranked role belongs to the correct family. The 2019 column evaluates the historical reference set of 20,183 postings; the champion scores 69.92%, compared with 80.03% on the held-out 2025 test set. This difference provides a historical distribution-shift benchmark. Training and inference timings reflect the recorded run environment and can vary by hardware.
 

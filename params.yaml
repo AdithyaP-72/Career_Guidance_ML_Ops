@@ -36,7 +36,9 @@ profiling:
   snapshots: [2017, 2019, 2022, 2025]
 
 train:                     # Step 5 baselines (src/models/train.py; one dvc stage per model)
-  models: [dummy, profile, logreg, random_forest, lightgbm, mlp, sgd, complement_nb]
+  models: [dummy, profile, logreg, random_forest, lightgbm, sgd, complement_nb]
+  # mlp is switched off: 50-100 min on CPU per retrain (scikit-learn has no GPU support) and it was the weakest
+  # challenger (76.4% top-3; see README). Its settings stay below: add it back to the list above to retrain it.
   skill_dropout: true      # train on postings + their cut-down copies (features.dropout)
   experiment: career-role-baselines   # MLflow experiment name
   # Each block below is passed straight to the model's constructor.

@@ -560,7 +560,8 @@ ComplementNB ranks best (80.0% top-3) but its confidence % is far too low (ECE 0
    Also in `src/models/evaluate.py`, add `lineterminator="\n"` to the three `.to_csv(...)` calls.
    (On Windows pandas writes `\r\n`; DVC hashes that, git commits `\n`, and everyone else's
    `dvc repro` then retrains every model. This PR retrains everything anyway, so it costs nothing extra.)
-5. `uv run dvc repro` (retrains every model, ~1 h, mostly the MLP; this time all logged to DagsHub).
+5. `uv run dvc repro` (retrains every model, ~15-30 min, mostly LightGBM; this time all logged to DagsHub).
+   The MLP is no longer in `train.models` on main; if the rebase brings it back, keep it out.
    Check: `reports/metrics.json` → `best_model: complement_nb_cal`, `mlflow_model_uri` starts with
    `models:/` (not null); `reports/model_card.md` → PASSED.
 6. `uv run dvc push`, commit `src/models/ params.yaml dvc.lock reports/`, push, open a PR.
