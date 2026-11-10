@@ -3,11 +3,15 @@ publishes them in the OpenAPI docs at /docs."""
 
 from __future__ import annotations
 
+from typing import Annotated
+
 from pydantic import BaseModel, Field
+
+Skill = Annotated[str, Field(min_length=1, max_length=100)]  # the longest skill in the vocabulary has 49 characters
 
 
 class PredictRequest(BaseModel):
-    skills: list[str] = Field(
+    skills: list[Skill] = Field(
         min_length=1,
         max_length=30,
         description="Your skills. Use /skills?q=... to find the spellings the model knows.",

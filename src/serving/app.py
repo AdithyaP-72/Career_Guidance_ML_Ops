@@ -6,6 +6,10 @@ Reads one model bundle (src/serving/bundle.py) at startup. Settings come from en
     MIN_SKILLS       known skills required per request        (default: 5, as in the product spec)
     LOW_CONFIDENCE   top-1 confidence below this → low_confidence = true   (default: 0.2)
     CORS_ORIGINS     comma-separated origins allowed to call the API from a browser   (default: *)
+    RATE_<NAME>_PER_MIN / RATE_<NAME>_TOTAL_PER_MIN   rate limits per visitor / overall, NAME = UPLOAD, PREDICT,
+                     SEARCH   (defaults: 10/20, 60/600, 120/1200; see src/serving/limits.py)
+
+Request bodies over 64 KB (6 MB for /extract-skills) are refused before they are read.
 
 Endpoints:
     GET  /health       liveness + which model is loaded + which features are on (Docker HEALTHCHECK, Render, CD)
@@ -25,12 +29,13 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, File, HTTPException, Query, Request, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from starlette.concurrency import run_in_threadpool
 
 from src.serving import resume
+from src.serving.limits import BodySizeLimit, RateLimiter, rate_limited
 from src.serving.recommender import Recommender
 from src.serving.schemas import ModelInfo, PredictRequest, PredictResponse, ResumeSkills, SkillSearch
 from src.utils import ROOT, get_logger
@@ -41,6 +46,15 @@ MIN_SKILLS = int(os.environ.get("MIN_SKILLS", "5"))
 LOW_CONFIDENCE = float(os.environ.get("LOW_CONFIDENCE", "0.2"))
 MAX_RESUME_BYTES = resume.MAX_BYTES
 RESUME_TYPES = {".pdf", ".docx"}
+MAX_BODY_BYTES = 64_000  # JSON requests are tiny; only the resume upload needs more
+RATE_LIMITS = {"upload": (10, 20), "predict": (60, 600), "search": (120, 1200)}  # per visitor, total; per minute
+
+
+def _limiter(name: str, per_client: int, total: int) -> RateLimiter:
+    env = f"RATE_{name.upper()}"
+    return RateLimiter(
+        int(os.environ.get(f"{env}_PER_MIN", per_client)), int(os.environ.get(f"{env}_TOTAL_PER_MIN", total))
+    )
 
 
 @asynccontextmanager
@@ -52,6 +66,7 @@ async def lifespan(app: FastAPI):
     app.state.extractor = resume.get_extractor(
         vocab_path=str(bundle / "skill_vocab.json"), keyness_path=str(bundle / "skill_keyness.json")
     )
+    app.state.limits = {name: _limiter(name, *caps) for name, caps in RATE_LIMITS.items()}
     log.info("loaded %s", json.dumps(app.state.rec.meta))
     yield
 
@@ -62,9 +77,12 @@ app = FastAPI(
     version="0.2.0",
     lifespan=lifespan,
 )
+# Added first so CORS (added last) wraps it: a 413 then still carries CORS headers and the browser can read it.
+app.add_middleware(BodySizeLimit, default=MAX_BODY_BYTES, per_path={"/extract-skills": MAX_RESUME_BYTES + 1_000_000})
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    # stripped: a space or line break pasted into the dashboard would otherwise never match the browser's Origin
+    allow_origins=[o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()],
     allow_methods=["GET", "POST"],  # the browser frontend lives on another domain (Render static site)
     allow_headers=["*"],
 )
@@ -97,7 +115,7 @@ def model(request: Request):
     return rec(request).meta
 
 
-@app.get("/skills", response_model=SkillSearch)
+@app.get("/skills", response_model=SkillSearch, dependencies=[Depends(rate_limited("search"))])
 def skills(request: Request, q: str = Query("", max_length=60), limit: int = Query(10, ge=1, le=50)):
     return SkillSearch(query=q, matches=rec(request).search(q, limit))
 
@@ -108,7 +126,7 @@ def roles(request: Request):
     return [{"role": str(c), "family": r.roles.get(str(c), {}).get("family")} for c in r.model.classes_]
 
 
-@app.post("/predict", response_model=PredictResponse)
+@app.post("/predict", response_model=PredictResponse, dependencies=[Depends(rate_limited("predict"))])
 def predict(body: PredictRequest, request: Request):
     t = time.perf_counter()
     r = rec(request)
@@ -149,7 +167,7 @@ def predict(body: PredictRequest, request: Request):
     return response
 
 
-@app.post("/extract-skills", response_model=ResumeSkills)
+@app.post("/extract-skills", response_model=ResumeSkills, dependencies=[Depends(rate_limited("upload"))])
 async def extract_skills(request: Request, file: Annotated[UploadFile, File()]):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in RESUME_TYPES:

@@ -215,7 +215,10 @@ $("analyze").addEventListener("click", async () => {
     });
     if (!ok) {
       const d = body.detail;
-      setStatus(typeof d === "object" && d?.message ? `${d.message}. Unknown: ${d.unknown_skills.join(", ")}` : "Something went wrong.", true);
+      setStatus(
+        typeof d === "object" && d?.message ? `${d.message}. Unknown: ${d.unknown_skills.join(", ")}`
+          : typeof d === "string" ? d : "Something went wrong.", // e.g. 429 "Too many requests..."
+        true);
       return;
     }
     setStatus("");

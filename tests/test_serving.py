@@ -23,6 +23,9 @@ def bundle(tmp_path_factory):
 def client(bundle):
     mp = pytest.MonkeyPatch()
     mp.setenv("BUNDLE_DIR", str(bundle))
+    for name in ("UPLOAD", "PREDICT", "SEARCH"):  # this module makes many requests; limits are tested in test_limits
+        mp.setenv(f"RATE_{name}_PER_MIN", "10000")
+        mp.setenv(f"RATE_{name}_TOTAL_PER_MIN", "10000")
     with TestClient(app) as c:  # `with` runs the startup (lifespan) that loads the bundle
         yield c
     mp.undo()
