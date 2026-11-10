@@ -1,0 +1,51 @@
+# How the skill gap (readiness, missing skills, learning path) treats skills. Read by src/serving/recommender.py.
+#
+# Serving only: the model's inputs are NOT changed, so the validated model and its quality-gate results stay valid.
+# The long-term fix is to move `same_skill` into configs/skill_aliases.yaml and retrain, so the model learns them as
+# one skill too.
+
+# Each group is one skill written different ways; having any of them counts as having the skill.
+# A missing skill is shown in the role's own spelling. Also applied automatically (in code):
+#   - spelling twins in the vocabulary: "fast api" / "fastapi", "cyber security" / "cybersecurity"
+#   - "<skill> development / developer / programming" means <skill>: "python development" = python
+same_skill:
+  - [ci/cd, continuous integration, continuous delivery, continuous deployment]
+  - [rest api, rest, rest apis, restful, restful api, restful apis, restful web services]
+  - [node.js, nodejs, node js]
+  - [react.js, react, reactjs]
+  - [javascript, js]
+  - [kubernetes, k8s]
+  - [postgresql, postgres]
+  - [aws, amazon web services]
+  - [gcp, google cloud, google cloud platform]
+  - [machine learning, ml]
+  - [artificial intelligence, ai]
+
+# Fragments of a real skill that recruiters tag on their own ("front desk" -> "desk", "full stack" -> "stack"):
+# not something a person can "have" or "learn next", so they are left out of readiness, gap and learning path.
+# Generic-looking words that ARE the job (sales, management, teaching, marketing, automation) stay in.
+too_vague:
+  - api
+  - application development
+  - civil
+  - control
+  - core
+  - data
+  - desk
+  - development
+  - digital
+  - engineering
+  - key
+  - process
+  - project
+  - quality
+  - resource
+  - site
+  - software development
+  - stack
+  - technical
+
+# Real skills whose course matches are from another field (every "automation" course is industrial or library
+# automation): better no course than a wrong one. They stay in readiness and the skill gap.
+no_courses:
+  - automation

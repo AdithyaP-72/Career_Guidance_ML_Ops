@@ -5,6 +5,7 @@
 !uv.lock
 !src/
 !configs/skill_aliases.yaml
+!configs/skill_equivalents.yaml
 !bundle/
 **/__pycache__
 **/*.pyc
