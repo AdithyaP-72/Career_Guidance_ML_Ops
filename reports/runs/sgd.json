@@ -1,6 +1,6 @@
 {
   "model": "sgd",
-  "run_id": "c7c771b71ca940009c817be5ba3403db",
+  "run_id": "a96de6945de04ba6b4d9497cf777a739",
   "experiment": "career-role-baselines",
-  "tracking": "local"
+  "tracking": "https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow"
 }
