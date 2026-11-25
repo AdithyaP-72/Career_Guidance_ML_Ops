@@ -106,21 +106,21 @@ jobs:
           version: "0.12.23"
           enable-cache: true
 
-      - name: Install dependencies
-        run: uv sync --frozen
+      - name: Install the pipeline tools only (DVC, MLflow; no Jupyter, linters or API packages)
+        run: uv sync --frozen --no-default-groups --group pipeline
 
       - name: DagsHub credentials for DVC (written to .dvc/config.local, never committed)
         env:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          uv run dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
-          uv run dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
+          uv run --no-sync dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
+          uv run --no-sync dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
 
       - name: Pull only what the gate needs (the model and the test split, ~6 MB)
-        run: uv run dvc pull models/model.joblib data/processed/test.parquet
+        run: uv run --no-sync dvc pull models/model.joblib data/processed/test.parquet
 
       - name: Quality gate (fails the job if the model fails a check)
-        run: uv run python -m src.models.validate --strict
+        run: uv run --no-sync python -m src.models.validate --strict
 
       - name: Model card in the run summary
         if: always()
