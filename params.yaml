@@ -88,6 +88,13 @@ train:                     # Step 5 baselines (src/models/train.py; one dvc stag
 select:                    # src/models/select.py
   metric: top3_5skills     # best baseline = highest top-3 accuracy on 5-skill test inputs
 
+monitoring:                # Phase 3: Monitoring, Feedback & Governance
+  thresholds:
+    max_pct_drop_top3: 15.0       # % top-3 accuracy drop (2025 test vs 2019 ref) before retraining
+    max_js_divergence: 0.15       # Jensen–Shannon divergence (live vs training distribution)
+    max_low_confidence_pct: 25.0  # % of requests with confidence < 0.30
+    min_logged_requests: 50       # minimum requests in log before live-drift check runs
+
 courses:                   # Objective O3: Learning path course recommendations (src/models/courses.py)
   max_courses_per_skill: 3
   min_nptel_similarity: 0.35  # minimum TF-IDF cosine similarity for NPTEL text match

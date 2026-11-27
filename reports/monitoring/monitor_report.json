@@ -1,0 +1,95 @@
+{
+  "n_logged_requests": 200,
+  "js_divergence_train_vs_live": 0.089008,
+  "drift_alert": "OK – prediction distribution is similar to training",
+  "confidence_stats": {
+    "mean": 0.5269,
+    "median": 0.5041,
+    "min": 0.0608,
+    "max": 0.9999,
+    "low_confidence_pct": 24.5
+  },
+  "top_20_skills_in_requests": [
+    {
+      "skill": "sales",
+      "count": 13
+    },
+    {
+      "skill": "communication skills",
+      "count": 10
+    },
+    {
+      "skill": "management",
+      "count": 10
+    },
+    {
+      "skill": "business development",
+      "count": 9
+    },
+    {
+      "skill": "python",
+      "count": 9
+    },
+    {
+      "skill": "sap",
+      "count": 7
+    },
+    {
+      "skill": "project management",
+      "count": 6
+    },
+    {
+      "skill": "customer service",
+      "count": 6
+    },
+    {
+      "skill": "voice process",
+      "count": 6
+    },
+    {
+      "skill": "development",
+      "count": 6
+    },
+    {
+      "skill": "agile",
+      "count": 5
+    },
+    {
+      "skill": "english",
+      "count": 5
+    },
+    {
+      "skill": "customer support",
+      "count": 5
+    },
+    {
+      "skill": "aws",
+      "count": 5
+    },
+    {
+      "skill": "selenium",
+      "count": 5
+    },
+    {
+      "skill": "bpo",
+      "count": 5
+    },
+    {
+      "skill": "accounts receivable",
+      "count": 5
+    },
+    {
+      "skill": "automation testing",
+      "count": 4
+    },
+    {
+      "skill": "international voice process",
+      "count": 4
+    },
+    {
+      "skill": "linux",
+      "count": 4
+    }
+  ],
+  "note": "JSD > 0.1 → mild drift warning; JSD > 0.2 → critical drift. Run uv run python -m src.monitoring.monitor after collecting requests."
+}

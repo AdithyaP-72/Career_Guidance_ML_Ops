@@ -1,0 +1,104 @@
+role,train_share,pred_share,delta
+Data Analyst,0.0308,0.085,0.0542
+Customer Support (Voice),0.0235,0.045,0.0215
+Sales Executive,0.0745,0.095,0.0205
+Automation Test Engineer,0.0055,0.02,0.0145
+Area / Territory Sales Manager,0.0136,0.0,-0.0136
+Hotel / Travel Staff,0.0071,0.02,0.0129
+Procurement / Purchase,0.0127,0.0,-0.0127
+Full Stack Developer,0.0175,0.005,-0.0125
+ML / AI Engineer,0.0173,0.005,-0.0123
+Manual Test Engineer,0.0232,0.035,0.0118
+HR Executive / Generalist,0.0165,0.005,-0.0115
+Mechanical Design Engineer,0.0137,0.025,0.0113
+Frontend Developer,0.0153,0.005,-0.0103
+Software Engineer (general),0.0853,0.095,0.0097
+Content Writer,0.0053,0.015,0.0097
+Accounts Payable / Receivable,0.0108,0.02,0.0092
+Java Developer,0.0192,0.01,-0.0092
+Data Engineer,0.0161,0.025,0.0089
+Data Scientist,0.0065,0.015,0.0085
+Digital Marketing Executive,0.0083,0.0,-0.0083
+Architect (Building),0.0083,0.0,-0.0083
+Management Consultant,0.018,0.01,-0.008
+Doctor / Medical Officer,0.0077,0.0,-0.0077
+Relationship Manager (Banking),0.0126,0.005,-0.0076
+Recruiter / Talent Acquisition,0.0173,0.01,-0.0073
+Inside Sales / Telesales,0.0122,0.005,-0.0072
+Customer Service Executive,0.0284,0.035,0.0066
+Graphic Designer,0.0062,0.0,-0.0062
+Admin Executive,0.0191,0.025,0.0059
+Marketing Executive,0.0157,0.01,-0.0057
+Electrical Engineer,0.0056,0.0,-0.0056
+DevOps Engineer,0.0105,0.005,-0.0055
+Business Development Executive,0.0245,0.03,0.0055
+Auditor,0.0054,0.0,-0.0054
+Corporate Trainer,0.0053,0.0,-0.0053
+Salesforce Developer,0.0053,0.0,-0.0053
+Real Estate Sales,0.0049,0.01,0.0051
+Embedded / Firmware Engineer,0.0049,0.01,0.0051
+Customer Support (Non-voice),0.0049,0.0,-0.0049
+Insurance Advisor,0.0049,0.0,-0.0049
+Production Engineer,0.0145,0.01,-0.0045
+Executive Assistant,0.0045,0.0,-0.0045
+.NET Developer,0.0095,0.005,-0.0045
+ServiceNow Developer,0.0044,0.0,-0.0044
+Financial Analyst,0.0044,0.0,-0.0044
+Chef / Cook,0.0043,0.0,-0.0043
+Branch Banking Officer,0.0108,0.015,0.0042
+Network Engineer,0.0059,0.01,0.0041
+Chartered Accountant,0.0038,0.0,-0.0038
+Key Account Manager,0.0063,0.01,0.0037
+BI Developer,0.0037,0.0,-0.0037
+Retail Sales Associate,0.0065,0.01,0.0035
+Video Editor / Animator,0.0035,0.0,-0.0035
+Logistics / Supply Chain Executive,0.0066,0.01,0.0034
+Social Media Executive,0.0033,0.0,-0.0033
+Business Analyst,0.0069,0.01,0.0031
+MEP / HVAC Engineer,0.0019,0.005,0.0031
+Collections Officer,0.0031,0.0,-0.0031
+Clinical Research / Pharmacovigilance,0.003,0.0,-0.003
+Interior Designer,0.003,0.0,-0.003
+Project Manager,0.012,0.015,0.003
+Staff Nurse,0.0028,0.0,-0.0028
+Accountant,0.0223,0.025,0.0027
+SEO Specialist,0.0024,0.005,0.0026
+Database Administrator,0.0025,0.0,-0.0025
+Payroll Executive,0.0025,0.0,-0.0025
+PHP Developer,0.0024,0.0,-0.0024
+Mobile App Developer,0.0024,0.0,-0.0024
+Lawyer / Legal Associate,0.0026,0.005,0.0024
+Brand / Product Marketing Manager,0.0024,0.0,-0.0024
+School Teacher,0.0073,0.005,-0.0023
+IT Support / Desktop Engineer,0.0077,0.01,0.0023
+Warehouse / Inventory,0.0027,0.005,0.0023
+Medical Coder,0.0027,0.005,0.0023
+Oracle Apps Consultant,0.0072,0.005,-0.0022
+Android Developer,0.0028,0.005,0.0022
+System Administrator,0.0022,0.0,-0.0022
+Professor / Lecturer,0.0029,0.005,0.0021
+Cloud Engineer,0.0129,0.015,0.0021
+Journalist / Editor,0.0021,0.0,-0.0021
+Pre-Sales Consultant,0.002,0.0,-0.002
+Mainframe Developer,0.002,0.0,-0.002
+SAP Consultant,0.0381,0.04,0.0019
+Credit / Loan Officer,0.0068,0.005,-0.0018
+R&D / Process Engineer,0.0068,0.005,-0.0018
+Microsoft Dynamics Consultant,0.0018,0.0,-0.0018
+Fashion Designer,0.0018,0.0,-0.0018
+Site / Civil Engineer,0.0068,0.005,-0.0018
+Technical Writer,0.0017,0.0,-0.0017
+Python Developer,0.0083,0.01,0.0017
+HR Business Partner,0.0015,0.0,-0.0015
+Trust & Safety / Content Moderator,0.0037,0.005,0.0013
+Tutor / Academic Counsellor,0.0041,0.005,0.0009
+Company Secretary / Compliance,0.0041,0.005,0.0009
+Finance Manager,0.0109,0.01,-0.0009
+UI/UX Designer,0.0041,0.005,0.0009
+Service Engineer / Technician,0.0059,0.005,-0.0009
+Product Manager,0.0041,0.005,0.0009
+Quality Engineer (Manufacturing),0.0059,0.005,-0.0009
+Cyber Security Analyst,0.0055,0.005,-0.0005
+Tax / GST Executive,0.0047,0.005,0.0003
+Maintenance Engineer,0.0052,0.005,-0.0002
+Receptionist / Front Office,0.0052,0.005,-0.0002

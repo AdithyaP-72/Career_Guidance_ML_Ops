@@ -1,0 +1,59 @@
+{
+  "test_2025": {
+    "top1": 0.5647282291057861,
+    "top3": 0.793907071887785,
+    "top5": 0.8584161309175921
+  },
+  "ref_2019": {
+    "top1": 0.41782688401129664,
+    "top3": 0.6674924441361542,
+    "top5": 0.752811772283605
+  },
+  "drift_top1": -0.1469,
+  "drift_top3": -0.1264,
+  "drift_top5": -0.1056,
+  "pct_drop_top3": 15.92,
+  "drift_alert": "WARNING – top-3 accuracy dropped 15.9% from 2025 test to 2019 reference",
+  "worst_degraded_roles": [
+    {
+      "role": "School Teacher",
+      "delta": -0.4326
+    },
+    {
+      "role": "Professor / Lecturer",
+      "delta": -0.4314
+    },
+    {
+      "role": "Data Engineer",
+      "delta": -0.4063
+    },
+    {
+      "role": "Android Developer",
+      "delta": -0.4044
+    },
+    {
+      "role": "Social Media Executive",
+      "delta": -0.3389
+    },
+    {
+      "role": "Mobile App Developer",
+      "delta": -0.3096
+    },
+    {
+      "role": "Video Editor / Animator",
+      "delta": -0.2971
+    },
+    {
+      "role": "SEO Specialist",
+      "delta": -0.2935
+    },
+    {
+      "role": "Credit / Loan Officer",
+      "delta": -0.282
+    },
+    {
+      "role": "UI/UX Designer",
+      "delta": -0.2728
+    }
+  ]
+}

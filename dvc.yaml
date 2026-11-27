@@ -167,4 +167,54 @@ stages:
       - reports/courses_summary.json:
           cache: false
 
+  # ── Phase 3: Monitoring, Feedback & Governance ──────────────────────────────
+
+  drift_experiment:
+    cmd: uv run python -m src.monitoring.drift_experiment
+    deps:
+      - src/monitoring/drift_experiment.py
+      - src/models/evaluate.py
+      - src/features/build.py
+      - models/model.joblib
+      - data/processed/test.parquet
+      - data/processed/reference_2019.parquet
+    params:
+      - monitoring
+    outs:
+      - reports/drift/per_role_drift.csv:
+          cache: false
+      - reports/drift/skill_distribution_drift.json:
+          cache: false
+      - reports/drift/per_role_drift.png:
+          cache: false
+    metrics:
+      - reports/drift/drift_report.json:
+          cache: false
+
+  retrain_trigger:
+    cmd: uv run python -m src.monitoring.retrain_trigger
+    deps:
+      - src/monitoring/retrain_trigger.py
+      - reports/drift/drift_report.json
+    params:
+      - monitoring
+    metrics:
+      - reports/retraining_trigger.json:
+          cache: false
+
+  model_comparison_extended:
+    cmd: uv run python -m src.monitoring.model_comparison
+    deps:
+      - src/monitoring/model_comparison.py
+      - reports/metrics
+      - reports/metrics.json
+    params:
+      - select
+      - train.models
+    outs:
+      - reports/model_comparison.md:
+          cache: false
+      - reports/model_comparison_extended.csv:
+          cache: false
+
 

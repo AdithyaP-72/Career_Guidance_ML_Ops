@@ -142,8 +142,10 @@ Top-3 accuracy means the correct role appears among the model's three highest-ra
 ├── src/
 │   ├── data/                    # Ingestion, profiling, labelling, taxonomy & splitting
 │   ├── features/build.py        # CountVectorizer + experience ColumnTransformer
-│   └── models/                  # Estimators, training, MLflow tracking, profiles & courses
-├── tests/                       # Pytest test suite (54 passed unit tests)
+│   ├── models/                  # Estimators, training, MLflow tracking, profiles & courses
+│   └── monitoring/              # Phase 3: logger, monitor, dashboard, drift, retrain trigger & comparison
+├── tests/                       # Pytest test suite (73 passed unit tests)
+├── MODEL_CARD.md                # Phase 3: Model governance, limitations, fairness & licences
 ├── dvc.yaml & params.yaml       # DVC multi-stage pipeline definition & hyperparams
 ├── pyproject.toml & uv.lock     # Fully-pinned dependencies managed with uv
 └── journey.md                   # Initial baseline analysis and findings
@@ -191,4 +193,67 @@ A scikit-learn `ColumnTransformer` combines:
 * **Naukri 2025 Snapshot:** CC BY-NC-SA 4.0 (academic non-commercial use).
 * **Naukri 2019 Snapshot:** CC0 (Public Domain, PromptCloud).
 * **NCO-2015:** MIT / Govt. of India data (Ministry of Labour & Employment, DGE).
+
+---
+
+## 6. Phase 3 — Monitoring, Feedback & Governance
+
+Phase 3 adds production observability, drift detection, automated retraining gates, and governance documentation on top of the Phase 1/2 pipeline. All modules live under `src/monitoring/` and are configured via the `monitoring:` block in `params.yaml`.
+
+### How the 7 Components Work
+
+| # | Component | Module / File | What it does | Output |
+|---|---|---|---|---|
+| 1 | **Model Monitoring** | `src/monitoring/monitor.py` | Compares live prediction role shares against the training distribution using **Jensen–Shannon divergence (JSD)**, computes confidence stats (mean, median, % below `0.30`), and tracks top-20 requested skills. Flags JSD $> 0.1$ (warning) or $> 0.2$ (critical). | `reports/monitoring/monitor_report.json`, `prediction_dist.csv` |
+| 2 | **Prediction Logging** | `src/monitoring/logger.py` | Provides `log_prediction(...)` to append structured JSONL records (`timestamp`, `request_id`, `skills`, `experience_min/max`, `top1_role`, `top1_confidence`, `top3_roles`, `model_version`, `source`) to `logs/predictions.jsonl`, with automatic 10 MB log rotation. Running it as `__main__` seeds 200 demo records from `test.parquet`. | `logs/predictions.jsonl` |
+| 3 | **Performance Dashboard** | `src/monitoring/dashboard.py` | Builds a self-contained static HTML dashboard embedding 4 charts (baseline comparison, live confidence histogram, training vs. live distribution drift, and top-30 per-role F1) plus a key metrics summary table and drift alert banner. | `reports/performance_dashboard.html` |
+| 4 | **Drift / Degradation Experiment** | `src/monitoring/drift_experiment.py` | Evaluates `models/model.joblib` on both the **2025 test set** and the **2019 reference set** (`reference_2019.parquet`), measures overall and per-role accuracy drops, and tracks emerging vs. declining skills since 2019. | `reports/drift/drift_report.json`, `per_role_drift.csv`, `skill_distribution_drift.json`, `per_role_drift.png` |
+| 5 | **Retraining Trigger** | `src/monitoring/retrain_trigger.py` | Evaluates 3 automated checks against `params.yaml` thresholds (`max_pct_drop_top3: 15.0`, `max_js_divergence: 0.15`, `max_low_confidence_pct: 25.0` with `min_logged_requests: 50`). Exits `0` (`NO_RETRAIN`), `1` (`RETRAIN_RECOMMENDED`, 1 failure), or `2` (`RETRAIN_REQUIRED`, $\ge 2$ failures). | `reports/retraining_trigger.json` |
+| 6 | **Extended Model Comparison** | `src/monitoring/model_comparison.py` | Reads all `reports/metrics/*.json` files, adds champion/strength verdicts, per-metric rankings, and 2025 $\to$ 2019 drift drop %, and exports both CSV and Markdown tables. | `reports/model_comparison_extended.csv`, `reports/model_comparison.md` |
+| 7 | **Governance & Model Card** | `MODEL_CARD.md` | Documents intended use, out-of-scope uses, training data, evaluation & drift metrics, limitations/risks, fairness considerations, data licences (including Coursera CC BY-NC-SA 4.0 attribution), and retraining criteria. | `MODEL_CARD.md` |
+
+### Running the Monitoring Workflow
+
+Run the modules in order (using `--no-sync` if offline):
+
+```powershell
+# 1. (Optional) Seed demo prediction logs from the test split
+uv run --no-sync python -m src.monitoring.logger
+
+# 2. Compute live distribution & confidence monitoring metrics
+uv run --no-sync python -m src.monitoring.monitor
+
+# 3. Run the 2025 vs 2019 temporal drift experiment
+uv run --no-sync python -m src.monitoring.drift_experiment
+
+# 4. Generate extended model comparison tables
+uv run --no-sync python -m src.monitoring.model_comparison
+
+# 5. Build the HTML performance dashboard
+uv run --no-sync python -m src.monitoring.dashboard
+
+# 6. Check automated retraining trigger (exit code 0 / 1 / 2)
+uv run --no-sync python -m src.monitoring.retrain_trigger
+```
+
+Stages `drift_experiment`, `retrain_trigger`, and `model_comparison_extended` are also wired into `dvc.yaml` and can be reproduced with `uv run dvc repro`.
+
+### How to Open the Performance Dashboard
+
+`reports/performance_dashboard.html` is a self-contained HTML file (all charts are embedded as base64 PNGs, so no backend server is required).
+
+* **Windows PowerShell:**
+  ```powershell
+  Start-Process reports\performance_dashboard.html
+  ```
+* **macOS:**
+  ```bash
+  open reports/performance_dashboard.html
+  ```
+* **Linux:**
+  ```bash
+  xdg-open reports/performance_dashboard.html
+  ```
+* **Or:** Double-click `reports/performance_dashboard.html` in File Explorer / Finder, or drag it into any web browser. To refresh the dashboard after new predictions arrive, re-run `monitor` and `dashboard`.
+
 
