@@ -7,5 +7,9 @@
 !configs/skill_aliases.yaml
 !configs/skill_equivalents.yaml
 !bundle/
+!.phase3/
+.phase3/*
+!.phase3/bundle/
+!.phase3/bundle/**
 **/__pycache__
 **/*.pyc

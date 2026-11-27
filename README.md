@@ -2,6 +2,8 @@
 
 An end-to-end MLOps pipeline for Indian career path guidance. Given a user's skills and experience, the system recommends top-3 specific job roles, quantifies skill gaps and readiness, and recommends an ordered learning path mapped to free online courses.
 
+**Phase 3 local lab.** Run the API with Prometheus and a provisioned Grafana dashboard, replay a controlled synthetic 2026 shift, and compare a challenger in an isolated MLflow registry. Start with the [demonstration](docs/PHASE3_DEMONSTRATION.md), then see the [architecture](docs/PHASE3_ARCHITECTURE.md), [drift and retraining](docs/DRIFT_AND_RETRAINING.md), [governance](docs/MODEL_GOVERNANCE.md), and [troubleshooting](docs/TROUBLESHOOTING.md).
+
 ---
 
 ## 1. Project Overview & Objectives
@@ -184,8 +186,8 @@ Phase 2 (productionization & deployment) is documented step by step in [docs/PHA
 | **5** | Validation & Testing | pytest (87 tests), quality gate (`validate` stage: calibration, slices, behavioural cases), skops safe loading, MLflow Model Registry (`@champion` / `@challenger`) | ✅ Done (Phase 2) |
 | **6** | Packaging & CI/CD | Podman (OCI image), GHCR, GitHub Actions (CI + CD) | ✅ Done (Phase 2) |
 | **7** | Serving & API | FastAPI, static frontend, Render (Blueprint) | ✅ Done (Phase 2) |
-| **8** | Monitoring | Prometheus, Grafana, NannyML / custom JS divergence | ⏳ Planned |
-| **9** | Continuous Retraining | GitHub Actions automated `dvc repro` workflow | ⏳ Planned |
+| **8** | Monitoring | FastAPI metrics, PSI, Prometheus alerts, Grafana | Phase 3 local lab |
+| **9** | Continuous Retraining | GitHub Actions, DVC and isolated MLflow | Phase 3 scheduled synthetic experiment |
 
 ### 5.5 Dataset Licences & Attributions
 * **Coursera Course Metadata 2025:** Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Course titles, metadata, and skills taxonomies are provided by Coursera via Kaggle mirror for academic and coursework non-commercial use. Course links and metadata are attributed in accordance with the licence.

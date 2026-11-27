@@ -1,0 +1,37 @@
+rule_files:
+  - alerts.yml
+evaluation_interval: 5s
+tests:
+  - interval: 5s
+    input_series:
+      - series: career_drift_psi{job="career-api",instance="api:8000"}
+        values: '0.35+0x10'
+      - series: career_drift_threshold{job="career-api",instance="api:8000",severity="critical"}
+        values: '0.25+0x10'
+      - series: career_drift_status{job="career-api",instance="api:8000",status="critical"}
+        values: '1+0x10'
+    alert_rule_test:
+      - eval_time: 10s
+        alertname: CareerDataDriftCritical
+        exp_alerts: []
+      - eval_time: 20s
+        alertname: CareerDataDriftCritical
+        exp_alerts:
+          - exp_labels:
+              job: career-api
+              instance: api:8000
+              severity: critical
+            exp_annotations:
+              summary: The largest feature PSI crossed the configured critical threshold
+  - interval: 5s
+    input_series:
+      - series: career_drift_psi{job="career-api",instance="api:8000"}
+        values: 'NaN NaN NaN NaN NaN NaN'
+      - series: career_drift_threshold{job="career-api",instance="api:8000",severity="critical"}
+        values: '0.25+0x5'
+      - series: career_drift_status{job="career-api",instance="api:8000",status="insufficient"}
+        values: '1+0x5'
+    alert_rule_test:
+      - eval_time: 25s
+        alertname: CareerDataDriftCritical
+        exp_alerts: []

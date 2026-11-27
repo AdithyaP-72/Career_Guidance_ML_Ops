@@ -35,3 +35,12 @@ ppt/*.jpg
 
 # Phase 2: model bundle for the API image (built from the MLflow registry or models/, never committed)
 bundle/
+
+# Phase 3 generates local data, reports and secrets. Keep DVC model objects out of Git.
+/.phase3/
+/data/drift/
+/reports/phase3/
+/models/*.joblib
+/models/*.json
+/models/*.npz
+/models/baselines/*.joblib
