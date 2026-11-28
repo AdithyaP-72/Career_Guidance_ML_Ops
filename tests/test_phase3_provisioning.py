@@ -48,7 +48,13 @@ def test_evidence_exports_known_fields_without_leaking_other_report_content(tmp_
         {"windows": {"synthetic_2026_demo": {"drift": {"overall_psi": 0.63}, "top3_accepted": 0.83}}},
         tmp_path / "demo" / "latest.json",
     )
+    write_json(
+        {"real_2019_reference": {"top3": 0.70, "max_psi": 0.26, "top_drifted": [{"feature": "html"}]}},
+        tmp_path / "real_drift" / "latest.json",
+    )
     metrics = evidence_metrics(tmp_path)
+    assert 'career_phase3_real_drift_score{split="real_2019_reference",metric="max_psi"} 0.26' in metrics
+    assert 'split="real_2025_test"' not in metrics
     assert 'career_phase3_quality_pass{check="test_check",source="committed_report"} 0.0' in metrics
     assert 'stage="validate"' in metrics
     assert 'action="rolled_back",approved_by="Demo reviewer"' in metrics

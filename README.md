@@ -4,6 +4,15 @@ An end-to-end MLOps pipeline for Indian career path guidance. Given a user's ski
 
 **Phase 3 local lab.** Run the API with Prometheus and a provisioned Grafana dashboard, replay a controlled synthetic 2026 shift, and compare a challenger in an isolated MLflow registry. Start with the [demonstration](docs/PHASE3_DEMONSTRATION.md), then see the [architecture](docs/PHASE3_ARCHITECTURE.md), [drift and retraining](docs/DRIFT_AND_RETRAINING.md), [governance](docs/MODEL_GOVERNANCE.md), and [troubleshooting](docs/TROUBLESHOOTING.md).
 
+```bash
+uv run dvc pull                     # real data + model (DagsHub credentials)
+scripts/phase3_lab.sh up            # prepare + start API :8000, Prometheus :9090, Grafana :3000
+scripts/phase3_lab.sh demo          # real 2025 vs synthetic 2026 replay; drift alert fires (~3.5 min)
+scripts/phase3_lab.sh real-drift    # real 2019 vs 2025 drift report
+scripts/phase3_lab.sh retrain       # challenger in the isolated registry (~2 min)
+scripts/phase3_lab.sh down
+```
+
 ---
 
 ## 1. Project Overview & Objectives
@@ -145,7 +154,7 @@ Top-3 accuracy means the correct role appears among the model's three highest-ra
 │   ├── data/                    # Ingestion, profiling, labelling, taxonomy & splitting
 │   ├── features/build.py        # CountVectorizer + experience ColumnTransformer
 │   └── models/                  # Estimators, training, MLflow tracking, profiles & courses
-├── tests/                       # Pytest test suite (54 passed unit tests)
+├── tests/                       # Pytest test suite (190 tests)
 ├── dvc.yaml & params.yaml       # DVC multi-stage pipeline definition & hyperparams
 ├── pyproject.toml & uv.lock     # Fully-pinned dependencies managed with uv
 └── journey.md                   # Initial baseline analysis and findings
@@ -183,7 +192,7 @@ Phase 2 (productionization & deployment) is documented step by step in [docs/PHA
 | **3** | Versioning & Storage | Git, DVC, DagsHub Remote Storage (S3 API) | ✅ Done |
 | **4a** | Baselines & Tracking | scikit-learn, LightGBM, MLflow (DagsHub hosted) | ✅ Done |
 | **4b** | Hyperparameter Tuning | Optuna Bayesian optimization | ⏳ Next |
-| **5** | Validation & Testing | pytest (87 tests), quality gate (`validate` stage: calibration, slices, behavioural cases), skops safe loading, MLflow Model Registry (`@champion` / `@challenger`) | ✅ Done (Phase 2) |
+| **5** | Validation & Testing | pytest (190 tests), quality gate (`validate` stage: calibration, slices, behavioural cases), skops safe loading, MLflow Model Registry (`@champion` / `@challenger`) | ✅ Done (Phase 2) |
 | **6** | Packaging & CI/CD | Podman (OCI image), GHCR, GitHub Actions (CI + CD) | ✅ Done (Phase 2) |
 | **7** | Serving & API | FastAPI, static frontend, Render (Blueprint) | ✅ Done (Phase 2) |
 | **8** | Monitoring | FastAPI metrics, PSI, Prometheus alerts, Grafana | Phase 3 local lab |

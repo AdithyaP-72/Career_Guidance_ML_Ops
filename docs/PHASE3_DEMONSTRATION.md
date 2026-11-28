@@ -2,19 +2,17 @@
 
 ## Set up before the presentation
 
-Use Python 3.12, uv, and a running Docker or Podman engine. Use the project's existing DVC remote credentials. The real 2025 datasets and model must already be available to DVC. The optional `--registry-evidence` flag uses the existing MLflow connection to read the hosted aliases. Grafana credentials and the monitoring token are generated locally under `.phase3/secrets/`.
+Use Python 3.12, uv, and Podman or Docker with Compose. Commands below are for Linux/macOS bash; `scripts/phase3_lab.sh` wraps every step (run it with no arguments for the list). On Windows PowerShell, run the underlying `uv run python -m ...` commands shown in the script and set `$env:PHASE3_GIT_SHA` yourself. Use the project's existing DVC remote credentials. The real 2025 datasets and model must already be available to DVC. The optional `--registry-evidence` flag uses the existing MLflow connection to read the hosted aliases. Grafana credentials and the monitoring token are generated locally under `.phase3/secrets/`.
 
-```powershell
+```bash
 uv sync --locked
 uv run dvc pull
-uv run python -m scripts.generate_2026_drift
-uv run python -m scripts.prepare_phase3 --registry-evidence
-$env:PHASE3_GIT_SHA = git rev-parse --short HEAD
-docker compose up --build -d
-docker compose ps
+scripts/phase3_lab.sh prepare --registry-evidence   # synthetic 2026 data, bundle, drift reference, secrets
+scripts/phase3_lab.sh real-drift                    # real 2019 vs 2025 report (about 25 s)
+scripts/phase3_lab.sh up                            # build + start API, Prometheus, Grafana; prints URLs
 ```
 
-For Podman, run `podman machine start` where a machine is configured, then `podman compose up --build -d`. On Windows, Docker Desktop can be started with `docker desktop start --detach`. If the optional DagsHub evidence read fails, run preparation without `--registry-evidence` and show the registry directly in DagsHub.
+The script uses Podman when installed (it starts the rootless `podman.socket` that `podman compose` needs) and Docker otherwise. If the optional DagsHub evidence read fails, run `scripts/phase3_lab.sh prepare` without the flag and show the registry directly in DagsHub. If ports 8000/9090/3000 are taken, export `PHASE3_API_PORT`, `PHASE3_PROMETHEUS_PORT` or `PHASE3_GRAFANA_PORT` first; the script passes them to the demo too.
 
 - API health is at `http://localhost:8000/health`.
 - Prometheus alert status is at `http://localhost:9090/alerts`.
@@ -36,22 +34,25 @@ For Podman, run `podman machine start` where a machine is configured, then `podm
 2. Show the three healthy containers and open the dashboard. Point out the live metrics and the timestamped repository evidence.
 3. Run the command below. The first window sends previously unseen real 2025 records to `/predict`. The second sends synthetic 2026 records to that same model. The CLI waits for Prometheus alert evaluation.
 
-   ```powershell
-   uv run python -m scripts.demo_drift
+   ```bash
+   scripts/phase3_lab.sh demo     # about 3.5 minutes with the default 1,500 rows per window
    ```
 
 4. Show the change in PSI, the feature distributions and the actual alert. Compare accepted-request accuracy and the all-submitted top-3 metric. The latter includes requests refused because the API could not form a usable prediction.
-5. Run `uv run python -m scripts.retrain_phase3`. The first run fits and evaluates. An identical run reuses evidence. Open the stage, quality, comparison and governance panels once the report is written. Show the real 2025 retention result beside the shifted evaluation and final holdout.
-6. Explain the decision. An eligible result permits an explicit local promotion and rollback. A rejected result is evidence that the controls work. See [model governance](MODEL_GOVERNANCE.md).
-7. Point to the timestamped report and local MLflow run IDs. In a second terminal, open the local registry UI and select **Models**. A numbered version identifies a specific artifact. An alias such as `champion` is a movable pointer, so rollback can point it back at an earlier version.
+5. Show real drift too: the "Real temporal drift" table puts the same model on real 2019 postings next to the 2025 control (PSI about 0.26 critical vs 0.007, top-3 70% vs 80%). This is the evidence that the detector reacts to real market change, not just to the simulation.
+6. Run `scripts/phase3_lab.sh retrain` (about 2 minutes). The first run fits and evaluates. An identical run reuses evidence. Open the stage, quality, comparison and governance panels once the report is written. Show the real 2025 retention result beside the shifted evaluation and final holdout.
+7. Explain the decision. An eligible result permits an explicit local promotion and rollback. A rejected result is evidence that the controls work. See [model governance](MODEL_GOVERNANCE.md).
+8. Point to the timestamped report and local MLflow run IDs. In a second terminal, open the local registry UI and select **Models**. A numbered version identifies a specific artifact. An alias such as `champion` is a movable pointer, so rollback can point it back at an earlier version.
 
-   ```powershell
-   uv run python -m mlflow server --backend-store-uri sqlite:///reports/phase3/retraining/registry.db --host 127.0.0.1 --port 5002 --workers 1
+   ```bash
+   scripts/phase3_lab.sh promote "Your name"    # only after an eligible result
+   scripts/phase3_lab.sh rollback "Your name"
+   scripts/phase3_lab.sh registry               # MLflow UI for the isolated registry
    ```
 
    The local UI is at [localhost:5002](http://127.0.0.1:5002/). Compare the alias there with the hosted DagsHub alias. DagsHub stores production release evidence, and the live application is deployed separately.
 
-If Wi-Fi is unreliable, prepare the images ahead of time and keep the generated `reports/phase3/demo/latest.json` and `reports/phase3/retraining/latest.json` open. The reports identify the experiment and the timestamps. Stop the lab with `docker compose down` or `podman compose down`.
+If Wi-Fi is unreliable, prepare the images ahead of time and keep the generated `reports/phase3/demo/latest.json` and `reports/phase3/retraining/latest.json` open. The reports identify the experiment and the timestamps. Stop the lab with `scripts/phase3_lab.sh down` (add `-v` to also delete the Prometheus and Grafana volumes).
 
 ## Measured rehearsal on 27 November 2026
 

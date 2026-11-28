@@ -101,6 +101,14 @@ def evidence_metrics(directory: Path) -> str:
                 to_version=str(action.get("to_version") or "none"),
             )
 
+    real = _read(directory / "real_drift" / "latest.json")
+    if real:
+        timestamp(real.get("generated_at"), "real_2019_drift")
+        for split in ("real_2025_test", "real_2019_reference"):
+            values = real.get(split) or {}
+            for metric in ("top1", "top3", "macro_f1", "ece", "max_psi"):
+                emit("real_drift_score", values.get(metric), split=split, metric=metric)
+
     replay = _read(directory / "demo" / "latest.json")
     if replay:
         timestamp(replay.get("completed_at"), "labelled_api_replay")

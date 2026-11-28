@@ -187,8 +187,8 @@ def predict(body: PredictRequest, request: Request):
     )
     if sample is not None:
         request.state.phase3_observation = replace(sample, role=recs[0]["role"], confidence=recs[0]["confidence"])
-        return response
-    # One JSON line per prediction: the raw material for Phase 3 monitoring.
+    # One JSON line per prediction (counts and the predicted role only, no skills or resume text).
+    # Written whether or not the in-memory drift monitor is on, so container logs keep the audit trail.
     log.info(
         "prediction %s",
         json.dumps(

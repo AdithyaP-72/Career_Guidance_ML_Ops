@@ -44,3 +44,10 @@ bundle/
 /models/*.json
 /models/*.npz
 /models/baselines/*.joblib
+
+# made-up resumes for demos (not real people)
+sample_resumes/
+
+# shared session handoff notes (local only)
+HANDOFF.md
+handoff/

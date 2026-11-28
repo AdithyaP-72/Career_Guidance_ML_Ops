@@ -1164,13 +1164,52 @@
       "description": "Latest completed replay. Top-k scores are fractions. HTTP latency is measured in milliseconds."
     },
     {
+      "id": 41,
+      "type": "table",
+      "title": "Real temporal drift · 2025 champion on 2019 postings (historical)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 71,
+        "w": 24,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_real_drift_score",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ],
+      "description": "From scripts/real_drift_2019. Same frozen model and PSI reference on both splits; the 2025 test split is the no-drift control. Top-k scores are fractions."
+    },
+    {
       "id": 25,
       "type": "row",
       "title": "Versioning · repository snapshot, registry aliases and live API",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 71,
+        "y": 78,
         "w": 24,
         "h": 1
       },
@@ -1186,7 +1225,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 72,
+        "y": 79,
         "w": 14,
         "h": 7
       },
@@ -1221,7 +1260,7 @@
       },
       "gridPos": {
         "x": 14,
-        "y": 72,
+        "y": 79,
         "w": 10,
         "h": 7
       },
@@ -1258,7 +1297,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 79,
+        "y": 86,
         "w": 14,
         "h": 7
       },
@@ -1293,7 +1332,7 @@
       },
       "gridPos": {
         "x": 14,
-        "y": 79,
+        "y": 86,
         "w": 10,
         "h": 7
       },
@@ -1327,7 +1366,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 86,
+        "y": 93,
         "w": 24,
         "h": 1
       },
@@ -1343,7 +1382,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 87,
+        "y": 94,
         "w": 12,
         "h": 8
       },
@@ -1389,7 +1428,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 87,
+        "y": 94,
         "w": 12,
         "h": 8
       },
@@ -1428,7 +1467,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 95,
+        "y": 102,
         "w": 24,
         "h": 6
       },
@@ -1460,7 +1499,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 101,
+        "y": 108,
         "w": 24,
         "h": 1
       },
@@ -1476,7 +1515,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 102,
+        "y": 109,
         "w": 12,
         "h": 9
       },
@@ -1513,7 +1552,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 102,
+        "y": 109,
         "w": 12,
         "h": 9
       },
@@ -1557,7 +1596,7 @@
       "title": "Intended use and evidence",
       "gridPos": {
         "x": 0,
-        "y": 111,
+        "y": 118,
         "w": 24,
         "h": 5
       },

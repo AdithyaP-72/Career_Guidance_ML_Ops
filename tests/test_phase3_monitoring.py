@@ -1,5 +1,7 @@
+import logging
 import math
 
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 
@@ -39,6 +41,7 @@ def test_reference_reused_for_single_feature_shift_and_small_sample():
 
 
 def test_private_prediction_counters_and_demo_reset(tmp_path, monkeypatch, caplog):
+    caplog.set_level(logging.INFO)  # otherwise the INFO prediction lines are dropped and the checks are vacuous
     bundle = make_toy_bundle(tmp_path / "bundle")
     frame = toy_postings()
     pipe = build_pipeline("logreg", load_params()).fit(frame[["skills", "exp_min"]], frame["role"])
@@ -75,6 +78,8 @@ def test_private_prediction_counters_and_demo_reset(tmp_path, monkeypatch, caplo
         assert len(app.state.monitor.events) == 2
         assert sentinel not in repr(app.state.monitor.events)
         assert sentinel not in caplog.text
+        # The structured prediction log line is still written while the drift monitor is on.
+        assert caplog.text.count("prediction {") == 3
         current = client.get("/drift", headers=headers).json()
         assert current["window"] == "real_2025_demo"
         assert current["sample_count"] == 2
@@ -98,3 +103,16 @@ def test_private_prediction_counters_and_demo_reset(tmp_path, monkeypatch, caplo
         assert sentinel not in metrics
         monkeypatch.setenv("PHASE3_DEMO", "false")
         assert client.post("/drift/reset", headers=headers).status_code == 404
+
+
+def test_real_drift_skill_shift_sign_and_counts():
+    from scripts.real_drift_2019 import skill_shift
+
+    new = pd.DataFrame({"skills": [["python", "aws"], ["python"], ["aws"], ["python", "llm"]]})
+    old = pd.DataFrame({"skills": [["java"], ["java", "python"], ["html"], ["java"]]})
+    shift = skill_shift(new, old, top=2)
+    grew = {row["skill"]: row["change"] for row in shift["grew_since_2019"]}
+    faded = {row["skill"]: row["change"] for row in shift["faded_since_2019"]}
+    assert grew["python"] == pytest.approx(0.5) and grew["aws"] == pytest.approx(0.5)
+    assert faded["java"] == pytest.approx(-0.75)
+    assert (shift["skills_only_in_2025"], shift["skills_only_in_2019"]) == (2, 2)
