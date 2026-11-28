@@ -18,10 +18,12 @@ import hashlib
 import os
 import subprocess
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 
 import mlflow
 from dotenv import load_dotenv
+from mlflow import MlflowClient
 
 from src.utils import PROCESSED, ROOT
 
@@ -36,6 +38,29 @@ def configure(experiment: str) -> str:
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment(experiment)
     return uri
+
+
+@contextmanager
+def isolated_experiment(output: Path, experiment_name: str):
+    """Use a dedicated SQLite store for both tracking and model registry writes."""
+    old_tracking, old_registry = mlflow.get_tracking_uri(), mlflow.get_registry_uri()
+    uri = f"sqlite:///{(output / 'registry.db').resolve().as_posix()}"
+    mlflow.set_tracking_uri(uri)
+    mlflow.set_registry_uri(uri)
+    try:
+        client = MlflowClient(tracking_uri=uri, registry_uri=uri)
+        experiment = client.get_experiment_by_name(experiment_name)
+        artifacts = (output / "artifacts").resolve()
+        artifacts.mkdir(exist_ok=True)
+        experiment_id = (
+            experiment.experiment_id
+            if experiment
+            else client.create_experiment(experiment_name, artifact_location=artifacts.as_uri())
+        )
+        yield client, experiment_id
+    finally:
+        mlflow.set_tracking_uri(old_tracking)
+        mlflow.set_registry_uri(old_registry)
 
 
 def md5(path: Path) -> str:

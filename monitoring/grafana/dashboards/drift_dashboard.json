@@ -1,0 +1,1609 @@
+{
+  "uid": "career-phase3",
+  "title": "CareerCompass · Phase 3 Operations",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "refresh": "5s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "tags": [
+    "careercompass",
+    "mlops"
+  ],
+  "timezone": "browser",
+  "links": [
+    {
+      "title": "MLflow experiments",
+      "type": "link",
+      "url": "https://dagshub.com/AdithyaP-72/Career_Guidance_ML_Ops.mlflow",
+      "targetBlank": true
+    },
+    {
+      "title": "CI/CD runs",
+      "type": "link",
+      "url": "https://github.com/AdithyaP-72/Career_Guidance_ML_Ops/actions",
+      "targetBlank": true
+    }
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "System overview · live scrape",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "API reachable",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bool"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"career-api\"}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "API"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Model version",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 1,
+        "w": 5,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_model_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "{{algorithm}} · {{version}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Prediction requests",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_prediction_requests_total",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "Requests"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Success rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 13,
+        "y": 1,
+        "w": 5,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "1 - career_prediction_error_rate",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "Success"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Process uptime",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 1,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "time() - career_process_started_timestamp_seconds",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "Uptime"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "row",
+      "title": "API performance · live scrape",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "API latency quantiles",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(career_prediction_latency_seconds_bucket[1m])))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "P50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(career_prediction_latency_seconds_bucket[1m])))",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "P95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(career_prediction_latency_seconds_bucket[1m])))",
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "P99"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Request rate and errors",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(career_prediction_requests_total[1m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Requests"
+        },
+        {
+          "expr": "rate(career_prediction_errors_total[1m])",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Errors"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Mean API latency",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(career_prediction_latency_seconds_sum[1m]) / rate(career_prediction_latency_seconds_count[1m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Mean"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "API error ratio",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_prediction_error_rate",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Errors"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Model behaviour · current observation window and lifetime histograms",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Confidence and unknown-skill share",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_prediction_confidence_average",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Confidence"
+        },
+        {
+          "expr": "career_unknown_skill_rate",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Unknown skills"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Most common predictions over the past minute",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, increase(career_predicted_role_total[1m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "{{role}}"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Prediction confidence buckets",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 24,
+        "h": 6
+      },
+      "description": "Cumulative confidence bucket counts.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "sum by (le) (increase(career_prediction_confidence_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "row",
+      "title": "Data drift · same frozen model for normal and synthetic replay",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Maximum feature PSI and configured thresholds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 13,
+        "h": 8
+      },
+      "description": "Heuristic limits, shown only with sufficient observations for the observed PSI series.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_drift_psi",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Maximum feature PSI"
+        },
+        {
+          "expr": "career_drift_threshold{severity=\"warning\"}",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Warning threshold"
+        },
+        {
+          "expr": "career_drift_threshold{severity=\"critical\"}",
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series",
+          "legendFormat": "Critical threshold"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "type": "stat",
+      "title": "Observation count",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 13,
+        "y": 37,
+        "w": 5,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_drift_samples",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "Samples"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "type": "stat",
+      "title": "Drift status",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 37,
+        "w": 6,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_drift_status == 1",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "{{status}}"
+        }
+      ],
+      "description": "Status for the active observation window. A warning can occur on finite stable batches and should be investigated."
+    },
+    {
+      "id": 20,
+      "type": "table",
+      "title": "Largest feature PSI values",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "topk(12, career_drift_feature_psi)",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "type": "table",
+      "title": "Configured alerts",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 45,
+        "w": 12,
+        "h": 8
+      },
+      "description": "Pending and firing alerts produced by Prometheus.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "ALERTS{alertname=~\"Career.*\"}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "table",
+      "title": "Experience · reference vs current",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_drift_distribution{feature=~\"experience.*\"}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "type": "table",
+      "title": "AI, cloud and skill distributions",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 53,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_drift_distribution{feature=~\"skill[:_].*|ai.*|cloud.*\"}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "type": "stat",
+      "title": "Last sufficient drift evaluation",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 60,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_drift_last_success_timestamp_seconds * 1000",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "Evaluation"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "type": "stat",
+      "title": "Current status since",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 60,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "career_drift_status_since_timestamp_seconds * 1000",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "Status changed"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "type": "stat",
+      "title": "Active observation window",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 60,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "name"
+      },
+      "targets": [
+        {
+          "expr": "career_drift_window_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "legendFormat": "{{window}}"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "type": "table",
+      "title": "Labelled API replay measurements",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 64,
+        "w": 24,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_replay_score",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ],
+      "description": "Latest completed replay. Top-k scores are fractions. HTTP latency is measured in milliseconds."
+    },
+    {
+      "id": 41,
+      "type": "table",
+      "title": "Real temporal drift · 2025 champion on 2019 postings (historical)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 71,
+        "w": 24,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_real_drift_score",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ],
+      "description": "From scripts/real_drift_2019. Same frozen model and PSI reference on both splits; the 2025 test split is the no-drift control. Top-k scores are fractions."
+    },
+    {
+      "id": 25,
+      "type": "row",
+      "title": "Versioning · repository snapshot, registry aliases and live API",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 78,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 26,
+      "type": "table",
+      "title": "Model and dataset lineage",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 79,
+        "w": 14,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_model_lineage_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "table",
+      "title": "DagsHub registry aliases at snapshot",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 79,
+        "w": 10,
+        "h": 7
+      },
+      "description": "Available when preparation runs with --registry-evidence.",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_registry_alias_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "type": "table",
+      "title": "Pipeline stages recorded in dvc.lock",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 86,
+        "w": 14,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_pipeline_stage_recorded",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "type": "table",
+      "title": "Evidence refresh timestamps",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 86,
+        "w": 10,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_evidence_timestamp_seconds * 1000",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Retraining · isolated synthetic experiment",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 93,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "table",
+      "title": "Experimental decision and stage results",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 94,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_retraining_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "expr": "career_phase3_retraining_stage_info",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "table",
+      "title": "Champion and challenger measurements",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 94,
+        "w": 12,
+        "h": 8
+      },
+      "description": "Metric and split labels distinguish real retention checks from synthetic evaluation and final holdout.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_comparison_score",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": null
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "type": "table",
+      "title": "Experimental run IDs and registry versions",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 102,
+        "w": 24,
+        "h": 6
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_experimental_model_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "type": "row",
+      "title": "Governance · quality gates and audit",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 108,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 35,
+      "type": "table",
+      "title": "Checks from committed and experimental reports",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 109,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bool"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_quality_pass",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "type": "table",
+      "title": "Experimental approval and rollback history",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "career-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 109,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "career_phase3_audit_info",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "career-prometheus"
+          },
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "type": "text",
+      "title": "Intended use and evidence",
+      "gridPos": {
+        "x": 0,
+        "y": 118,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "CareerCompass supports career exploration. The [model card](https://github.com/AdithyaP-72/Career_Guidance_ML_Ops/blob/main/reports/model_card.md) explains limits and rule-derived labels. **Synthetic 2026 windows are controlled experiments.** Local registry decisions do not change the deployed champion. Empty panels can mean missing reports, absent registry evidence or a window with insufficient observations. See the Phase 3 runbook for evidence generation."
+      }
+    }
+  ]
+}

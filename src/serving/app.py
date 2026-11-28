@@ -26,16 +26,19 @@ import json
 import os
 import time
 from contextlib import asynccontextmanager
+from dataclasses import replace
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from starlette.concurrency import run_in_threadpool
 
+from src.models.drift import observation
 from src.serving import resume
 from src.serving.limits import BodySizeLimit, RateLimiter, rate_limited
+from src.serving.monitoring import Monitor, PredictionTelemetry, configure_monitor, require_monitor
 from src.serving.recommender import Recommender
 from src.serving.schemas import MAX_SKILLS, ModelInfo, PredictRequest, PredictResponse, ResumeSkills, SkillSearch
 from src.utils import ROOT, get_logger
@@ -67,6 +70,7 @@ async def lifespan(app: FastAPI):
         vocab_path=str(bundle / "skill_vocab.json"), keyness_path=str(bundle / "skill_keyness.json")
     )
     app.state.limits = {name: _limiter(name, *caps) for name, caps in RATE_LIMITS.items()}
+    app.state.monitoring_token, app.state.monitor = configure_monitor(bundle, app.state.rec, MIN_SKILLS)
     log.info("loaded %s", json.dumps(app.state.rec.meta))
     yield
 
@@ -79,6 +83,7 @@ app = FastAPI(
 )
 # Added first so CORS (added last) wraps it: a 413 then still carries CORS headers and the browser can read it.
 app.add_middleware(BodySizeLimit, default=MAX_BODY_BYTES, per_path={"/extract-skills": MAX_RESUME_BYTES + 1_000_000})
+app.add_middleware(PredictionTelemetry)
 app.add_middleware(
     CORSMiddleware,
     # stripped: a space or line break pasted into the dashboard would otherwise never match the browser's Origin
@@ -110,6 +115,32 @@ def health(request: Request):
     }
 
 
+@app.get("/metrics", include_in_schema=False)
+def metrics(monitor: Annotated[Monitor, Depends(require_monitor)]):
+    text = monitor.metrics()
+    evidence_dir = os.environ.get("PHASE3_EVIDENCE_DIR")
+    if evidence_dir:
+        from src.serving.phase3_evidence import evidence_metrics
+
+        text += evidence_metrics(Path(evidence_dir))
+    return PlainTextResponse(text, media_type="text/plain; version=0.0.4")
+
+
+@app.get("/drift", include_in_schema=False)
+def drift(monitor: Annotated[Monitor, Depends(require_monitor)]):
+    return monitor.report()
+
+
+@app.post("/drift/reset", include_in_schema=False)
+def reset_drift(
+    monitor: Annotated[Monitor, Depends(require_monitor)],
+    window: Literal["live", "real_2025_demo", "synthetic_2026_demo"] = "live",
+):
+    if os.environ.get("PHASE3_DEMO", "").lower() != "true":
+        raise HTTPException(404)
+    return monitor.reset(window)
+
+
 @app.get("/model")
 def model(request: Request):
     return rec(request).meta
@@ -131,6 +162,10 @@ def predict(body: PredictRequest, request: Request):
     t = time.perf_counter()
     r = rec(request)
     cleaned = r.clean(body.skills)
+    sample = None
+    if request.app.state.monitor is not None:
+        sample = observation(cleaned.known, cleaned.unknown, body.experience_years, r.vocab)
+        request.state.phase3_observation = sample
     if len(cleaned.known) < MIN_SKILLS:
         raise HTTPException(
             status_code=422,
@@ -150,7 +185,10 @@ def predict(body: PredictRequest, request: Request):
         low_confidence=recs[0]["confidence"] < LOW_CONFIDENCE,
         recommendations=recs,
     )
-    # One JSON line per prediction: the raw material for Phase 3 monitoring.
+    if sample is not None:
+        request.state.phase3_observation = replace(sample, role=recs[0]["role"], confidence=recs[0]["confidence"])
+    # One JSON line per prediction (counts and the predicted role only, no skills or resume text).
+    # Written whether or not the in-memory drift monitor is on, so container logs keep the audit trail.
     log.info(
         "prediction %s",
         json.dumps(

@@ -1,0 +1,24 @@
+groups:
+  - name: career-monitoring
+    rules:
+      - alert: CareerDataDriftCritical
+        expr: career_drift_psi >= scalar(career_drift_threshold{severity="critical"}) and ignoring(status) career_drift_status{status="critical"} == 1
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: The largest feature PSI crossed the configured critical threshold
+      - alert: CareerDataDriftWarning
+        expr: career_drift_psi >= scalar(career_drift_threshold{severity="warning"}) and ignoring(status) career_drift_status{status="warning"} == 1
+        for: 15s
+        labels:
+          severity: warning
+        annotations:
+          summary: The largest feature PSI crossed the configured warning threshold
+      - alert: CareerMonitorUnavailable
+        expr: up{job="career-api"} == 0 or absent(up{job="career-api"})
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus cannot scrape the CareerCompass monitoring endpoint

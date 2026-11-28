@@ -29,6 +29,7 @@ from datetime import UTC, datetime
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.metrics import f1_score
 
 from src.features.build import EXPERIENCE, SKILLS
 from src.models.evaluate import inputs, read_split
@@ -82,6 +83,37 @@ def top3_hits(proba: np.ndarray, classes: np.ndarray, y: np.ndarray) -> np.ndarr
 def slice_scores(hits: np.ndarray, groups: pd.Series) -> pd.Series:
     """Top-3 accuracy per group, worst first."""
     return pd.Series(hits, index=groups.to_numpy()).groupby(level=0).mean().sort_values()
+
+
+def evaluate_labelled(pipe, frame: pd.DataFrame) -> tuple[dict, np.ndarray]:
+    """Score the common five-skill view and return paired top-3 hits."""
+    x, classes = inputs(frame, "skills_eval"), np.asarray(pipe.classes_)
+    y = frame["role"].to_numpy()
+    if not set(y) <= set(classes):
+        raise ValueError("Evaluation contains roles that the model cannot predict.")
+    probabilities = pipe.predict_proba(x)
+    if not np.isfinite(probabilities).all() or not np.allclose(probabilities.sum(axis=1), 1):
+        raise ValueError("The model returned invalid probability distributions.")
+    top = classes[probabilities.argmax(axis=1)]
+    hits = top3_hits(probabilities, classes, y)
+    return {
+        "samples": len(frame),
+        "top1": float(np.mean(top == y)),
+        "top3": float(hits.mean()),
+        "macro_f1": float(f1_score(y, top, labels=np.unique(y), average="macro", zero_division=0)),
+        "ece": ece_top1(probabilities, classes, y),
+        "top3_by_role": slice_scores(hits, frame["role"]).to_dict(),
+        "top3_by_family": slice_scores(hits, frame["family"]).to_dict(),
+    }, hits
+
+
+def paired_gain(before: np.ndarray, after: np.ndarray) -> tuple[float, tuple[float, float]]:
+    """Seeded multinomial bootstrap of paired wins, ties and losses on the same examples."""
+    differences = after.astype(int) - before.astype(int)
+    counts = np.bincount(differences + 1, minlength=3)
+    draws = np.random.default_rng(42).multinomial(len(differences), counts / len(differences), size=2000)
+    bounds = np.quantile((draws[:, 2] - draws[:, 0]) / len(differences), [0.025, 0.975])
+    return float(differences.mean()), (float(bounds[0]), float(bounds[1]))
 
 
 def p95_latency_ms(pipe, X: pd.DataFrame, n: int) -> float:

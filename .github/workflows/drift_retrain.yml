@@ -1,0 +1,68 @@
+# Scheduled replay of the controlled 2026 experiment. It does not ingest live traffic.
+name: Phase 3 experimental drift and retraining
+
+on:
+  schedule:
+    - cron: "27 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase3-synthetic-2026-retraining
+  cancel-in-progress: false
+
+env:
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+  MLFLOW_ENABLE_TELEMETRY: "false"
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.23"
+          enable-cache: true
+
+      - name: Install pinned pipeline dependencies
+        run: uv sync --frozen --no-default-groups --group pipeline
+
+      - name: Pull immutable DVC evidence through the repository remote
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          test -n "$DAGSHUB_TOKEN"
+          uv run --no-sync dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
+          uv run --no-sync dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
+          uv run --no-sync dvc pull -r origin data/processed/train.parquet data/processed/test.parquet \
+            data/processed/reference_2019.parquet models/model.joblib models/baselines/profile.joblib models/skill_vocab.json
+
+      - name: Generate reproducible partitions
+        run: uv run --no-sync python -m scripts.generate_2026_drift
+
+      - name: Restore evidence for this exact data and pipeline version
+        uses: actions/cache@v4
+        with:
+          path: reports/phase3/retraining
+          key: phase3-${{ runner.os }}-${{ hashFiles('dvc.lock', 'uv.lock', 'params.yaml', 'configs/behaviour_cases.yaml', 'src/models/*.py', 'src/features/build.py', 'scripts/*2026*.py', 'scripts/retrain_phase3.py', 'data/drift/synthetic_2026_manifest.json') }}
+
+      - name: Check drift and conditionally fit or reuse the challenger
+        # Exit 0 includes below-threshold, insufficient, or rejected decisions recorded in JSON.
+        # Exit 2 means execution failed. Only this isolated SQLite registry is writable.
+        run: uv run --no-sync python -m scripts.retrain_phase3 --trigger "$GITHUB_EVENT_NAME"
+
+      - name: Upload model, registry and governance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3-synthetic-2026-${{ github.run_id }}
+          path: |
+            reports/phase3/retraining/
+            data/drift/synthetic_2026_manifest.json
+          if-no-files-found: warn
+          retention-days: 30

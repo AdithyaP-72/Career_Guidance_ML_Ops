@@ -41,7 +41,8 @@ COPY --from=build /app/.venv /app/.venv
 COPY src/ src/
 COPY configs/skill_aliases.yaml configs/skill_aliases.yaml
 COPY configs/skill_equivalents.yaml configs/skill_equivalents.yaml
-COPY bundle/ bundle/
+ARG MODEL_BUNDLE=bundle
+COPY ${MODEL_BUNDLE}/ bundle/
 
 # Which commit this image was built from; /health reports it so CD can confirm what is live.
 ARG GIT_SHA=dev

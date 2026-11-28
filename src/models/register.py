@@ -64,6 +64,25 @@ def existing_version(client: MlflowClient, name: str, model_md5: str):
     return next((v for v in versions if v.tags.get("model_md5") == model_md5), None)
 
 
+def switch_champion_alias(
+    client: MlflowClient,
+    name: str,
+    current_version: str,
+    next_version: str,
+    previous_version: str | None,
+) -> None:
+    """Move both aliases and restore the original previous alias if the champion update fails."""
+    client.set_registered_model_alias(name, PREVIOUS, current_version)
+    try:
+        client.set_registered_model_alias(name, CHAMPION, next_version)
+    except Exception:
+        if previous_version:
+            client.set_registered_model_alias(name, PREVIOUS, previous_version)
+        else:
+            client.delete_registered_model_alias(name, PREVIOUS)
+        raise
+
+
 def register_candidate(
     client: MlflowClient,
     name: str,

@@ -1,0 +1,9 @@
+apiVersion: 1
+providers:
+  - name: career-phase3
+    folder: CareerCompass
+    type: file
+    allowUiUpdates: false
+    updateIntervalSeconds: 15
+    options:
+      path: /opt/phase3/dashboards
